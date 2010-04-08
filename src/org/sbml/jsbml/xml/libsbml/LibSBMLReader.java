@@ -1488,6 +1488,7 @@ public class LibSBMLReader implements SBMLReader {
 				fireIOEvent(this.model.getEvent(i));
 			}
 			addAllSBaseChangeListenersTo(this.model);
+			fireIOEvent(null);
 			return this.model;
 		}
 		return null;

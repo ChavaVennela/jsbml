@@ -888,6 +888,7 @@ public class LibSBMLWriter implements SBMLWriter {
 			if (model.getEvent(eventOrig.getId()) == null)
 				fireIOEvent(mo.getListOfEvents().remove(i));
 		}
+		fireIOEvent(null);
 	}
 
 	/**
@@ -1085,6 +1086,7 @@ public class LibSBMLWriter implements SBMLWriter {
 			fireIOEvent(event);
 		}
 		removeUnneccessaryElements(model, orig);
+		fireIOEvent(null);
 	}
 
 	/*
