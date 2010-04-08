@@ -79,11 +79,10 @@ import org.sbml.libsbml.SBMLError;
 import org.sbml.libsbml.libsbmlConstants;
 
 /**
- * @author Andreas Dr&auml;ger <a
- *         href="mailto:andreas.draeger@uni-tuebingen.de">
- *         andreas.draeger@uni-tuebingen.de</a>
+ * @author Andreas Dr&auml;ger
  * 
  */
+@SuppressWarnings("deprecation")
 public class LibSBMLReader implements SBMLReader {
 
 	private static final String error = " must be an instance of ";
@@ -1386,7 +1385,6 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readModel(java.lang.Object)
 	 */
-	@SuppressWarnings("deprecation")
 	public Model readModel(Object model) {
 		if (model instanceof String) {
 			org.sbml.libsbml.SBMLDocument doc = (new org.sbml.libsbml.SBMLReader())

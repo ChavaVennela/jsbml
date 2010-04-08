@@ -79,6 +79,7 @@ import org.sbml.libsbml.libsbmlConstants;
  *         andreas.draeger@uni-tuebingen.de</a>
  * 
  */
+@SuppressWarnings("deprecation")
 public class LibSBMLWriter implements SBMLWriter {
 
 	private static final String error = " must be an instance of org.sbml.libsbml.";
