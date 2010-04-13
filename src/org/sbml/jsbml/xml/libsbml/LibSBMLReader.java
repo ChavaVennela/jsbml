@@ -44,16 +44,16 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
+import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.Delay;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
 import org.sbml.jsbml.FunctionDefinition;
+import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
-import org.sbml.jsbml.Creator;
-import org.sbml.jsbml.History;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
@@ -68,8 +68,8 @@ import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.SpeciesType;
+import org.sbml.jsbml.State;
 import org.sbml.jsbml.StoichiometryMath;
-import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Trigger;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
@@ -1309,7 +1309,7 @@ public class LibSBMLReader implements SBMLReader {
 				(int) eve.getVersion());
 		copySBaseProperties(ev, eve);
 		if (eve.isSetVariable()) {
-			Symbol variable = model.findSymbol(eve.getVariable());
+			State variable = model.findState(eve.getVariable());
 			if (variable == null)
 				ev.setVariable(eve.getVariable());
 			else
@@ -1351,7 +1351,7 @@ public class LibSBMLReader implements SBMLReader {
 		if (!sbIA.isSetSymbol())
 			throw new IllegalArgumentException(
 					"Symbol attribute not set for InitialAssignment");
-		InitialAssignment ia = new InitialAssignment(model.findSymbol(sbIA
+		InitialAssignment ia = new InitialAssignment(model.findState(sbIA
 				.getSymbol()));
 		copySBaseProperties(ia, sbIA);
 		if (sbIA.isSetMath())
@@ -1598,7 +1598,7 @@ public class LibSBMLReader implements SBMLReader {
 			r = new AlgebraicRule((int) libRule.getLevel(), (int) libRule
 					.getVersion());
 		else {
-			Symbol s = model.findSymbol(libRule.getVariable());
+			State s = model.findState(libRule.getVariable());
 			if (libRule.isAssignment())
 				r = new AssignmentRule(s);
 			else
