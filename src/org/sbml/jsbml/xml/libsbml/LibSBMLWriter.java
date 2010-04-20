@@ -44,16 +44,17 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
+import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.Delay;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
 import org.sbml.jsbml.FunctionDefinition;
+import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
+import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
-import org.sbml.jsbml.Creator;
-import org.sbml.jsbml.History;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
@@ -1360,7 +1361,7 @@ public class LibSBMLWriter implements SBMLWriter {
 					"kineticLaw must be an instance of org.sbml.libsbml.KineticLaw.");
 		org.sbml.libsbml.KineticLaw libKinLaw = (org.sbml.libsbml.KineticLaw) kineticLaw;
 		// add or change parameters
-		for (Parameter p : kl.getListOfParameters()) {
+		for (LocalParameter p : kl.getListOfParameters()) {
 			org.sbml.libsbml.Parameter libParam = libKinLaw.getParameter(p
 					.getId());
 			if (p.isSetUnits()
@@ -1370,9 +1371,9 @@ public class LibSBMLWriter implements SBMLWriter {
 				libKinLaw.getModel().addUnitDefinition(
 						writeUnitDefinition(p.getUnitsInstance()));
 			if (libParam == null)
-				libKinLaw.addParameter(writeParameter(p));
+				libKinLaw.addParameter(writeParameter(new Parameter(p)));
 			else
-				saveParameterProperties(p, libParam);
+				saveParameterProperties(new Parameter(p), libParam);
 		}
 		// remove parameters
 		for (long i = libKinLaw.getNumParameters() - 1; i >= 0; i--) {
@@ -2205,7 +2206,7 @@ public class LibSBMLWriter implements SBMLWriter {
 		org.sbml.libsbml.KineticLaw k = new org.sbml.libsbml.KineticLaw(
 				kinteicLaw.getLevel(), kinteicLaw.getVersion());
 		saveMathContainerProperties(kinteicLaw, k);
-		for (Parameter p : kinteicLaw.getListOfParameters()) {
+		for (LocalParameter p : kinteicLaw.getListOfParameters()) {
 			if (p.isSetUnits()) {
 				if (!Unit
 						.isUnitKind(p.getUnits(), p.getLevel(), p.getVersion())) {
@@ -2215,7 +2216,7 @@ public class LibSBMLWriter implements SBMLWriter {
 					}
 				}
 			}
-			k.addParameter(writeParameter(p));
+			k.addParameter(writeParameter(new Parameter(p)));
 		}
 		return k;
 	}
@@ -2229,7 +2230,7 @@ public class LibSBMLWriter implements SBMLWriter {
 		org.sbml.libsbml.Model m = new org.sbml.libsbml.Model(model.getLevel(),
 				model.getVersion());
 		saveNamedSBaseProperties(model, m);
-		if (model.isSetModelHistory()) {
+		if (model.isSetHistory()) {
 			if (!m.isSetModelHistory())
 				m.setModelHistory(new org.sbml.libsbml.ModelHistory());
 			saveModelHistoryProperties(model.getModelHistory(), m

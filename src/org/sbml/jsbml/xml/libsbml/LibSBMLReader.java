@@ -52,6 +52,7 @@ import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
+import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
@@ -68,11 +69,11 @@ import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.SpeciesType;
-import org.sbml.jsbml.State;
 import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Trigger;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.io.IOProgressListener;
 import org.sbml.libsbml.SBMLError;
@@ -773,7 +774,8 @@ public class LibSBMLReader implements SBMLReader {
 		case libsbmlConstants.AST_NAME:
 			ast = new ASTNode(ASTNode.Type.NAME, parent);
 			if (parent instanceof KineticLaw)
-				for (Parameter p : ((KineticLaw) parent).getListOfParameters())
+				for (LocalParameter p : ((KineticLaw) parent)
+						.getListOfParameters())
 					if (p.getId().equals(math.getName())) {
 						ast.setVariable(p);
 						break;
@@ -1309,7 +1311,7 @@ public class LibSBMLReader implements SBMLReader {
 				(int) eve.getVersion());
 		copySBaseProperties(ev, eve);
 		if (eve.isSetVariable()) {
-			State variable = model.findState(eve.getVariable());
+			Variable variable = model.findVariable(eve.getVariable());
 			if (variable == null)
 				ev.setVariable(eve.getVariable());
 			else
@@ -1351,7 +1353,7 @@ public class LibSBMLReader implements SBMLReader {
 		if (!sbIA.isSetSymbol())
 			throw new IllegalArgumentException(
 					"Symbol attribute not set for InitialAssignment");
-		InitialAssignment ia = new InitialAssignment(model.findState(sbIA
+		InitialAssignment ia = new InitialAssignment(model.findVariable(sbIA
 				.getSymbol()));
 		copySBaseProperties(ia, sbIA);
 		if (sbIA.isSetMath())
@@ -1373,11 +1375,21 @@ public class LibSBMLReader implements SBMLReader {
 				.getVersion());
 		copySBaseProperties(kinlaw, kl);
 		for (int i = 0; i < kl.getNumParameters(); i++)
-			kinlaw.addParameter(readParameter(kl.getParameter(i)));
+			kinlaw.addParameter(readLocalParameter(kl.getParameter(i)));
 		if (kl.isSetMath())
 			kinlaw.setMath(convert(kl.getMath(), kinlaw));
 		addAllSBaseChangeListenersTo(kinlaw);
 		return kinlaw;
+	}
+
+	/**
+	 * 
+	 * @param parameter
+	 * @return
+	 */
+	private LocalParameter readLocalParameter(
+			org.sbml.libsbml.Parameter parameter) {
+		return new LocalParameter(readParameter(parameter));
 	}
 
 	/*
@@ -1598,7 +1610,7 @@ public class LibSBMLReader implements SBMLReader {
 			r = new AlgebraicRule((int) libRule.getLevel(), (int) libRule
 					.getVersion());
 		else {
-			State s = model.findState(libRule.getVariable());
+			Variable s = model.findVariable(libRule.getVariable());
 			if (libRule.isAssignment())
 				r = new AssignmentRule(s);
 			else
