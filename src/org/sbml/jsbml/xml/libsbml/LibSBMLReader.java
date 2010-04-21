@@ -29,6 +29,9 @@
 
 package org.sbml.jsbml.xml.libsbml;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -92,7 +95,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @param model
 	 */
-	public static final void addPredefinedUnitDefinitions(Model model) {
+	private static final void addPredefinedUnitDefinitions(Model model) {
 		if (model.getUnitDefinition("substance") == null)
 			model.addUnitDefinition(UnitDefinition.substance(model.getLevel(),
 					model.getVersion()));
@@ -116,7 +119,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param error
 	 * @return
 	 */
-	public static final SBMLException convert(SBMLError error) {
+	static final SBMLException convert(SBMLError error) {
 		SBMLException exc = new SBMLException(error.getMessage());
 		if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_GENERAL_CONSISTENCY)
 			exc.setCategory(SBMLException.Category.GENERAL_CONSISTENCY);
@@ -702,8 +705,9 @@ public class LibSBMLReader implements SBMLReader {
 	/**
 	 * 
 	 * @param model
+	 * @throws Exception
 	 */
-	public LibSBMLReader(Object model) {
+	public LibSBMLReader(Object model) throws Exception {
 		this();
 		this.model = readModel(model);
 	}
@@ -712,9 +716,17 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @param sb
 	 */
-	public void addAllSBaseChangeListenersTo(SBase sb) {
+	private void addAllSBaseChangeListenersTo(SBase sb) {
 		for (SBaseChangedListener listener : listOfSBaseChangeListeners)
 			sb.addChangeListener(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.sbml.jsbml.SBMLReader#addIOProgressListener(org.sbml.jsbml.io.IOProgressListener)
+	 */
+	public void addIOProgressListener(IOProgressListener listener) {
+		setEventListeners.add(listener);
 	}
 
 	/**
@@ -732,7 +744,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param parent
 	 * @return
 	 */
-	public ASTNode convert(org.sbml.libsbml.ASTNode math, MathContainer parent) {
+	private ASTNode convert(org.sbml.libsbml.ASTNode math, MathContainer parent) {
 		ASTNode ast;
 		switch (math.getType()) {
 		case libsbmlConstants.AST_REAL:
@@ -954,7 +966,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.jlibsbml.SBMLReader#convertDate(java.lang.Object)
 	 */
-	public Date convertDate(Object date) {
+	private Date convertDate(Object date) {
 		if (!(date instanceof org.sbml.libsbml.Date))
 			throw new IllegalArgumentException("date" + error
 					+ "org.sbml.libsbml.Date.");
@@ -1064,9 +1076,18 @@ public class LibSBMLReader implements SBMLReader {
 
 	/**
 	 * 
+	 * @param currObject
+	 */
+	private void fireIOEvent(Object currObject) {
+		for (IOProgressListener iopl : setEventListeners)
+			iopl.ioProgressOn(currObject);
+	}
+
+	/**
+	 * 
 	 * @return
 	 */
-	public Model getModel() {
+	private Model getModel() {
 		return model;
 	}
 
@@ -1086,7 +1107,6 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.squeezer.io.AbstractSBMLReader#getOriginalModel()
 	 */
-	// @Override
 	public org.sbml.libsbml.Model getOriginalModel() {
 		return originalModel;
 	}
@@ -1110,7 +1130,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readCompartment(java.lang.Object)
 	 */
-	public Compartment readCompartment(Object compartment) {
+	private Compartment readCompartment(Object compartment) {
 		if (!(compartment instanceof org.sbml.libsbml.Compartment))
 			throw new IllegalArgumentException("compartment" + error
 					+ "org.sbml.libsbml.Compartment");
@@ -1143,7 +1163,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param compartmenttype
 	 * @return
 	 */
-	public CompartmentType readCompartmentType(Object compartmenttype) {
+	private CompartmentType readCompartmentType(Object compartmenttype) {
 		if (!(compartmenttype instanceof org.sbml.libsbml.CompartmentType))
 			throw new IllegalArgumentException("compartmenttype" + error
 					+ "org.sbml.libsbml.CompartmentType");
@@ -1159,7 +1179,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param constraint
 	 * @return
 	 */
-	public Constraint readConstraint(Object constraint) {
+	private Constraint readConstraint(Object constraint) {
 		if (!(constraint instanceof org.sbml.libsbml.Constraint))
 			throw new IllegalArgumentException("constraint" + error
 					+ "org.sbml.libsml.Constraint");
@@ -1180,7 +1200,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.jlibsbml.SBMLReader#readCVTerm(java.lang.Object)
 	 */
-	public CVTerm readCVTerm(Object term) {
+	private CVTerm readCVTerm(Object term) {
 		if (!(term instanceof org.sbml.libsbml.CVTerm))
 			throw new IllegalArgumentException("term" + error
 					+ "org.sbml.libsbml.CVTerm.");
@@ -1257,7 +1277,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param delay
 	 * @return
 	 */
-	public Delay readDelay(Object delay) {
+	private Delay readDelay(Object delay) {
 		if (!(delay instanceof org.sbml.libsbml.Delay))
 			throw new IllegalArgumentException("delay" + error
 					+ "org.sbml.libsbml.Delay");
@@ -1274,7 +1294,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param event
 	 * @return
 	 */
-	public Event readEvent(Object event) {
+	private Event readEvent(Object event) {
 		if (!(event instanceof org.sbml.libsbml.Event))
 			throw new IllegalArgumentException("event" + error
 					+ "org.sbml.libsbml.Event");
@@ -1302,7 +1322,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param eventAssignment
 	 * @return
 	 */
-	public EventAssignment readEventAssignment(Object eventass) {
+	private EventAssignment readEventAssignment(Object eventass) {
 		if (!(eventass instanceof org.sbml.libsbml.EventAssignment))
 			throw new IllegalArgumentException("eventassignment" + error
 					+ "org.sbml.libsbml.EventAssignment");
@@ -1327,7 +1347,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readFunctionDefinition(java.lang.Object)
 	 */
-	public FunctionDefinition readFunctionDefinition(Object functionDefinition) {
+	private FunctionDefinition readFunctionDefinition(Object functionDefinition) {
 		if (!(functionDefinition instanceof org.sbml.libsbml.FunctionDefinition))
 			throw new IllegalArgumentException("functionDefinition" + error
 					+ "org.sbml.libsbml.FunctionDefinition.");
@@ -1345,7 +1365,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readInitialAssignment(java.lang.Object)
 	 */
-	public InitialAssignment readInitialAssignment(Object initialAssignment) {
+	private InitialAssignment readInitialAssignment(Object initialAssignment) {
 		if (!(initialAssignment instanceof org.sbml.libsbml.InitialAssignment))
 			throw new IllegalArgumentException("initialAssignment" + error
 					+ "org.sbml.libsbml.InitialAssignment.");
@@ -1366,7 +1386,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readKineticLaw(java.lang.Object)
 	 */
-	public KineticLaw readKineticLaw(Object kineticLaw) {
+	private KineticLaw readKineticLaw(Object kineticLaw) {
 		if (!(kineticLaw instanceof org.sbml.libsbml.KineticLaw))
 			throw new IllegalArgumentException("kineticLaw" + error
 					+ "org.sbml.libsbml.KineticLaw.");
@@ -1397,10 +1417,15 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readModel(java.lang.Object)
 	 */
-	public Model readModel(Object model) {
+	public Model readModel(Object model) throws Exception {
 		if (model instanceof String) {
+			File file = new File(model.toString());
+			if (!file.exists() || !file.isFile())
+				throw new FileNotFoundException(file.getAbsolutePath());
+			if (!file.canRead())
+				throw new IOException(file.getAbsolutePath());
 			org.sbml.libsbml.SBMLDocument doc = (new org.sbml.libsbml.SBMLReader())
-					.readSBML(model.toString());
+					.readSBML(file.getAbsolutePath());
 			setOfDocuments.add(doc);
 			model = doc.getModel();
 		}
@@ -1506,21 +1531,12 @@ public class LibSBMLReader implements SBMLReader {
 		return null;
 	}
 
-	/**
-	 * 
-	 * @param currObject
-	 */
-	private void fireIOEvent(Object currObject) {
-		for (IOProgressListener iopl : setEventListeners)
-			iopl.ioProgressOn(currObject);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.sbml.SBMLReader#readModifierSpeciesReference(java.lang.Object)
 	 */
-	public ModifierSpeciesReference readModifierSpeciesReference(
+	private ModifierSpeciesReference readModifierSpeciesReference(
 			Object modifierSpeciesReference) {
 		if (!(modifierSpeciesReference instanceof org.sbml.libsbml.ModifierSpeciesReference))
 			throw new IllegalArgumentException("modifierSpeciesReference"
@@ -1547,7 +1563,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readParameter(java.lang.Object)
 	 */
-	public Parameter readParameter(Object parameter) {
+	private Parameter readParameter(Object parameter) {
 		if (!(parameter instanceof org.sbml.libsbml.Parameter))
 			throw new IllegalArgumentException("parameter" + error
 					+ "org.sbml.libsbml.Parameter.");
@@ -1574,7 +1590,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readReaction(java.lang.Object)
 	 */
-	public Reaction readReaction(Object reac) {
+	private Reaction readReaction(Object reac) {
 		if (!(reac instanceof org.sbml.libsbml.Reaction))
 			throw new IllegalArgumentException("reaction" + error
 					+ "org.sbml.libsbml.Reaction.");
@@ -1600,7 +1616,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readRule(java.lang.Object)
 	 */
-	public Rule readRule(Object rule) {
+	private Rule readRule(Object rule) {
 		if (!(rule instanceof org.sbml.libsbml.Rule))
 			throw new IllegalArgumentException("rule" + error
 					+ "org.sbml.libsbml.Rule.");
@@ -1627,7 +1643,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readSpecies(java.lang.Object)
 	 */
-	public Species readSpecies(Object species) {
+	private Species readSpecies(Object species) {
 		if (!(species instanceof org.sbml.libsbml.Species))
 			throw new IllegalArgumentException("species" + error
 					+ "org.sbml.libsbml.Species.");
@@ -1659,7 +1675,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readSpeciesReference(java.lang.Object)
 	 */
-	public SpeciesReference readSpeciesReference(Object speciesReference) {
+	private SpeciesReference readSpeciesReference(Object speciesReference) {
 		if (!(speciesReference instanceof org.sbml.libsbml.SpeciesReference))
 			throw new IllegalArgumentException("speciesReference" + error
 					+ "org.sbml.libsbml.SpeciesReference.");
@@ -1681,7 +1697,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readSpeciesType(java.lang.Object)
 	 */
-	public SpeciesType readSpeciesType(Object speciesType) {
+	private SpeciesType readSpeciesType(Object speciesType) {
 		if (!(speciesType instanceof org.sbml.libsbml.SpeciesType))
 			throw new IllegalArgumentException("speciesType" + error
 					+ "org.sbml.libsbml.SpeciesType.");
@@ -1697,7 +1713,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readStoichiometricMath(java.lang.Object)
 	 */
-	public StoichiometryMath readStoichiometricMath(Object stoichiometryMath) {
+	private StoichiometryMath readStoichiometricMath(Object stoichiometryMath) {
 		org.sbml.libsbml.StoichiometryMath s = (org.sbml.libsbml.StoichiometryMath) stoichiometryMath;
 		StoichiometryMath sm = new StoichiometryMath((int) s.getLevel(),
 				(int) s.getVersion());
@@ -1712,7 +1728,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * @param trigger
 	 * @return
 	 */
-	public Trigger readTrigger(Object trigger) {
+	private Trigger readTrigger(Object trigger) {
 		if (!(trigger instanceof org.sbml.libsbml.Trigger))
 			throw new IllegalArgumentException("trigger" + error
 					+ "org.sbml.libsbml.Trigger");
@@ -1731,7 +1747,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readUnit(java.lang.Object)
 	 */
-	public Unit readUnit(Object unit) {
+	private Unit readUnit(Object unit) {
 		if (!(unit instanceof org.sbml.libsbml.Unit))
 			throw new IllegalArgumentException("unit" + error
 					+ "org.sbml.libsbml.Unit");
@@ -1860,7 +1876,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readUnitDefinition(java.lang.Object)
 	 */
-	public UnitDefinition readUnitDefinition(Object unitDefinition) {
+	private UnitDefinition readUnitDefinition(Object unitDefinition) {
 		if (!(unitDefinition instanceof org.sbml.libsbml.UnitDefinition))
 			throw new IllegalArgumentException("unitDefinition" + error
 					+ "org.sbml.libsbml.UnitDefinition");
@@ -1871,9 +1887,5 @@ public class LibSBMLReader implements SBMLReader {
 		for (int i = 0; i < libUD.getNumUnits(); i++)
 			ud.addUnit(readUnit(libUD.getUnit(i)));
 		return ud;
-	}
-
-	public void addIOProgressListener(IOProgressListener listener) {
-		setEventListeners.add(listener);
 	}
 }

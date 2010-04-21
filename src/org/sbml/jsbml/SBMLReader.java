@@ -56,8 +56,9 @@ public interface SBMLReader {
 	 * 
 	 * @param model
 	 * @return
+	 * @throws Exception 
 	 */
-	public Model readModel(Object model);
+	public Model readModel(Object model) throws Exception;
 
 	/**
 	 * 

@@ -101,7 +101,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @param ast
 	 * @return
 	 */
-	public org.sbml.libsbml.ASTNode convert(ASTNode astnode) {
+	private org.sbml.libsbml.ASTNode convert(ASTNode astnode) {
 		org.sbml.libsbml.ASTNode libAstNode;
 		switch (astnode.getType()) {
 		case REAL:
@@ -369,7 +369,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * 
 	 * @see org.sbml.jlibsbml.SBMLWriter#convertDate(java.util.Date)
 	 */
-	public org.sbml.libsbml.Date convertDate(Date date) {
+	private org.sbml.libsbml.Date convertDate(Date date) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		return new org.sbml.libsbml.Date(c.get(Calendar.YEAR), c
@@ -387,7 +387,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @param libMath
 	 * @return
 	 */
-	public boolean equal(ASTNode math, org.sbml.libsbml.ASTNode libMath) {
+	private boolean equal(ASTNode math, org.sbml.libsbml.ASTNode libMath) {
 		if (math == null || libMath == null)
 			return false;
 		boolean equal = true;
@@ -742,7 +742,6 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * 
 	 * @see org.sbml.jsbml.SBMLWriter#getWriteWarnings()
 	 */
-	// @Override
 	public List<SBMLException> getWriteWarnings(Object sbase) {
 		if (!(sbase instanceof org.sbml.libsbml.SBase))
 			throw new IllegalArgumentException(
@@ -907,7 +906,6 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.squeezer.io.AbstractSBMLWriter#saveChanges(org.sbml.Model,
 	 * java.lang.Object)
 	 */
-	// @Override
 	public void saveChanges(Model model, Object orig) throws SBMLException {
 		if (!(orig instanceof org.sbml.libsbml.Model))
 			throw new IllegalArgumentException(
@@ -1222,7 +1220,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveCompartmentProperties(org.sbml.jlibsbml
 	 * .Compartment, java.lang.Object)
 	 */
-	public void saveCompartmentProperties(Compartment c, Object compartment) {
+	private void saveCompartmentProperties(Compartment c, Object compartment) {
 		if (!(compartment instanceof org.sbml.libsbml.Compartment))
 			throw new IllegalArgumentException(
 					"compartment must be an instance of org.sbml.libsbml.Compartment.");
@@ -1250,7 +1248,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveCVTermProperties(org.sbml.jlibsbml.CVTerm
 	 * , java.lang.Object)
 	 */
-	public void saveCVTermProperties(CVTerm cvt, Object term) {
+	private void saveCVTermProperties(CVTerm cvt, Object term) {
 		if (!(term instanceof org.sbml.libsbml.CVTerm))
 			throw new IllegalArgumentException(
 					"term must be an instance of org.sbml.libsbml.CVTerm.");
@@ -1291,7 +1289,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveEventProperties(org.sbml.jlibsbml.Event,
 	 * java.lang.Object)
 	 */
-	public void saveEventProperties(Event ev, Object event)
+	private void saveEventProperties(Event ev, Object event)
 			throws SBMLException {
 		if (!(event instanceof org.sbml.libsbml.Event))
 			throw new IllegalArgumentException(
@@ -1354,7 +1352,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveKineticLawProperties(org.sbml.jlibsbml
 	 * .KineticLaw, java.lang.Object)
 	 */
-	public void saveKineticLawProperties(KineticLaw kl, Object kineticLaw)
+	private void saveKineticLawProperties(KineticLaw kl, Object kineticLaw)
 			throws SBMLException {
 		if (!(kineticLaw instanceof org.sbml.libsbml.KineticLaw))
 			throw new IllegalArgumentException(
@@ -1391,7 +1389,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveMathContainerProperties(org.sbml.jlibsbml
 	 * .MathContainer, java.lang.Object)
 	 */
-	public void saveMathContainerProperties(MathContainer mc, Object sbase)
+	private void saveMathContainerProperties(MathContainer mc, Object sbase)
 			throws SBMLException {
 		if (mc instanceof NamedSBase)
 			saveNamedSBaseProperties((NamedSBase) mc, sbase);
@@ -1497,7 +1495,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveModelHistoryProperties(org.sbml.jlibsbml
 	 * .Model, java.lang.Object)
 	 */
-	public void saveModelHistoryProperties(History m, Object modelHistory) {
+	private void saveModelHistoryProperties(History m, Object modelHistory) {
 		if (!(modelHistory instanceof org.sbml.libsbml.ModelHistory))
 			throw new IllegalArgumentException(
 					"model must be an instance of org.sbml.libsbml.Model.");
@@ -1607,7 +1605,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * ModifierSpeciesReference, java.lang.Object)
 	 */
 	// @Override
-	public void saveModifierSpeciesReferenceProperties(
+	private void saveModifierSpeciesReferenceProperties(
 			ModifierSpeciesReference msr, Object modifierSpeciesReference) {
 		if (!(modifierSpeciesReference instanceof org.sbml.libsbml.ModifierSpeciesReference))
 			throw new IllegalArgumentException(
@@ -1622,7 +1620,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * java.lang.Object)
 	 */
 	// @Override
-	public void saveNamedSBaseProperties(NamedSBase nsb, Object sb) {
+	private void saveNamedSBaseProperties(NamedSBase nsb, Object sb) {
 		if (!(sb instanceof org.sbml.libsbml.SBase))
 			throw new IllegalArgumentException(
 					"sb must be an instance of org.sbml.libsbml.SBase.");
@@ -1704,7 +1702,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveParameterProperties(org.sbml.jlibsbml
 	 * .Parameter, java.lang.Object)
 	 */
-	public void saveParameterProperties(Parameter p, Object parameter) {
+	private void saveParameterProperties(Parameter p, Object parameter) {
 		if (!(parameter instanceof org.sbml.libsbml.Parameter))
 			throw new IllegalArgumentException(
 					"parameter must be an instance of org.sbml.libsbml.Parameter.");
@@ -1725,7 +1723,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveReactionProperties(org.sbml.jlibsbml
 	 * .Reaction, java.lang.Object)
 	 */
-	public void saveReactionProperties(Reaction r, Object reaction)
+	private void saveReactionProperties(Reaction r, Object reaction)
 			throws SBMLException {
 		if (!(reaction instanceof org.sbml.libsbml.Reaction))
 			throw new IllegalArgumentException(
@@ -1819,7 +1817,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * java.lang.Object)
 	 */
 	// @Override
-	public void saveSBaseProperties(SBase s, Object sb) {
+	private void saveSBaseProperties(SBase s, Object sb) {
 		if (!(sb instanceof org.sbml.libsbml.SBase))
 			throw new IllegalArgumentException(
 					"sb must be an instance of org.sbml.libsbml.SBase.");
@@ -1874,7 +1872,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveSpeciesProperties(org.sbml.jlibsbml.
 	 * Species, java.lang.Object)
 	 */
-	public void saveSpeciesProperties(Species s, Object species) {
+	private void saveSpeciesProperties(Species s, Object species) {
 		if (!(species instanceof org.sbml.libsbml.Species))
 			throw new IllegalArgumentException(
 					"species must be an instance of org.sbml.libsbml.Species.");
@@ -1915,7 +1913,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * (org.sbml.SpeciesReference, java.lang.Object)
 	 */
 	// @Override
-	public void saveSpeciesReferenceProperties(SpeciesReference sr,
+	private void saveSpeciesReferenceProperties(SpeciesReference sr,
 			Object specRef) throws SBMLException {
 		if (!(specRef instanceof org.sbml.libsbml.SpeciesReference))
 			throw new IllegalArgumentException(
@@ -1975,7 +1973,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeCompartment(org.sbml.Compartment)
 	 */
 	// @Override
-	public org.sbml.libsbml.Compartment writeCompartment(Compartment compartment) {
+	private org.sbml.libsbml.Compartment writeCompartment(Compartment compartment) {
 		org.sbml.libsbml.Compartment c = new org.sbml.libsbml.Compartment(
 				compartment.getLevel(), compartment.getVersion());
 		saveNamedSBaseProperties(compartment, c);
@@ -2000,7 +1998,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeCompartmentType(org.sbml.CompartmentType)
 	 */
 	// @Override
-	public org.sbml.libsbml.CompartmentType writeCompartmentType(
+	private org.sbml.libsbml.CompartmentType writeCompartmentType(
 			CompartmentType compartmentType) {
 		org.sbml.libsbml.CompartmentType ct = new org.sbml.libsbml.CompartmentType(
 				compartmentType.getLevel(), compartmentType.getVersion());
@@ -2014,7 +2012,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeConstraint(org.sbml.Constraint)
 	 */
 	// @Override
-	public org.sbml.libsbml.Constraint writeConstraint(Constraint constraint) {
+	private org.sbml.libsbml.Constraint writeConstraint(Constraint constraint) {
 		org.sbml.libsbml.Constraint c = new org.sbml.libsbml.Constraint(
 				constraint.getLevel(), constraint.getVersion());
 		saveSBaseProperties(constraint, c);
@@ -2031,7 +2029,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * 
 	 * @see org.sbml.jlibsbml.SBMLWriter#writeCVTerm(org.sbml.jlibsbml.CVTerm)
 	 */
-	public org.sbml.libsbml.CVTerm writeCVTerm(CVTerm t) {
+	private org.sbml.libsbml.CVTerm writeCVTerm(CVTerm t) {
 		org.sbml.libsbml.CVTerm libCVt = new org.sbml.libsbml.CVTerm();
 		switch (t.getQualifierType()) {
 		case MODEL_QUALIFIER:
@@ -2114,7 +2112,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeDelay(org.sbml.Delay)
 	 */
 	// @Override
-	public org.sbml.libsbml.Delay writeDelay(Delay delay) {
+	private org.sbml.libsbml.Delay writeDelay(Delay delay) {
 		org.sbml.libsbml.Delay d = new org.sbml.libsbml.Delay(delay.getLevel(),
 				delay.getVersion());
 		saveSBaseProperties(delay, d);
@@ -2129,7 +2127,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeEvent(org.sbml.Event)
 	 */
 	// @Override
-	public org.sbml.libsbml.Event writeEvent(Event event) throws SBMLException {
+	private org.sbml.libsbml.Event writeEvent(Event event) throws SBMLException {
 		org.sbml.libsbml.Event e = new org.sbml.libsbml.Event(event.getLevel(),
 				event.getVersion());
 		saveNamedSBaseProperties(event, e);
@@ -2151,7 +2149,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeEventAssignment(org.sbml.EventAssignment)
 	 */
 	// @Override
-	public org.sbml.libsbml.EventAssignment writeEventAssignment(
+	private org.sbml.libsbml.EventAssignment writeEventAssignment(
 			EventAssignment eventAssignment, Object... args)
 			throws SBMLException {
 		org.sbml.libsbml.EventAssignment ea = new org.sbml.libsbml.EventAssignment(
@@ -2169,7 +2167,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.SBMLWriter#writeFunctionDefinition(org.sbml.FunctionDefinition)
 	 */
 	// @Override
-	public org.sbml.libsbml.FunctionDefinition writeFunctionDefinition(
+	private org.sbml.libsbml.FunctionDefinition writeFunctionDefinition(
 			FunctionDefinition functionDefinition) throws SBMLException {
 		org.sbml.libsbml.FunctionDefinition fd = new org.sbml.libsbml.FunctionDefinition(
 				functionDefinition.getLevel(), functionDefinition.getVersion());
@@ -2184,7 +2182,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.SBMLWriter#writeInitialAssignment(org.sbml.InitialAssignment)
 	 */
 	// @Override
-	public org.sbml.libsbml.InitialAssignment writeInitialAssignment(
+	private org.sbml.libsbml.InitialAssignment writeInitialAssignment(
 			InitialAssignment initialAssignment) throws SBMLException {
 		org.sbml.libsbml.InitialAssignment ia = new org.sbml.libsbml.InitialAssignment(
 				initialAssignment.getLevel(), initialAssignment.getVersion());
@@ -2201,7 +2199,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jlibsbml.SBMLWriter#writeKineticLaw(org.sbml.jlibsbml.KineticLaw
 	 * )
 	 */
-	public org.sbml.libsbml.KineticLaw writeKineticLaw(KineticLaw kinteicLaw,
+	private org.sbml.libsbml.KineticLaw writeKineticLaw(KineticLaw kinteicLaw,
 			Object... args) throws SBMLException {
 		org.sbml.libsbml.KineticLaw k = new org.sbml.libsbml.KineticLaw(
 				kinteicLaw.getLevel(), kinteicLaw.getVersion());
@@ -2270,7 +2268,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * ModifierSpeciesReference)
 	 */
 	// @Override
-	public org.sbml.libsbml.ModifierSpeciesReference writeModifierSpeciesReference(
+	private org.sbml.libsbml.ModifierSpeciesReference writeModifierSpeciesReference(
 			ModifierSpeciesReference modifierSpeciesReference, Object... args) {
 		org.sbml.libsbml.ModifierSpeciesReference m = new org.sbml.libsbml.ModifierSpeciesReference(
 				modifierSpeciesReference.getLevel(), modifierSpeciesReference
@@ -2287,7 +2285,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeParameter(org.sbml.Parameter)
 	 */
 	// @Override
-	public org.sbml.libsbml.Parameter writeParameter(Parameter parameter,
+	private org.sbml.libsbml.Parameter writeParameter(Parameter parameter,
 			Object... args) {
 		org.sbml.libsbml.Parameter p = new org.sbml.libsbml.Parameter(parameter
 				.getLevel(), parameter.getVersion());
@@ -2305,7 +2303,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeReaction(org.sbml.Reaction)
 	 */
-	public org.sbml.libsbml.Reaction writeReaction(Reaction reaction)
+	private org.sbml.libsbml.Reaction writeReaction(Reaction reaction)
 			throws SBMLException {
 		org.sbml.libsbml.Reaction r = new org.sbml.libsbml.Reaction(reaction
 				.getLevel(), reaction.getVersion());
@@ -2328,7 +2326,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeRule(org.sbml.Rule)
 	 */
 	// @Override
-	public org.sbml.libsbml.Rule writeRule(Rule rule, Object... args) {
+	private org.sbml.libsbml.Rule writeRule(Rule rule, Object... args) {
 		org.sbml.libsbml.Rule r;
 		if (rule.isAlgebraic())
 			r = new org.sbml.libsbml.AlgebraicRule(rule.getLevel(), rule
@@ -2357,7 +2355,6 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeSBML(java.lang.Object, java.lang.String)
 	 */
-	// @Override
 	public boolean writeSBML(Object sbmlDocument, String filename)
 			throws SBMLException {
 		return writeSBML(sbmlDocument, filename, null, null);
@@ -2415,7 +2412,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeSpecies(org.sbml.Species)
 	 */
 	// @Override
-	public org.sbml.libsbml.Species writeSpecies(Species species) {
+	private org.sbml.libsbml.Species writeSpecies(Species species) {
 		org.sbml.libsbml.Species s = new org.sbml.libsbml.Species(species
 				.getLevel(), species.getVersion());
 		saveNamedSBaseProperties(species, s);
@@ -2441,7 +2438,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeSpeciesReference(org.sbml.SpeciesReference)
 	 */
 	// @Override
-	public org.sbml.libsbml.SpeciesReference writeSpeciesReference(
+	private org.sbml.libsbml.SpeciesReference writeSpeciesReference(
 			SpeciesReference speciesReference, Object... args) {
 		org.sbml.libsbml.SpeciesReference sr = new org.sbml.libsbml.SpeciesReference(
 				speciesReference.getLevel(), speciesReference.getVersion());
@@ -2462,7 +2459,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeSpeciesType(org.sbml.SpeciesType)
 	 */
 	// @Override
-	public org.sbml.libsbml.SpeciesType writeSpeciesType(SpeciesType speciesType) {
+	private org.sbml.libsbml.SpeciesType writeSpeciesType(SpeciesType speciesType) {
 		org.sbml.libsbml.SpeciesType st = new org.sbml.libsbml.SpeciesType(
 				speciesType.getLevel(), speciesType.getVersion());
 		saveNamedSBaseProperties(speciesType, st);
@@ -2476,7 +2473,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.SBMLWriter#writeStoichoimetryMath(org.sbml.StoichiometryMath)
 	 */
 	// @Override
-	public org.sbml.libsbml.StoichiometryMath writeStoichoimetryMath(
+	private org.sbml.libsbml.StoichiometryMath writeStoichoimetryMath(
 			StoichiometryMath stoichiometryMath) {
 		org.sbml.libsbml.StoichiometryMath sm = new org.sbml.libsbml.StoichiometryMath(
 				stoichiometryMath.getLevel(), stoichiometryMath.getVersion());
@@ -2492,7 +2489,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeTrigger(org.sbml.Trigger)
 	 */
 	// @Override
-	public org.sbml.libsbml.Trigger writeTrigger(Trigger trigger) {
+	private org.sbml.libsbml.Trigger writeTrigger(Trigger trigger) {
 		org.sbml.libsbml.Trigger t = new org.sbml.libsbml.Trigger(trigger
 				.getLevel(), trigger.getVersion());
 		saveSBaseProperties(trigger, t);
@@ -2507,7 +2504,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.SBMLWriter#writeUnit(org.sbml.Unit)
 	 */
 	// @Override
-	public org.sbml.libsbml.Unit writeUnit(Unit unit, Object... args) {
+	private org.sbml.libsbml.Unit writeUnit(Unit unit, Object... args) {
 		org.sbml.libsbml.Unit u = new org.sbml.libsbml.Unit(unit.getLevel(),
 				unit.getVersion());
 		saveSBaseProperties(unit, u);
@@ -2633,8 +2630,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeUnitDefinition(org.sbml.UnitDefinition)
 	 */
-	// @Override
-	public org.sbml.libsbml.UnitDefinition writeUnitDefinition(
+	private org.sbml.libsbml.UnitDefinition writeUnitDefinition(
 			UnitDefinition unitDefinition) {
 		org.sbml.libsbml.UnitDefinition ud = new org.sbml.libsbml.UnitDefinition(
 				unitDefinition.getLevel(), unitDefinition.getVersion());
