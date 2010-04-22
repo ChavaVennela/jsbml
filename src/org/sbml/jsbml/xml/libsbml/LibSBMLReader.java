@@ -60,6 +60,7 @@ import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
+import org.sbml.jsbml.NamedSBaseWithDerivedUnit;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
@@ -723,7 +724,9 @@ public class LibSBMLReader implements SBMLReader {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.sbml.jsbml.SBMLReader#addIOProgressListener(org.sbml.jsbml.io.IOProgressListener)
+	 * 
+	 * @seeorg.sbml.jsbml.SBMLReader#addIOProgressListener(org.sbml.jsbml.io.
+	 * IOProgressListener)
 	 */
 	public void addIOProgressListener(IOProgressListener listener) {
 		setEventListeners.add(listener);
@@ -793,7 +796,8 @@ public class LibSBMLReader implements SBMLReader {
 						break;
 					}
 			if (ast.getVariable() == null) {
-				NamedSBase nsb = model.findNamedSBase(math.getName());
+				NamedSBaseWithDerivedUnit nsb = model
+						.findNamedSBaseWithDerivedUnit(math.getName());
 				if (nsb == null)
 					ast.setName(math.getName());
 				else
