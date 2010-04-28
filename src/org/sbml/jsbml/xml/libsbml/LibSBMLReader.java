@@ -67,7 +67,7 @@ import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
-import org.sbml.jsbml.SBMLReader;
+import org.sbml.jsbml.SBMLInputConverter;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
@@ -79,7 +79,7 @@ import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.CVTerm.Qualifier;
-import org.sbml.jsbml.io.IOProgressListener;
+import org.sbml.jsbml.util.IOProgressListener;
 import org.sbml.libsbml.SBMLError;
 import org.sbml.libsbml.libsbmlConstants;
 
@@ -88,7 +88,7 @@ import org.sbml.libsbml.libsbmlConstants;
  * 
  */
 @SuppressWarnings("deprecation")
-public class LibSBMLReader implements SBMLReader {
+public class LibSBMLReader implements SBMLInputConverter {
 
 	private static final String error = " must be an instance of ";
 
@@ -710,7 +710,7 @@ public class LibSBMLReader implements SBMLReader {
 	 */
 	public LibSBMLReader(Object model) throws Exception {
 		this();
-		this.model = readModel(model);
+		this.model = convert2Model(model);
 	}
 
 	/**
@@ -1421,7 +1421,7 @@ public class LibSBMLReader implements SBMLReader {
 	 * 
 	 * @see org.sbml.SBMLReader#readModel(java.lang.Object)
 	 */
-	public Model readModel(Object model) throws Exception {
+	public Model convert2Model(Object model) throws Exception {
 		if (model instanceof String) {
 			File file = new File(model.toString());
 			if (!file.exists() || !file.isFile())

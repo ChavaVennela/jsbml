@@ -62,7 +62,7 @@ import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLException;
-import org.sbml.jsbml.SBMLWriter;
+import org.sbml.jsbml.SBMLOutputConverter;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -71,7 +71,7 @@ import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Trigger;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
-import org.sbml.jsbml.io.IOProgressListener;
+import org.sbml.jsbml.util.IOProgressListener;
 import org.sbml.libsbml.libsbmlConstants;
 
 /**
@@ -81,7 +81,7 @@ import org.sbml.libsbml.libsbmlConstants;
  * 
  */
 @SuppressWarnings("deprecation")
-public class LibSBMLWriter implements SBMLWriter {
+public class LibSBMLWriter implements SBMLOutputConverter {
 
 	private static final String error = " must be an instance of org.sbml.libsbml.";
 	private Set<IOProgressListener> setIOListeners = new HashSet<IOProgressListener>();
@@ -906,7 +906,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * @see org.sbml.squeezer.io.AbstractSBMLWriter#saveChanges(org.sbml.Model,
 	 * java.lang.Object)
 	 */
-	public void saveChanges(Model model, Object orig) throws SBMLException {
+	public boolean saveChanges(Model model, Object orig) throws SBMLException {
 		if (!(orig instanceof org.sbml.libsbml.Model))
 			throw new IllegalArgumentException(
 					"only instances of org.sbml.libsbml.Model can be considered.");
@@ -1086,6 +1086,8 @@ public class LibSBMLWriter implements SBMLWriter {
 		}
 		removeUnneccessaryElements(model, orig);
 		fireIOEvent(null);
+		saveNamedSBaseProperties(model, modelOrig);
+		return true;
 	}
 
 	/*
@@ -1095,7 +1097,7 @@ public class LibSBMLWriter implements SBMLWriter {
 	 * org.sbml.jsbml.io.AbstractSBMLWriter#saveChanges(org.sbml.jsbml.Reaction,
 	 * java.lang.Object)
 	 */
-	public void saveChanges(Reaction reaction, Object model)
+	public boolean saveChanges(Reaction reaction, Object model)
 			throws SBMLException {
 		if (!(model instanceof org.sbml.libsbml.Model))
 			throw new IllegalArgumentException("model" + error
@@ -1158,6 +1160,7 @@ public class LibSBMLWriter implements SBMLWriter {
 		}
 		saveReactionProperties(reaction, pluMo.getReaction(reaction.getId()));
 		removeUnneccessaryElements(reaction.getModel(), pluMo);
+		return true;
 	}
 
 	/**
