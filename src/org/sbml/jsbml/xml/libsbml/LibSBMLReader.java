@@ -788,20 +788,23 @@ public class LibSBMLReader implements SBMLInputConverter {
 			break;
 		case libsbmlConstants.AST_NAME:
 			ast = new ASTNode(ASTNode.Type.NAME, parent);
-			if (parent instanceof KineticLaw)
+			if (parent instanceof KineticLaw) {
 				for (LocalParameter p : ((KineticLaw) parent)
-						.getListOfParameters())
+						.getListOfParameters()) {
 					if (p.getId().equals(math.getName())) {
 						ast.setVariable(p);
 						break;
 					}
+				}
+			}
 			if (ast.getVariable() == null) {
 				NamedSBaseWithDerivedUnit nsb = model
 						.findNamedSBaseWithDerivedUnit(math.getName());
-				if (nsb == null)
+				if (nsb == null) {
 					ast.setName(math.getName());
-				else
+				} else {
 					ast.setVariable(nsb);
+				}
 			}
 			break;
 		case libsbmlConstants.AST_CONSTANT_PI:
@@ -960,9 +963,129 @@ public class LibSBMLReader implements SBMLInputConverter {
 			ast = new ASTNode(ASTNode.Type.UNKNOWN, parent);
 			break;
 		}
-		for (int i = 0; i < math.getNumChildren(); i++)
+		for (int i = 0; i < math.getNumChildren(); i++) {
 			ast.addChild(convert(math.getChild(i), parent));
+		}
 		return ast;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.sbml.SBMLReader#readModel(java.lang.Object)
+	 */
+	public Model convert2Model(Object model) throws Exception {
+		if (model instanceof String) {
+			File file = new File(model.toString());
+			if (!file.exists() || !file.isFile())
+				throw new FileNotFoundException(file.getAbsolutePath());
+			if (!file.canRead())
+				throw new IOException(file.getAbsolutePath());
+			org.sbml.libsbml.SBMLDocument doc = (new org.sbml.libsbml.SBMLReader())
+					.readSBML(file.getAbsolutePath());
+			setOfDocuments.add(doc);
+			model = doc.getModel();
+		}
+		if (model instanceof org.sbml.libsbml.Model) {
+			this.originalModel = (org.sbml.libsbml.Model) model;
+			SBMLDocument sbmldoc = new SBMLDocument((int) originalModel
+					.getLevel(), (int) originalModel.getVersion());
+			copySBaseProperties(sbmldoc, originalModel.getSBMLDocument());
+			this.model = sbmldoc.createModel(originalModel.getId());
+			copyNamedSBaseProperties(this.model, originalModel);
+			int i;
+			if (originalModel.isSetModelHistory()) {
+				History mh = new History();
+				org.sbml.libsbml.ModelHistory libHist = originalModel
+						.getModelHistory();
+				for (i = 0; i < libHist.getNumCreators(); i++) {
+					Creator mc = new Creator();
+					org.sbml.libsbml.ModelCreator creator = originalModel
+							.getModelHistory().getCreator(i);
+					mc.setGivenName(creator.getGivenName());
+					mc.setFamilyName(creator.getFamilyName());
+					mc.setEmail(creator.getEmail());
+					mc.setOrganization(creator.getOrganization());
+					mh.addCreator(mc);
+				}
+				if (libHist.isSetCreatedDate())
+					mh.setCreatedDate(convertDate(libHist.getCreatedDate()));
+				if (libHist.isSetModifiedDate())
+					mh.setModifiedDate(convertDate(libHist.getModifiedDate()));
+				for (i = 0; i < libHist.getNumModifiedDates(); i++)
+					mh.addModifiedDate(convertDate(libHist.getModifiedDate(i)));
+				this.model.setModelHistory(mh);
+				fireIOEvent(mh);
+			}
+			for (i = 0; i < originalModel.getNumFunctionDefinitions(); i++) {
+				this.model
+						.addFunctionDefinition(readFunctionDefinition(originalModel
+								.getFunctionDefinition(i)));
+				fireIOEvent(this.model.getFunctionDefinition(i));
+			}
+			for (i = 0; i < originalModel.getNumUnitDefinitions(); i++) {
+				this.model.addUnitDefinition(readUnitDefinition(originalModel
+						.getUnitDefinition(i)));
+				fireIOEvent(this.model.getUnitDefinition(i));
+			}
+			// This is something, libSBML wouldn't do...
+			addPredefinedUnitDefinitions(this.model);
+			for (i = 0; i < originalModel.getNumCompartmentTypes(); i++) {
+				this.model.addCompartmentType(readCompartmentType(originalModel
+						.getCompartmentType(i)));
+				fireIOEvent(this.model.getCompartmentType(i));
+			}
+			for (i = 0; i < originalModel.getNumSpeciesTypes(); i++) {
+				this.model.addSpeciesType(readSpeciesType(originalModel
+						.getSpeciesType(i)));
+				fireIOEvent(this.model.getSpeciesType(i));
+			}
+			for (i = 0; i < originalModel.getNumCompartments(); i++) {
+				this.model.addCompartment(readCompartment(originalModel
+						.getCompartment(i)));
+				fireIOEvent(this.model.getCompartment(i));
+			}
+			for (i = 0; i < originalModel.getNumSpecies(); i++) {
+				this.model.addSpecies(readSpecies(originalModel.getSpecies(i)));
+				fireIOEvent(this.model.getSpecies(i));
+			}
+			for (i = 0; i < originalModel.getNumParameters(); i++) {
+				this.model.addParameter(readParameter(originalModel
+						.getParameter(i)));
+				fireIOEvent(this.model.getParameter(i));
+			}
+			for (i = 0; i < originalModel.getNumInitialAssignments(); i++) {
+				this.model
+						.addInitialAssignment(readInitialAssignment(originalModel
+								.getInitialAssignment(i)));
+				fireIOEvent(this.model.getInitialAssignment(i));
+			}
+			for (i = 0; i < originalModel.getNumRules(); i++) {
+				this.model.addRule(readRule(originalModel.getRule(i)));
+				fireIOEvent(this.model.getRule(i));
+			}
+			for (i = 0; i < originalModel.getNumConstraints(); i++) {
+				this.model.addConstraint(readConstraint(originalModel
+						.getConstraint(i)));
+				fireIOEvent(this.model.getConstraint(i));
+			}
+			for (i = 0; i < originalModel.getNumReactions(); i++) {
+				org.sbml.libsbml.Reaction rOrig = originalModel.getReaction(i);
+				Reaction r = readReaction(rOrig);
+				this.model.addReaction(r);
+				if (rOrig.isSetKineticLaw())
+					r.setKineticLaw(readKineticLaw(rOrig.getKineticLaw()));
+				fireIOEvent(this.model.getReaction(i));
+			}
+			for (i = 0; i < originalModel.getNumEvents(); i++) {
+				this.model.addEvent(readEvent(originalModel.getEvent(i)));
+				fireIOEvent(this.model.getEvent(i));
+			}
+			addAllSBaseChangeListenersTo(this.model);
+			fireIOEvent(null);
+			return this.model;
+		}
+		return null;
 	}
 
 	/*
@@ -1419,125 +1542,6 @@ public class LibSBMLReader implements SBMLInputConverter {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.sbml.SBMLReader#readModel(java.lang.Object)
-	 */
-	public Model convert2Model(Object model) throws Exception {
-		if (model instanceof String) {
-			File file = new File(model.toString());
-			if (!file.exists() || !file.isFile())
-				throw new FileNotFoundException(file.getAbsolutePath());
-			if (!file.canRead())
-				throw new IOException(file.getAbsolutePath());
-			org.sbml.libsbml.SBMLDocument doc = (new org.sbml.libsbml.SBMLReader())
-					.readSBML(file.getAbsolutePath());
-			setOfDocuments.add(doc);
-			model = doc.getModel();
-		}
-		if (model instanceof org.sbml.libsbml.Model) {
-			this.originalModel = (org.sbml.libsbml.Model) model;
-			SBMLDocument sbmldoc = new SBMLDocument((int) originalModel
-					.getLevel(), (int) originalModel.getVersion());
-			copySBaseProperties(sbmldoc, originalModel.getSBMLDocument());
-			this.model = sbmldoc.createModel(originalModel.getId());
-			copyNamedSBaseProperties(this.model, originalModel);
-			int i;
-			if (originalModel.isSetModelHistory()) {
-				History mh = new History();
-				org.sbml.libsbml.ModelHistory libHist = originalModel
-						.getModelHistory();
-				for (i = 0; i < libHist.getNumCreators(); i++) {
-					Creator mc = new Creator();
-					org.sbml.libsbml.ModelCreator creator = originalModel
-							.getModelHistory().getCreator(i);
-					mc.setGivenName(creator.getGivenName());
-					mc.setFamilyName(creator.getFamilyName());
-					mc.setEmail(creator.getEmail());
-					mc.setOrganization(creator.getOrganization());
-					mh.addCreator(mc);
-				}
-				if (libHist.isSetCreatedDate())
-					mh.setCreatedDate(convertDate(libHist.getCreatedDate()));
-				if (libHist.isSetModifiedDate())
-					mh.setModifiedDate(convertDate(libHist.getModifiedDate()));
-				for (i = 0; i < libHist.getNumModifiedDates(); i++)
-					mh.addModifiedDate(convertDate(libHist.getModifiedDate(i)));
-				this.model.setModelHistory(mh);
-				fireIOEvent(mh);
-			}
-			for (i = 0; i < originalModel.getNumFunctionDefinitions(); i++) {
-				this.model
-						.addFunctionDefinition(readFunctionDefinition(originalModel
-								.getFunctionDefinition(i)));
-				fireIOEvent(this.model.getFunctionDefinition(i));
-			}
-			for (i = 0; i < originalModel.getNumUnitDefinitions(); i++) {
-				this.model.addUnitDefinition(readUnitDefinition(originalModel
-						.getUnitDefinition(i)));
-				fireIOEvent(this.model.getUnitDefinition(i));
-			}
-			// This is something, libSBML wouldn't do...
-			addPredefinedUnitDefinitions(this.model);
-			for (i = 0; i < originalModel.getNumCompartmentTypes(); i++) {
-				this.model.addCompartmentType(readCompartmentType(originalModel
-						.getCompartmentType(i)));
-				fireIOEvent(this.model.getCompartmentType(i));
-			}
-			for (i = 0; i < originalModel.getNumSpeciesTypes(); i++) {
-				this.model.addSpeciesType(readSpeciesType(originalModel
-						.getSpeciesType(i)));
-				fireIOEvent(this.model.getSpeciesType(i));
-			}
-			for (i = 0; i < originalModel.getNumCompartments(); i++) {
-				this.model.addCompartment(readCompartment(originalModel
-						.getCompartment(i)));
-				fireIOEvent(this.model.getCompartment(i));
-			}
-			for (i = 0; i < originalModel.getNumSpecies(); i++) {
-				this.model.addSpecies(readSpecies(originalModel.getSpecies(i)));
-				fireIOEvent(this.model.getSpecies(i));
-			}
-			for (i = 0; i < originalModel.getNumParameters(); i++) {
-				this.model.addParameter(readParameter(originalModel
-						.getParameter(i)));
-				fireIOEvent(this.model.getParameter(i));
-			}
-			for (i = 0; i < originalModel.getNumInitialAssignments(); i++) {
-				this.model
-						.addInitialAssignment(readInitialAssignment(originalModel
-								.getInitialAssignment(i)));
-				fireIOEvent(this.model.getInitialAssignment(i));
-			}
-			for (i = 0; i < originalModel.getNumRules(); i++) {
-				this.model.addRule(readRule(originalModel.getRule(i)));
-				fireIOEvent(this.model.getRule(i));
-			}
-			for (i = 0; i < originalModel.getNumConstraints(); i++) {
-				this.model.addConstraint(readConstraint(originalModel
-						.getConstraint(i)));
-				fireIOEvent(this.model.getConstraint(i));
-			}
-			for (i = 0; i < originalModel.getNumReactions(); i++) {
-				org.sbml.libsbml.Reaction rOrig = originalModel.getReaction(i);
-				Reaction r = readReaction(rOrig);
-				this.model.addReaction(r);
-				if (rOrig.isSetKineticLaw())
-					r.setKineticLaw(readKineticLaw(rOrig.getKineticLaw()));
-				fireIOEvent(this.model.getReaction(i));
-			}
-			for (i = 0; i < originalModel.getNumEvents(); i++) {
-				this.model.addEvent(readEvent(originalModel.getEvent(i)));
-				fireIOEvent(this.model.getEvent(i));
-			}
-			addAllSBaseChangeListenersTo(this.model);
-			fireIOEvent(null);
-			return this.model;
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.sbml.SBMLReader#readModifierSpeciesReference(java.lang.Object)
 	 */
 	private ModifierSpeciesReference readModifierSpeciesReference(
@@ -1637,10 +1641,12 @@ public class LibSBMLReader implements SBMLInputConverter {
 				r = new RateRule(s);
 		}
 		copySBaseProperties(r, libRule);
-		if (libRule.isSetMath())
+		if (libRule.isSetMath()) {
 			r.setMath(convert(libRule.getMath(), r));
+		}
 		return r;
 	}
+
 
 	/*
 	 * (non-Javadoc)
