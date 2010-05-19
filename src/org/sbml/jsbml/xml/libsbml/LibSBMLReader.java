@@ -977,10 +977,12 @@ public class LibSBMLReader implements SBMLInputConverter {
 	public Model convert2Model(Object model) throws Exception {
 		if (model instanceof String) {
 			File file = new File(model.toString());
-			if (!file.exists() || !file.isFile())
+			if (!file.exists() || !file.isFile()) {
 				throw new FileNotFoundException(file.getAbsolutePath());
-			if (!file.canRead())
+			}
+			if (!file.canRead()) {
 				throw new IOException(file.getAbsolutePath());
+			}
 			org.sbml.libsbml.SBMLDocument doc = (new org.sbml.libsbml.SBMLReader())
 					.readSBML(file.getAbsolutePath());
 			setOfDocuments.add(doc);
@@ -1475,15 +1477,17 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * @see org.sbml.SBMLReader#readFunctionDefinition(java.lang.Object)
 	 */
 	private FunctionDefinition readFunctionDefinition(Object functionDefinition) {
-		if (!(functionDefinition instanceof org.sbml.libsbml.FunctionDefinition))
+		if (!(functionDefinition instanceof org.sbml.libsbml.FunctionDefinition)) {
 			throw new IllegalArgumentException("functionDefinition" + error
 					+ "org.sbml.libsbml.FunctionDefinition.");
+		}
 		org.sbml.libsbml.FunctionDefinition fd = (org.sbml.libsbml.FunctionDefinition) functionDefinition;
 		FunctionDefinition f = new FunctionDefinition(fd.getId(), (int) fd
 				.getLevel(), (int) fd.getVersion());
 		copyNamedSBaseProperties(f, fd);
-		if (fd.isSetMath())
+		if (fd.isSetMath()) {
 			f.setMath(convert(fd.getMath(), f));
+		}
 		return f;
 	}
 
@@ -1625,20 +1629,22 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * @see org.sbml.SBMLReader#readRule(java.lang.Object)
 	 */
 	private Rule readRule(Object rule) {
-		if (!(rule instanceof org.sbml.libsbml.Rule))
+		if (!(rule instanceof org.sbml.libsbml.Rule)) {
 			throw new IllegalArgumentException("rule" + error
 					+ "org.sbml.libsbml.Rule.");
+		}
 		org.sbml.libsbml.Rule libRule = (org.sbml.libsbml.Rule) rule;
 		Rule r;
-		if (libRule.isAlgebraic())
+		if (libRule.isAlgebraic()) {
 			r = new AlgebraicRule((int) libRule.getLevel(), (int) libRule
 					.getVersion());
-		else {
+		} else {
 			Variable s = model.findVariable(libRule.getVariable());
-			if (libRule.isAssignment())
+			if (libRule.isAssignment()) {
 				r = new AssignmentRule(s);
-			else
+			} else {
 				r = new RateRule(s);
+			}
 		}
 		copySBaseProperties(r, libRule);
 		if (libRule.isSetMath()) {
@@ -1646,7 +1652,6 @@ public class LibSBMLReader implements SBMLInputConverter {
 		}
 		return r;
 	}
-
 
 	/*
 	 * (non-Javadoc)
