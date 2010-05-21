@@ -1821,33 +1821,41 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 */
 	// @Override
 	private void saveSBaseProperties(SBase s, Object sb) {
-		if (!(sb instanceof org.sbml.libsbml.SBase))
+		if (!(sb instanceof org.sbml.libsbml.SBase)) {
 			throw new IllegalArgumentException(
 					"sb must be an instance of org.sbml.libsbml.SBase.");
+		}
 		org.sbml.libsbml.SBase po = (org.sbml.libsbml.SBase) sb;
 		if (s.isSetMetaId() && po.isSetMetaId()
-				&& !s.getMetaId().equals(po.getMetaId()))
+				&& !s.getMetaId().equals(po.getMetaId())) {
 			po.setMetaId(s.getMetaId());
-		if (s.isSetNotes() && !s.getNotesString().equals(po.getNotesString()))
+		}
+		if (s.isSetNotes() && !s.getNotesString().equals(po.getNotesString())) {
 			po.setNotes(s.getNotesString());
-		if (s.isSetSBOTerm() && s.getSBOTerm() != po.getSBOTerm())
+		}
+		if (s.isSetSBOTerm() && s.getSBOTerm() != po.getSBOTerm()) {
 			po.setSBOTerm(s.getSBOTerm());
+		}
 		for (CVTerm cvt : s.getCVTerms()) {
 			long contains = -1;
 			for (int i = 0; i < po.getNumCVTerms() && contains < 0; i++) {
 				org.sbml.libsbml.CVTerm cvo = po.getCVTerm(i);
 				boolean equal = cvo.getNumResources() == cvt.getNumResources();
-				if (equal)
-					for (int j = 0; j < cvo.getNumResources(); j++)
+				if (equal) {
+					for (int j = 0; j < cvo.getNumResources(); j++) {
 						equal &= cvo.getResourceURI(j).equals(
 								cvt.getResourceURI(j));
-				if (equal)
+					}
+				}
+				if (equal) {
 					contains = i;
+				}
 			}
-			if (contains < 0)
+			if (contains < 0) {
 				po.addCVTerm(writeCVTerm(cvt));
-			else
+			} else {
 				saveCVTermProperties(cvt, po.getCVTerm(contains));
+			}
 		}
 		// remove CVTerms that are not needed anymore.
 		for (long i = po.getNumCVTerms() - 1; i >= 0; i--) {
@@ -1856,15 +1864,19 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 			for (int j = 0; j < s.getNumCVTerms() && contains < 0; j++) {
 				CVTerm cvt = s.getCVTerm(j);
 				boolean equal = cvo.getNumResources() == cvt.getNumResources();
-				if (equal)
-					for (int k = 0; k < cvo.getNumResources(); k++)
+				if (equal) {
+					for (int k = 0; k < cvo.getNumResources(); k++) {
 						equal &= cvo.getResourceURI(k).equals(
 								cvt.getResourceURI(k));
-				if (equal)
+					}
+				}
+				if (equal) {
 					contains = i;
+				}
 			}
-			if (contains < 0)
+			if (contains < 0) {
 				po.getCVTerms().remove(i);
+			}
 		}
 	}
 
@@ -1876,9 +1888,10 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * Species, java.lang.Object)
 	 */
 	private void saveSpeciesProperties(Species s, Object species) {
-		if (!(species instanceof org.sbml.libsbml.Species))
+		if (!(species instanceof org.sbml.libsbml.Species)) {
 			throw new IllegalArgumentException(
 					"species must be an instance of org.sbml.libsbml.Species.");
+		}
 		org.sbml.libsbml.Species spec = (org.sbml.libsbml.Species) species;
 		saveNamedSBaseProperties(s, spec);
 		if (s.isSetSpeciesType()
@@ -1976,7 +1989,8 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @see org.sbml.SBMLWriter#writeCompartment(org.sbml.Compartment)
 	 */
 	// @Override
-	private org.sbml.libsbml.Compartment writeCompartment(Compartment compartment) {
+	private org.sbml.libsbml.Compartment writeCompartment(
+			Compartment compartment) {
 		org.sbml.libsbml.Compartment c = new org.sbml.libsbml.Compartment(
 				compartment.getLevel(), compartment.getVersion());
 		saveNamedSBaseProperties(compartment, c);
@@ -2027,10 +2041,10 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		return c;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see org.sbml.jlibsbml.SBMLWriter#writeCVTerm(org.sbml.jlibsbml.CVTerm)
+	 * @param t
+	 * @return
 	 */
 	private org.sbml.libsbml.CVTerm writeCVTerm(CVTerm t) {
 		org.sbml.libsbml.CVTerm libCVt = new org.sbml.libsbml.CVTerm();
@@ -2462,7 +2476,8 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @see org.sbml.SBMLWriter#writeSpeciesType(org.sbml.SpeciesType)
 	 */
 	// @Override
-	private org.sbml.libsbml.SpeciesType writeSpeciesType(SpeciesType speciesType) {
+	private org.sbml.libsbml.SpeciesType writeSpeciesType(
+			SpeciesType speciesType) {
 		org.sbml.libsbml.SpeciesType st = new org.sbml.libsbml.SpeciesType(
 				speciesType.getLevel(), speciesType.getVersion());
 		saveNamedSBaseProperties(speciesType, st);

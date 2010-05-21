@@ -90,6 +90,9 @@ import org.sbml.libsbml.libsbmlConstants;
 @SuppressWarnings("deprecation")
 public class LibSBMLReader implements SBMLInputConverter {
 
+	/**
+	 * 
+	 */
 	private static final String error = " must be an instance of ";
 
 	/**
@@ -1193,14 +1196,18 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 */
 	private void copySBaseProperties(SBase sbase,
 			org.sbml.libsbml.SBase libSBase) {
-		if (libSBase.isSetMetaId())
+		if (libSBase.isSetMetaId()) {
 			sbase.setMetaId(libSBase.getMetaId());
-		if (libSBase.isSetSBOTerm())
+		}
+		if (libSBase.isSetSBOTerm()) {
 			sbase.setSBOTerm(libSBase.getSBOTerm());
-		if (libSBase.isSetNotes())
+		}
+		if (libSBase.isSetNotes()) {
 			sbase.setNotes(libSBase.getNotesString());
-		for (int i = 0; i < libSBase.getNumCVTerms(); i++)
+		}
+		for (int i = 0; i < libSBase.getNumCVTerms(); i++) {
 			sbase.addCVTerm(readCVTerm(libSBase.getCVTerm(i)));
+		}
 	}
 
 	/**
@@ -1324,15 +1331,16 @@ public class LibSBMLReader implements SBMLInputConverter {
 
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see org.sbml.jlibsbml.SBMLReader#readCVTerm(java.lang.Object)
+	 * @param term
+	 * @return
 	 */
 	private CVTerm readCVTerm(Object term) {
-		if (!(term instanceof org.sbml.libsbml.CVTerm))
+		if (!(term instanceof org.sbml.libsbml.CVTerm)) {
 			throw new IllegalArgumentException("term" + error
 					+ "org.sbml.libsbml.CVTerm.");
+		}
 		org.sbml.libsbml.CVTerm libCVt = (org.sbml.libsbml.CVTerm) term;
 		CVTerm t = new CVTerm();
 		switch (libCVt.getQualifierType()) {
