@@ -2636,7 +2636,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 			u.setKind(libsbmlConstants.UNIT_KIND_WEBER);
 			break;
 		}
-		u.setExponent(unit.getExponent());
+		u.setExponent((int) Math.round(unit.getExponent()));
 		u.setMultiplier(unit.getMultiplier());
 		u.setOffset(unit.getOffset());
 		u.setScale(unit.getScale());
