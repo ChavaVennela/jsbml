@@ -831,7 +831,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 			boolean contains = false;
 			for (int j = 0; j < model.getNumInitialAssignments() && !contains; j++) {
 				InitialAssignment ia = model.getInitialAssignment(j);
-				if (ia.getSymbol().equals(c.getSymbol())
+				if (ia.getVariable().equals(c.getSymbol())
 						&& equal(ia.getMath(), c.getMath()))
 					contains = true;
 			}
@@ -1004,7 +1004,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 					&& contains < 0; j++) {
 				org.sbml.libsbml.InitialAssignment libIA = modelOrig
 						.getInitialAssignment(j);
-				if (libIA.getSymbol().equals(ia.getSymbol())
+				if (libIA.getSymbol().equals(ia.getVariable())
 						&& equal(ia.getMath(), libIA.getMath()))
 					contains = j;
 			}
@@ -2204,8 +2204,8 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		org.sbml.libsbml.InitialAssignment ia = new org.sbml.libsbml.InitialAssignment(
 				initialAssignment.getLevel(), initialAssignment.getVersion());
 		saveMathContainerProperties(initialAssignment, ia);
-		if (initialAssignment.isSetSymbol())
-			ia.setSymbol(initialAssignment.getSymbol());
+		if (initialAssignment.isSetVariable())
+			ia.setSymbol(initialAssignment.getVariable());
 		return ia;
 	}
 
