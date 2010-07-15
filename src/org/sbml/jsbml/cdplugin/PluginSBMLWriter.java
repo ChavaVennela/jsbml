@@ -911,7 +911,7 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 			boolean contains = false;
 			for (int j = 0; j < model.getNumInitialAssignments() && !contains; j++) {
 				InitialAssignment ia = model.getInitialAssignment(j);
-				if (ia.getSymbol().equals(c.getSymbol())
+				if (ia.getVariable().equals(c.getSymbol())
 						&& equal(ia.getMath(), libsbml
 								.parseFormula(c.getMath())))
 					contains = true;
@@ -1139,7 +1139,7 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 					&& contains < 0; j++) {
 				PluginInitialAssignment libIA = pluginModel
 						.getInitialAssignment(j);
-				if (libIA.getSymbol().equals(ia.getSymbol())
+				if (libIA.getSymbol().equals(ia.getVariable())
 						&& equal(ia.getMath(), libsbml.parseFormula(libIA
 								.getMath())))
 					contains = j;
@@ -2428,7 +2428,7 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 	private PluginInitialAssignment writeInitialAssignment(
 			InitialAssignment initialAssignment) throws SBMLException {
 		PluginInitialAssignment ia = new PluginInitialAssignment(
-				initialAssignment.getSymbol());
+				initialAssignment.getVariable());
 		saveSBaseProperties(initialAssignment, ia);
 		saveMathContainerProperties(initialAssignment, ia);
 		return ia;
