@@ -1648,7 +1648,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 					.getVersion());
 		} else {
 			Variable s = model.findVariable(libRule.getVariable());
-			if (libRule.isAssignment()) {
+			if (libRule.isScalar() || libRule.isAssignment()) {
 				r = new AssignmentRule(s);
 			} else {
 				r = new RateRule(s);

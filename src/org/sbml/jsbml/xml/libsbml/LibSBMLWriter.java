@@ -2345,24 +2345,27 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	// @Override
 	private org.sbml.libsbml.Rule writeRule(Rule rule, Object... args) {
 		org.sbml.libsbml.Rule r;
-		if (rule.isAlgebraic())
+		if (rule.isAlgebraic()) {
 			r = new org.sbml.libsbml.AlgebraicRule(rule.getLevel(), rule
 					.getVersion());
-		else {
+		} else {
 			if (rule.isAssignment()) {
 				r = new org.sbml.libsbml.AssignmentRule(rule.getLevel(), rule
 						.getVersion());
-				if (((AssignmentRule) rule).isSetVariable())
+				if (((AssignmentRule) rule).isSetVariable()) {
 					r.setVariable(((AssignmentRule) rule).getVariable());
+				}
 			} else {
 				r = new org.sbml.libsbml.RateRule(rule.getLevel(), rule
 						.getVersion());
-				if (((RateRule) rule).isSetVariable())
+				if (((RateRule) rule).isSetVariable()) {
 					r.setVariable(((RateRule) rule).getVariable());
+				}
 			}
 		}
-		if (rule.isSetMath())
+		if (rule.isSetMath()) {
 			r.setMath(convert(rule.getMath()));
+		}
 		saveSBaseProperties(rule, r);
 		return r;
 	}
