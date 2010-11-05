@@ -58,6 +58,7 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
+import org.sbml.jsbml.Priority;
 import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
@@ -75,10 +76,7 @@ import org.sbml.jsbml.util.IOProgressListener;
 import org.sbml.libsbml.libsbmlConstants;
 
 /**
- * @author Andreas Dr&auml;ger <a
- *         href="mailto:andreas.draeger@uni-tuebingen.de">
- *         andreas.draeger@uni-tuebingen.de</a>
- * 
+ * @author Andreas Dr&auml;ger
  */
 @SuppressWarnings("deprecation")
 public class LibSBMLWriter implements SBMLOutputConverter {
@@ -858,8 +856,9 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 					if (equal(r.getMath(), c.getMath()))
 						contains = true;
 			}
-			if (!contains)
+			if (!contains) {
 				fireIOEvent(mo.getListOfRules().remove(i));
+			}
 		}
 
 		// remove unnecessary constraints
@@ -871,22 +870,25 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 				if (equal(ia.getMath(), c.getMath()))
 					contains = true;
 			}
-			if (!contains)
+			if (!contains) {
 				fireIOEvent(mo.getListOfConstraints().remove(i));
+			}
 		}
 
 		// remove reactions
 		for (i = mo.getNumReactions() - 1; i >= 0; i--) {
 			org.sbml.libsbml.Reaction r = mo.getReaction(i);
-			if (model.getReaction(r.getId()) == null)
+			if (model.getReaction(r.getId()) == null) {
 				fireIOEvent(mo.getListOfReactions().remove(i));
+			}
 		}
 
 		// remove events
 		for (i = mo.getNumEvents() - 1; i >= 0; i--) {
 			org.sbml.libsbml.Event eventOrig = mo.getEvent(i);
-			if (model.getEvent(eventOrig.getId()) == null)
+			if (model.getEvent(eventOrig.getId()) == null) {
 				fireIOEvent(mo.getListOfEvents().remove(i));
+			}
 		}
 		fireIOEvent(null);
 	}
@@ -896,8 +898,9 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @param currObject
 	 */
 	private void fireIOEvent(Object currObject) {
-		for (IOProgressListener iopl : setIOListeners)
+		for (IOProgressListener iopl : setIOListeners) {
 			iopl.ioProgressOn(currObject);
+		}
 	}
 
 	/*
@@ -915,11 +918,12 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 
 		// Function definitions
 		for (FunctionDefinition c : model.getListOfFunctionDefinitions()) {
-			if (modelOrig.getFunctionDefinition(c.getId()) == null)
+			if (modelOrig.getFunctionDefinition(c.getId()) == null) {
 				modelOrig.addFunctionDefinition(writeFunctionDefinition(c));
-			else
+			} else {
 				saveMathContainerProperties(c, modelOrig
 						.getFunctionDefinition(c.getId()));
+			}
 			fireIOEvent(c);
 		}
 
@@ -942,10 +946,11 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 							.equals("time"))) {
 				org.sbml.libsbml.UnitDefinition libU = modelOrig
 						.getUnitDefinition(ud.getId());
-				if (libU != null)
+				if (libU != null) {
 					saveUnitDefinitionProperties(ud, libU);
-				else
+				} else {
 					modelOrig.addUnitDefinition(writeUnitDefinition(ud));
+				}
 				fireIOEvent(ud);
 			}
 
@@ -961,38 +966,42 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 
 		// Species types
 		for (SpeciesType c : model.getListOfSpeciesTypes()) {
-			if (modelOrig.getSpeciesType(c.getId()) == null)
+			if (modelOrig.getSpeciesType(c.getId()) == null) {
 				modelOrig.addSpeciesType(writeSpeciesType(c));
-			else
+			} else {
 				saveNamedSBaseProperties(c, modelOrig.getSpeciesType(c.getId()));
+			}
 			fireIOEvent(c);
 		}
 
 		// Compartments
 		for (Compartment c : model.getListOfCompartments()) {
-			if (modelOrig.getCompartment(c.getId()) == null)
+			if (modelOrig.getCompartment(c.getId()) == null) {
 				modelOrig.addCompartment(writeCompartment(c));
-			else
+			} else {
 				saveCompartmentProperties(c, modelOrig
 						.getCompartment(c.getId()));
+			}
 			fireIOEvent(c);
 		}
 
 		// Species
 		for (Species s : model.getListOfSpecies()) {
-			if (modelOrig.getSpecies(s.getId()) == null)
+			if (modelOrig.getSpecies(s.getId()) == null) {
 				modelOrig.addSpecies(writeSpecies(s));
-			else
+			} else {
 				saveSpeciesProperties(s, modelOrig.getSpecies(s.getId()));
+			}
 			fireIOEvent(s);
 		}
 
 		// add or change parameters
 		for (Parameter p : model.getListOfParameters()) {
-			if (modelOrig.getParameter(p.getId()) == null)
+			if (modelOrig.getParameter(p.getId()) == null) {
 				modelOrig.addParameter(writeParameter(p));
-			else
+			} else {
 				saveParameterProperties(p, modelOrig.getParameter(p.getId()));
+			}
 			fireIOEvent(p);
 		}
 
@@ -1008,11 +1017,12 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 						&& equal(ia.getMath(), libIA.getMath()))
 					contains = j;
 			}
-			if (contains < 0)
+			if (contains < 0) {
 				modelOrig.addInitialAssignment(writeInitialAssignment(ia));
-			else
+			} else {
 				saveMathContainerProperties(ia, modelOrig
 						.getInitialAssignment(contains));
+			}
 			fireIOEvent(ia);
 		}
 
@@ -1042,11 +1052,12 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 				if (equal)
 					contains = j;
 			}
-			if (contains < 0)
+			if (contains < 0) {
 				modelOrig.addRule(writeRule(rule));
-			else
+			} else {
 				// math is equal anyway...
 				saveSBaseProperties(rule, modelOrig.getRule(contains));
+			}
 			fireIOEvent(rule);
 		}
 
@@ -1059,29 +1070,32 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 				if (equal(ia.getMath(), c.getMath()))
 					contains = j;
 			}
-			if (contains < 0)
+			if (contains < 0) {
 				modelOrig.addConstraint(writeConstraint(ia));
-			else
+			} else {
 				saveMathContainerProperties(ia, modelOrig
 						.getConstraint(contains));
+			}
 			fireIOEvent(ia);
 		}
 
 		// add or change reactions
 		for (Reaction r : model.getListOfReactions()) {
-			if (modelOrig.getReaction(r.getId()) == null)
+			if (modelOrig.getReaction(r.getId()) == null) {
 				modelOrig.addReaction(writeReaction(r));
-			else
+			} else {
 				saveReactionProperties(r, modelOrig.getReaction(r.getId()));
+			}
 			fireIOEvent(r);
 		}
 
 		// events
 		for (Event event : model.getListOfEvents()) {
-			if (modelOrig.getEvent(event.getId()) == null)
+			if (modelOrig.getEvent(event.getId()) == null) {
 				modelOrig.addEvent(writeEvent(event));
-			else
+			} else {
 				saveEventProperties(event, modelOrig.getEvent(event.getId()));
+			}
 			fireIOEvent(event);
 		}
 		removeUnneccessaryElements(model, orig);
@@ -1294,9 +1308,9 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 */
 	private void saveEventProperties(Event ev, Object event)
 			throws SBMLException {
-		if (!(event instanceof org.sbml.libsbml.Event))
-			throw new IllegalArgumentException(
-					"event must be an instance of org.sbml.libsbml.Event.");
+		if (!(event instanceof org.sbml.libsbml.Event)) {
+			throw new IllegalArgumentException("event" + error + "Event.");
+		}
 		org.sbml.libsbml.Event e = (org.sbml.libsbml.Event) event;
 		saveNamedSBaseProperties(ev, e);
 		if (ev.getUseValuesFromTriggerTime() != e.getUseValuesFromTriggerTime())
@@ -1304,18 +1318,29 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		if (ev.isSetTimeUnits() && ev.getTimeUnits() != e.getTimeUnits())
 			e.setTimeUnits(ev.getTimeUnits());
 		if (ev.isSetDelay()) {
-			if (!e.isSetDelay())
+			if (!e.isSetDelay()) {
 				e.setDelay(writeDelay(ev.getDelay()));
-			else
+			} else {
 				saveMathContainerProperties(ev.getDelay(), e.getDelay());
-		} else if (e.isSetDelay())
+			}
+		} else if (e.isSetDelay()) {
 			e.unsetDelay();
-		if (ev.isSetTrigger()) {
-			if (!e.isSetTrigger())
-				e.setTrigger(writeTrigger(ev.getTrigger()));
-			else
-				saveMathContainerProperties(ev.getTrigger(), e.getTrigger());
 		}
+		if (ev.isSetTrigger()) {
+			if (!e.isSetTrigger()) {
+				e.setTrigger(writeTrigger(ev.getTrigger()));
+			} else {
+				saveMathContainerProperties(ev.getTrigger(), e.getTrigger());
+			}
+		}
+		if (ev.isSetPriority()) {
+			if (!e.isSetPriority()) {
+				e.setPriority(writePriority(ev.getPriority()));
+			} else {
+				saveMathContainerProperties(ev.getPriority(), e.getPriority());
+			}
+		}
+
 		// synchronize event assignments
 
 		for (EventAssignment ea : ev.getListOfEventAssignments()) {
@@ -1324,13 +1349,15 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 				org.sbml.libsbml.EventAssignment libEA = e
 						.getEventAssignment(i);
 				if (libEA.getVariable().equals(ea.getVariable())
-						&& equal(ea.getMath(), libEA.getMath()))
+						&& equal(ea.getMath(), libEA.getMath())) {
 					contains = i;
+				}
 			}
-			if (contains < 0)
+			if (contains < 0) {
 				e.addEventAssignment(writeEventAssignment(ea));
-			else
+			} else {
 				saveMathContainerProperties(ea, e.getEventAssignment(contains));
+			}
 		}
 		// remove unnecessary event assignments
 		for (long i = e.getNumEventAssignments() - 1; i >= 0; i--) {
@@ -1340,11 +1367,13 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 				EventAssignment eventA = ev.getEventAssignment(j);
 				if (eventA.isSetVariable()
 						&& eventA.getVariable().equals(ea.getVariable())
-						&& equal(eventA.getMath(), ea.getMath()))
+						&& equal(eventA.getMath(), ea.getMath())) {
 					contains = true;
+				}
 			}
-			if (!contains)
+			if (!contains) {
 				e.removeEventAssignment(i);
+			}
 		}
 	}
 
@@ -1498,7 +1527,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * org.sbml.jlibsbml.SBMLWriter#saveModelHistoryProperties(org.sbml.jlibsbml
 	 * .Model, java.lang.Object)
 	 */
-	private void saveModelHistoryProperties(History m, Object modelHistory) {
+	private void saveHistoryProperties(History m, Object modelHistory) {
 		if (!(modelHistory instanceof org.sbml.libsbml.ModelHistory))
 			throw new IllegalArgumentException(
 					"model must be an instance of org.sbml.libsbml.Model.");
@@ -1607,12 +1636,12 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @seeorg.sbml.SBMLWriter#saveModifierSpeciesReferenceProperties(org.sbml.
 	 * ModifierSpeciesReference, java.lang.Object)
 	 */
-	// @Override
 	private void saveModifierSpeciesReferenceProperties(
 			ModifierSpeciesReference msr, Object modifierSpeciesReference) {
-		if (!(modifierSpeciesReference instanceof org.sbml.libsbml.ModifierSpeciesReference))
-			throw new IllegalArgumentException(
-					"modifierSpeciesReference must be an instance of org.sbml.libsbml.ModifierSpeciesReference.");
+		if (!(modifierSpeciesReference instanceof org.sbml.libsbml.ModifierSpeciesReference)) {
+			throw new IllegalArgumentException("modifierSpeciesReference"
+					+ error + "ModifierSpeciesReference.");
+		}
 		saveNamedSBaseProperties(msr, modifierSpeciesReference);
 	}
 
@@ -1622,7 +1651,6 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @see org.sbml.SBMLWriter#saveNamedSBaseProperties(org.sbml.NamedSBase,
 	 * java.lang.Object)
 	 */
-	// @Override
 	private void saveNamedSBaseProperties(NamedSBase nsb, Object sb) {
 		if (!(sb instanceof org.sbml.libsbml.SBase))
 			throw new IllegalArgumentException(
@@ -1819,11 +1847,10 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @see org.sbml.SBMLWriter#saveSBaseProperties(org.sbml.SBase,
 	 * java.lang.Object)
 	 */
-	// @Override
+
 	private void saveSBaseProperties(SBase s, Object sb) {
 		if (!(sb instanceof org.sbml.libsbml.SBase)) {
-			throw new IllegalArgumentException(
-					"sb must be an instance of org.sbml.libsbml.SBase.");
+			throw new IllegalArgumentException("sb" + error + "SBase.");
 		}
 		org.sbml.libsbml.SBase po = (org.sbml.libsbml.SBase) sb;
 		if (s.isSetMetaId() && po.isSetMetaId()
@@ -1856,6 +1883,12 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 			} else {
 				saveCVTermProperties(cvt, po.getCVTerm(contains));
 			}
+		}
+		if (s.isSetHistory()) {
+			if (!po.isSetModelHistory()) {
+				po.setModelHistory(new org.sbml.libsbml.ModelHistory());
+			}
+			saveHistoryProperties(s.getHistory(), po.getModelHistory());
 		}
 		// remove CVTerms that are not needed anymore.
 		for (long i = po.getNumCVTerms() - 1; i >= 0; i--) {
@@ -1928,7 +1961,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * org.sbml.squeezer.io.AbstractSBMLWriter#saveSpeciesReferenceProperties
 	 * (org.sbml.SpeciesReference, java.lang.Object)
 	 */
-	// @Override
+
 	private void saveSpeciesReferenceProperties(SpeciesReference sr,
 			Object specRef) throws SBMLException {
 		if (!(specRef instanceof org.sbml.libsbml.SpeciesReference))
@@ -1988,7 +2021,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeCompartment(org.sbml.Compartment)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Compartment writeCompartment(
 			Compartment compartment) {
 		org.sbml.libsbml.Compartment c = new org.sbml.libsbml.Compartment(
@@ -2014,7 +2047,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeCompartmentType(org.sbml.CompartmentType)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.CompartmentType writeCompartmentType(
 			CompartmentType compartmentType) {
 		org.sbml.libsbml.CompartmentType ct = new org.sbml.libsbml.CompartmentType(
@@ -2028,7 +2061,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeConstraint(org.sbml.Constraint)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Constraint writeConstraint(Constraint constraint) {
 		org.sbml.libsbml.Constraint c = new org.sbml.libsbml.Constraint(
 				constraint.getLevel(), constraint.getVersion());
@@ -2128,14 +2161,25 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeDelay(org.sbml.Delay)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Delay writeDelay(Delay delay) {
 		org.sbml.libsbml.Delay d = new org.sbml.libsbml.Delay(delay.getLevel(),
 				delay.getVersion());
 		saveSBaseProperties(delay, d);
-		if (delay.isSetMath())
+		if (delay.isSetMath()) {
 			d.setMath(convert(delay.getMath()));
+		}
 		return d;
+	}
+
+	private org.sbml.libsbml.Priority writePriority(Priority priority) {
+		org.sbml.libsbml.Priority p = new org.sbml.libsbml.Priority(priority
+				.getLevel(), priority.getVersion());
+		saveSBaseProperties(priority, p);
+		if (priority.isSetMath()) {
+			p.setMath(convert(priority.getMath()));
+		}
+		return p;
 	}
 
 	/*
@@ -2143,19 +2187,26 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeEvent(org.sbml.Event)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Event writeEvent(Event event) throws SBMLException {
 		org.sbml.libsbml.Event e = new org.sbml.libsbml.Event(event.getLevel(),
 				event.getVersion());
 		saveNamedSBaseProperties(event, e);
-		if (event.isSetDelay())
+		if (event.isSetDelay()) {
 			e.setDelay(writeDelay(event.getDelay()));
-		for (EventAssignment ea : event.getListOfEventAssignments())
+		}
+		if (event.isSetPriority()) {
+			e.setPriority(writePriority(event.getPriority()));
+		}
+		for (EventAssignment ea : event.getListOfEventAssignments()) {
 			e.addEventAssignment(writeEventAssignment(ea));
-		if (event.isSetTimeUnits())
+		}
+		if (event.isSetTimeUnits()) {
 			e.setTimeUnits(event.getTimeUnits());
-		if (e.isSetTrigger())
+		}
+		if (e.isSetTrigger()) {
 			e.setTrigger(writeTrigger(event.getTrigger()));
+		}
 		e.setUseValuesFromTriggerTime(event.getUseValuesFromTriggerTime());
 		return e;
 	}
@@ -2165,7 +2216,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeEventAssignment(org.sbml.EventAssignment)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.EventAssignment writeEventAssignment(
 			EventAssignment eventAssignment, Object... args)
 			throws SBMLException {
@@ -2183,7 +2234,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @see
 	 * org.sbml.SBMLWriter#writeFunctionDefinition(org.sbml.FunctionDefinition)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.FunctionDefinition writeFunctionDefinition(
 			FunctionDefinition functionDefinition) throws SBMLException {
 		org.sbml.libsbml.FunctionDefinition fd = new org.sbml.libsbml.FunctionDefinition(
@@ -2198,7 +2249,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @see
 	 * org.sbml.SBMLWriter#writeInitialAssignment(org.sbml.InitialAssignment)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.InitialAssignment writeInitialAssignment(
 			InitialAssignment initialAssignment) throws SBMLException {
 		org.sbml.libsbml.InitialAssignment ia = new org.sbml.libsbml.InitialAssignment(
@@ -2245,36 +2296,42 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		org.sbml.libsbml.Model m = new org.sbml.libsbml.Model(model.getLevel(),
 				model.getVersion());
 		saveNamedSBaseProperties(model, m);
-		if (model.isSetHistory()) {
-			if (!m.isSetModelHistory())
-				m.setModelHistory(new org.sbml.libsbml.ModelHistory());
-			saveModelHistoryProperties(model.getModelHistory(), m
-					.getModelHistory());
-		}
-		for (UnitDefinition ud : model.getListOfUnitDefinitions())
+		for (UnitDefinition ud : model.getListOfUnitDefinitions()) {
 			m.addUnitDefinition(writeUnitDefinition(ud));
-		for (FunctionDefinition fd : model.getListOfFunctionDefinitions())
+		}
+		for (FunctionDefinition fd : model.getListOfFunctionDefinitions()) {
 			m.addFunctionDefinition(writeFunctionDefinition(fd));
-		for (CompartmentType ct : model.getListOfCompartmentTypes())
+		}
+		for (CompartmentType ct : model.getListOfCompartmentTypes()) {
 			m.addCompartmentType(writeCompartmentType(ct));
-		for (SpeciesType st : model.getListOfSpeciesTypes())
+		}
+		for (SpeciesType st : model.getListOfSpeciesTypes()) {
 			m.addSpeciesType(writeSpeciesType(st));
-		for (Compartment c : model.getListOfCompartments())
+		}
+		for (Compartment c : model.getListOfCompartments()) {
 			m.addCompartment(writeCompartment(c));
-		for (Species s : model.getListOfSpecies())
+		}
+		for (Species s : model.getListOfSpecies()) {
 			m.addSpecies(writeSpecies(s));
-		for (Parameter p : model.getListOfParameters())
+		}
+		for (Parameter p : model.getListOfParameters()) {
 			m.addParameter(writeParameter(p));
-		for (Constraint c : model.getListOfConstraints())
+		}
+		for (Constraint c : model.getListOfConstraints()) {
 			m.addConstraint(writeConstraint(c));
-		for (InitialAssignment ia : model.getListOfInitialAssignments())
+		}
+		for (InitialAssignment ia : model.getListOfInitialAssignments()) {
 			m.addInitialAssignment(writeInitialAssignment(ia));
-		for (Rule r : model.getListOfRules())
+		}
+		for (Rule r : model.getListOfRules()) {
 			m.addRule(writeRule(r));
-		for (Reaction r : model.getListOfReactions())
+		}
+		for (Reaction r : model.getListOfReactions()) {
 			m.addReaction(writeReaction(r));
-		for (Event e : model.getListOfEvents())
+		}
+		for (Event e : model.getListOfEvents()) {
 			m.addEvent(writeEvent(e));
+		}
 		return m;
 	}
 
@@ -2284,7 +2341,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @seeorg.sbml.SBMLWriter#writeModifierSpeciesReference(org.sbml.
 	 * ModifierSpeciesReference)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.ModifierSpeciesReference writeModifierSpeciesReference(
 			ModifierSpeciesReference modifierSpeciesReference, Object... args) {
 		org.sbml.libsbml.ModifierSpeciesReference m = new org.sbml.libsbml.ModifierSpeciesReference(
@@ -2301,7 +2358,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeParameter(org.sbml.Parameter)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Parameter writeParameter(Parameter parameter,
 			Object... args) {
 		org.sbml.libsbml.Parameter p = new org.sbml.libsbml.Parameter(parameter
@@ -2342,7 +2399,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeRule(org.sbml.Rule)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Rule writeRule(Rule rule, Object... args) {
 		org.sbml.libsbml.Rule r;
 		if (rule.isAlgebraic()) {
@@ -2431,7 +2488,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeSpecies(org.sbml.Species)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Species writeSpecies(Species species) {
 		org.sbml.libsbml.Species s = new org.sbml.libsbml.Species(species
 				.getLevel(), species.getVersion());
@@ -2457,7 +2514,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeSpeciesReference(org.sbml.SpeciesReference)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.SpeciesReference writeSpeciesReference(
 			SpeciesReference speciesReference, Object... args) {
 		org.sbml.libsbml.SpeciesReference sr = new org.sbml.libsbml.SpeciesReference(
@@ -2478,7 +2535,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeSpeciesType(org.sbml.SpeciesType)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.SpeciesType writeSpeciesType(
 			SpeciesType speciesType) {
 		org.sbml.libsbml.SpeciesType st = new org.sbml.libsbml.SpeciesType(
@@ -2493,7 +2550,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * @see
 	 * org.sbml.SBMLWriter#writeStoichoimetryMath(org.sbml.StoichiometryMath)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.StoichiometryMath writeStoichoimetryMath(
 			StoichiometryMath stoichiometryMath) {
 		org.sbml.libsbml.StoichiometryMath sm = new org.sbml.libsbml.StoichiometryMath(
@@ -2509,13 +2566,19 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeTrigger(org.sbml.Trigger)
 	 */
-	// @Override
 	private org.sbml.libsbml.Trigger writeTrigger(Trigger trigger) {
 		org.sbml.libsbml.Trigger t = new org.sbml.libsbml.Trigger(trigger
 				.getLevel(), trigger.getVersion());
 		saveSBaseProperties(trigger, t);
-		if (trigger.isSetMath())
+		if (trigger.isSetInitialValue()) {
+			t.setInitialValue(trigger.getInitialValue());
+		}
+		if (trigger.isSetPersistent()) {
+			t.setPersistent(trigger.getPersistent());
+		}
+		if (trigger.isSetMath()) {
 			t.setMath(convert(trigger.getMath()));
+		}
 		return t;
 	}
 
@@ -2524,7 +2587,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 	 * 
 	 * @see org.sbml.SBMLWriter#writeUnit(org.sbml.Unit)
 	 */
-	// @Override
+
 	private org.sbml.libsbml.Unit writeUnit(Unit unit, Object... args) {
 		org.sbml.libsbml.Unit u = new org.sbml.libsbml.Unit(unit.getLevel(),
 				unit.getVersion());

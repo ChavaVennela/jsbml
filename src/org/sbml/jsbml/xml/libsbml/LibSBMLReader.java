@@ -62,6 +62,7 @@ import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.NamedSBaseWithDerivedUnit;
 import org.sbml.jsbml.Parameter;
+import org.sbml.jsbml.Priority;
 import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
@@ -100,21 +101,26 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * @param model
 	 */
 	private static final void addPredefinedUnitDefinitions(Model model) {
-		if (model.getUnitDefinition("substance") == null)
+		if (model.getUnitDefinition("substance") == null) {
 			model.addUnitDefinition(UnitDefinition.substance(model.getLevel(),
 					model.getVersion()));
-		if (model.getUnitDefinition("volume") == null)
+		}
+		if (model.getUnitDefinition("volume") == null) {
 			model.addUnitDefinition(UnitDefinition.volume(model.getLevel(),
 					model.getVersion()));
-		if (model.getUnitDefinition("area") == null)
+		}
+		if (model.getUnitDefinition("area") == null) {
 			model.addUnitDefinition(UnitDefinition.area(model.getLevel(), model
 					.getVersion()));
-		if (model.getUnitDefinition("length") == null)
+		}
+		if (model.getUnitDefinition("length") == null) {
 			model.addUnitDefinition(UnitDefinition.length(model.getLevel(),
 					model.getVersion()));
-		if (model.getUnitDefinition("time") == null)
+		}
+		if (model.getUnitDefinition("time") == null) {
 			model.addUnitDefinition(UnitDefinition.time(model.getLevel(), model
 					.getVersion()));
+		}
 	}
 
 	/**
@@ -125,550 +131,552 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 */
 	static final SBMLException convert(SBMLError error) {
 		SBMLException exc = new SBMLException(error.getMessage());
-		if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_GENERAL_CONSISTENCY)
+		if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_GENERAL_CONSISTENCY) {
 			exc.setCategory(SBMLException.Category.GENERAL_CONSISTENCY);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_IDENTIFIER_CONSISTENCY)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_IDENTIFIER_CONSISTENCY) {
 			exc.setCategory(SBMLException.Category.IDENTIFIER_CONSISTENCY);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_INTERNAL)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_INTERNAL) {
 			exc.setCategory(SBMLException.Category.INTERNAL);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_INTERNAL_CONSISTENCY)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_INTERNAL_CONSISTENCY) {
 			exc.setCategory(SBMLException.Category.INTERNAL_CONSISTENCY);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_MATHML_CONSISTENCY)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_MATHML_CONSISTENCY) {
 			exc.setCategory(SBMLException.Category.MATHML_CONSISTENCY);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_MODELING_PRACTICE)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_MODELING_PRACTICE) {
 			exc.setCategory(SBMLException.Category.MODELING_PRACTICE);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_OVERDETERMINED_MODEL)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_OVERDETERMINED_MODEL) {
 			exc.setCategory(SBMLException.Category.OVERDETERMINED_MODEL);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML) {
 			exc.setCategory(SBMLException.Category.SBML);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L1_COMPAT)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L1_COMPAT) {
 			exc.setCategory(SBMLException.Category.SBML_L1_COMPAT);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V1_COMPAT)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V1_COMPAT) {
 			exc.setCategory(SBMLException.Category.SBML_L2V1_COMPAT);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V2_COMPAT)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V2_COMPAT) {
 			exc.setCategory(SBMLException.Category.SBML_L2V2_COMPAT);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V3_COMPAT)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V3_COMPAT) {
 			exc.setCategory(SBMLException.Category.SBML_L2V3_COMPAT);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V4_COMPAT)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBML_L2V4_COMPAT) {
 			exc.setCategory(SBMLException.Category.SBML_L2V4_COMPAT);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBO_CONSISTENCY)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SBO_CONSISTENCY) {
 			exc.setCategory(SBMLException.Category.SBO_CONSISTENCY);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SYSTEM)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_SYSTEM) {
 			exc.setCategory(SBMLException.Category.SYSTEM);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_UNITS_CONSISTENCY)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_UNITS_CONSISTENCY) {
 			exc.setCategory(SBMLException.Category.UNITS_CONSISTENCY);
-		else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_XML)
+		} else if (error.getCategory() == libsbmlConstants.LIBSBML_CAT_XML) {
 			exc.setCategory(SBMLException.Category.XML);
+		}
 		exc.setShortMessage(error.getShortMessage());
-		if (error.getErrorId() == libsbmlConstants.UnknownError)
+		if (error.getErrorId() == libsbmlConstants.UnknownError) {
 			exc.setCode(SBMLException.Code.UnknownError);
-		else if (error.getErrorId() == libsbmlConstants.NotUTF8)
+		} else if (error.getErrorId() == libsbmlConstants.NotUTF8) {
 			exc.setCode(SBMLException.Code.NotUTF8);
-		else if (error.getErrorId() == libsbmlConstants.UnrecognizedElement)
+		} else if (error.getErrorId() == libsbmlConstants.UnrecognizedElement) {
 			exc.setCode(SBMLException.Code.UnrecognizedElement);
-		else if (error.getErrorId() == libsbmlConstants.NotSchemaConformant)
+		} else if (error.getErrorId() == libsbmlConstants.NotSchemaConformant) {
 			exc.setCode(SBMLException.Code.NotSchemaConformant);
-		else if (error.getErrorId() == libsbmlConstants.InvalidMathElement)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidMathElement) {
 			exc.setCode(SBMLException.Code.InvalidMathElement);
-		else if (error.getErrorId() == libsbmlConstants.DisallowedMathMLSymbol)
+		} else if (error.getErrorId() == libsbmlConstants.DisallowedMathMLSymbol) {
 			exc.setCode(SBMLException.Code.DisallowedMathMLSymbol);
-		else if (error.getErrorId() == libsbmlConstants.DisallowedMathMLEncodingUse)
+		} else if (error.getErrorId() == libsbmlConstants.DisallowedMathMLEncodingUse) {
 			exc.setCode(SBMLException.Code.DisallowedMathMLEncodingUse);
-		else if (error.getErrorId() == libsbmlConstants.DisallowedDefinitionURLUse)
+		} else if (error.getErrorId() == libsbmlConstants.DisallowedDefinitionURLUse) {
 			exc.setCode(SBMLException.Code.DisallowedDefinitionURLUse);
-		else if (error.getErrorId() == libsbmlConstants.BadCsymbolDefinitionURLValue)
+		} else if (error.getErrorId() == libsbmlConstants.BadCsymbolDefinitionURLValue) {
 			exc.setCode(SBMLException.Code.BadCsymbolDefinitionURLValue);
-		else if (error.getErrorId() == libsbmlConstants.DisallowedMathTypeAttributeUse)
+		} else if (error.getErrorId() == libsbmlConstants.DisallowedMathTypeAttributeUse) {
 			exc.setCode(SBMLException.Code.DisallowedMathTypeAttributeUse);
-		else if (error.getErrorId() == libsbmlConstants.DisallowedMathTypeAttributeValue)
+		} else if (error.getErrorId() == libsbmlConstants.DisallowedMathTypeAttributeValue) {
 			exc.setCode(SBMLException.Code.DisallowedMathTypeAttributeValue);
-		else if (error.getErrorId() == libsbmlConstants.LambdaOnlyAllowedInFunctionDef)
+		} else if (error.getErrorId() == libsbmlConstants.LambdaOnlyAllowedInFunctionDef) {
 			exc.setCode(SBMLException.Code.LambdaOnlyAllowedInFunctionDef);
-		else if (error.getErrorId() == libsbmlConstants.BooleanOpsNeedBooleanArgs)
+		} else if (error.getErrorId() == libsbmlConstants.BooleanOpsNeedBooleanArgs) {
 			exc.setCode(SBMLException.Code.BooleanOpsNeedBooleanArgs);
-		else if (error.getErrorId() == libsbmlConstants.NumericOpsNeedNumericArgs)
+		} else if (error.getErrorId() == libsbmlConstants.NumericOpsNeedNumericArgs) {
 			exc.setCode(SBMLException.Code.NumericOpsNeedNumericArgs);
-		else if (error.getErrorId() == libsbmlConstants.ArgsToEqNeedSameType)
+		} else if (error.getErrorId() == libsbmlConstants.ArgsToEqNeedSameType) {
 			exc.setCode(SBMLException.Code.ArgsToEqNeedSameType);
-		else if (error.getErrorId() == libsbmlConstants.PiecewiseNeedsConsistentTypes)
+		} else if (error.getErrorId() == libsbmlConstants.PiecewiseNeedsConsistentTypes) {
 			exc.setCode(SBMLException.Code.PiecewiseNeedsConsistentTypes);
-		else if (error.getErrorId() == libsbmlConstants.PieceNeedsBoolean)
+		} else if (error.getErrorId() == libsbmlConstants.PieceNeedsBoolean) {
 			exc.setCode(SBMLException.Code.PieceNeedsBoolean);
-		else if (error.getErrorId() == libsbmlConstants.ApplyCiMustBeUserFunction)
+		} else if (error.getErrorId() == libsbmlConstants.ApplyCiMustBeUserFunction) {
 			exc.setCode(SBMLException.Code.ApplyCiMustBeUserFunction);
-		else if (error.getErrorId() == libsbmlConstants.ApplyCiMustBeModelComponent)
+		} else if (error.getErrorId() == libsbmlConstants.ApplyCiMustBeModelComponent) {
 			exc.setCode(SBMLException.Code.ApplyCiMustBeModelComponent);
-		else if (error.getErrorId() == libsbmlConstants.KineticLawParametersAreLocalOnly)
+		} else if (error.getErrorId() == libsbmlConstants.KineticLawParametersAreLocalOnly) {
 			exc.setCode(SBMLException.Code.KineticLawParametersAreLocalOnly);
-		else if (error.getErrorId() == libsbmlConstants.MathResultMustBeNumeric)
+		} else if (error.getErrorId() == libsbmlConstants.MathResultMustBeNumeric) {
 			exc.setCode(SBMLException.Code.MathResultMustBeNumeric);
-		else if (error.getErrorId() == libsbmlConstants.OpsNeedCorrectNumberOfArgs)
+		} else if (error.getErrorId() == libsbmlConstants.OpsNeedCorrectNumberOfArgs) {
 			exc.setCode(SBMLException.Code.OpsNeedCorrectNumberOfArgs);
-		else if (error.getErrorId() == libsbmlConstants.InvalidNoArgsPassedToFunctionDef)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidNoArgsPassedToFunctionDef) {
 			exc.setCode(SBMLException.Code.InvalidNoArgsPassedToFunctionDef);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateComponentId)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateComponentId) {
 			exc.setCode(SBMLException.Code.DuplicateComponentId);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateUnitDefinitionId)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateUnitDefinitionId) {
 			exc.setCode(SBMLException.Code.DuplicateUnitDefinitionId);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateLocalParameterId)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateLocalParameterId) {
 			exc.setCode(SBMLException.Code.DuplicateLocalParameterId);
-		else if (error.getErrorId() == libsbmlConstants.MultipleAssignmentOrRateRules)
+		} else if (error.getErrorId() == libsbmlConstants.MultipleAssignmentOrRateRules) {
 			exc.setCode(SBMLException.Code.MultipleAssignmentOrRateRules);
-		else if (error.getErrorId() == libsbmlConstants.MultipleEventAssignmentsForId)
+		} else if (error.getErrorId() == libsbmlConstants.MultipleEventAssignmentsForId) {
 			exc.setCode(SBMLException.Code.MultipleEventAssignmentsForId);
-		else if (error.getErrorId() == libsbmlConstants.EventAndAssignmentRuleForId)
+		} else if (error.getErrorId() == libsbmlConstants.EventAndAssignmentRuleForId) {
 			exc.setCode(SBMLException.Code.EventAndAssignmentRuleForId);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateMetaId)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateMetaId) {
 			exc.setCode(SBMLException.Code.DuplicateMetaId);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSBOTermSyntax)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSBOTermSyntax) {
 			exc.setCode(SBMLException.Code.InvalidSBOTermSyntax);
-		else if (error.getErrorId() == libsbmlConstants.InvalidMetaidSyntax)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidMetaidSyntax) {
 			exc.setCode(SBMLException.Code.InvalidMetaidSyntax);
-		else if (error.getErrorId() == libsbmlConstants.InvalidIdSyntax)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidIdSyntax) {
 			exc.setCode(SBMLException.Code.InvalidIdSyntax);
-		else if (error.getErrorId() == libsbmlConstants.InvalidUnitIdSyntax)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidUnitIdSyntax) {
 			exc.setCode(SBMLException.Code.InvalidUnitIdSyntax);
-		else if (error.getErrorId() == libsbmlConstants.MissingAnnotationNamespace)
+		} else if (error.getErrorId() == libsbmlConstants.MissingAnnotationNamespace) {
 			exc.setCode(SBMLException.Code.MissingAnnotationNamespace);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationNamespaces)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationNamespaces) {
 			exc.setCode(SBMLException.Code.DuplicateAnnotationNamespaces);
-		else if (error.getErrorId() == libsbmlConstants.SBMLNamespaceInAnnotation)
+		} else if (error.getErrorId() == libsbmlConstants.SBMLNamespaceInAnnotation) {
 			exc.setCode(SBMLException.Code.SBMLNamespaceInAnnotation);
-		else if (error.getErrorId() == libsbmlConstants.InconsistentArgUnits)
+		} else if (error.getErrorId() == libsbmlConstants.InconsistentArgUnits) {
 			exc.setCode(SBMLException.Code.InconsistentArgUnits);
-		else if (error.getErrorId() == libsbmlConstants.AssignRuleCompartmentMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.AssignRuleCompartmentMismatch) {
 			exc.setCode(SBMLException.Code.AssignRuleCompartmentMismatch);
-		else if (error.getErrorId() == libsbmlConstants.AssignRuleSpeciesMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.AssignRuleSpeciesMismatch) {
 			exc.setCode(SBMLException.Code.AssignRuleSpeciesMismatch);
-		else if (error.getErrorId() == libsbmlConstants.AssignRuleParameterMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.AssignRuleParameterMismatch) {
 			exc.setCode(SBMLException.Code.AssignRuleParameterMismatch);
-		else if (error.getErrorId() == libsbmlConstants.InitAssignCompartmenMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.InitAssignCompartmenMismatch) {
 			exc.setCode(SBMLException.Code.InitAssignCompartmenMismatch);
-		else if (error.getErrorId() == libsbmlConstants.InitAssignSpeciesMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.InitAssignSpeciesMismatch) {
 			exc.setCode(SBMLException.Code.InitAssignSpeciesMismatch);
-		else if (error.getErrorId() == libsbmlConstants.InitAssignParameterMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.InitAssignParameterMismatch) {
 			exc.setCode(SBMLException.Code.InitAssignParameterMismatch);
-		else if (error.getErrorId() == libsbmlConstants.RateRuleCompartmentMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.RateRuleCompartmentMismatch) {
 			exc.setCode(SBMLException.Code.RateRuleCompartmentMismatch);
-		else if (error.getErrorId() == libsbmlConstants.RateRuleSpeciesMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.RateRuleSpeciesMismatch) {
 			exc.setCode(SBMLException.Code.RateRuleSpeciesMismatch);
-		else if (error.getErrorId() == libsbmlConstants.RateRuleParameterMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.RateRuleParameterMismatch) {
 			exc.setCode(SBMLException.Code.RateRuleParameterMismatch);
-		else if (error.getErrorId() == libsbmlConstants.KineticLawNotSubstancePerTime)
+		} else if (error.getErrorId() == libsbmlConstants.KineticLawNotSubstancePerTime) {
 			exc.setCode(SBMLException.Code.KineticLawNotSubstancePerTime);
-		else if (error.getErrorId() == libsbmlConstants.DelayUnitsNotTime)
+		} else if (error.getErrorId() == libsbmlConstants.DelayUnitsNotTime) {
 			exc.setCode(SBMLException.Code.DelayUnitsNotTime);
-		else if (error.getErrorId() == libsbmlConstants.EventAssignCompartmentMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.EventAssignCompartmentMismatch) {
 			exc.setCode(SBMLException.Code.EventAssignCompartmentMismatch);
-		else if (error.getErrorId() == libsbmlConstants.EventAssignSpeciesMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.EventAssignSpeciesMismatch) {
 			exc.setCode(SBMLException.Code.EventAssignSpeciesMismatch);
-		else if (error.getErrorId() == libsbmlConstants.EventAssignParameterMismatch)
+		} else if (error.getErrorId() == libsbmlConstants.EventAssignParameterMismatch) {
 			exc.setCode(SBMLException.Code.EventAssignParameterMismatch);
-		else if (error.getErrorId() == libsbmlConstants.OverdeterminedSystem)
+		} else if (error.getErrorId() == libsbmlConstants.OverdeterminedSystem) {
 			exc.setCode(SBMLException.Code.OverdeterminedSystem);
-		else if (error.getErrorId() == libsbmlConstants.InvalidModelSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidModelSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidModelSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidFunctionDefSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidFunctionDefSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidFunctionDefSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidParameterSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidParameterSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidParameterSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidInitAssignSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidInitAssignSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidInitAssignSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidRuleSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidRuleSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidRuleSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidConstraintSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidConstraintSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidConstraintSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidReactionSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidReactionSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidReactionSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesReferenceSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesReferenceSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidSpeciesReferenceSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidKineticLawSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidKineticLawSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidKineticLawSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidEventSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidEventSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidEventSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidEventAssignmentSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidEventAssignmentSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidEventAssignmentSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidCompartmentSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidCompartmentSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidCompartmentSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidSpeciesSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidCompartmentTypeSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidCompartmentTypeSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidCompartmentTypeSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesTypeSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesTypeSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidSpeciesTypeSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidTriggerSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidTriggerSBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidTriggerSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.InvalidDelaySBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidDelaySBOTerm) {
 			exc.setCode(SBMLException.Code.InvalidDelaySBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.NotesNotInXHTMLNamespace)
+		} else if (error.getErrorId() == libsbmlConstants.NotesNotInXHTMLNamespace) {
 			exc.setCode(SBMLException.Code.NotesNotInXHTMLNamespace);
-		else if (error.getErrorId() == libsbmlConstants.NotesContainsXMLDecl)
+		} else if (error.getErrorId() == libsbmlConstants.NotesContainsXMLDecl) {
 			exc.setCode(SBMLException.Code.NotesContainsXMLDecl);
-		else if (error.getErrorId() == libsbmlConstants.NotesContainsDOCTYPE)
+		} else if (error.getErrorId() == libsbmlConstants.NotesContainsDOCTYPE) {
 			exc.setCode(SBMLException.Code.NotesContainsDOCTYPE);
-		else if (error.getErrorId() == libsbmlConstants.InvalidNotesContent)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidNotesContent) {
 			exc.setCode(SBMLException.Code.InvalidNotesContent);
-		else if (error.getErrorId() == libsbmlConstants.InvalidNamespaceOnSBML)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidNamespaceOnSBML) {
 			exc.setCode(SBMLException.Code.InvalidNamespaceOnSBML);
-		else if (error.getErrorId() == libsbmlConstants.MissingOrInconsistentLevel)
+		} else if (error.getErrorId() == libsbmlConstants.MissingOrInconsistentLevel) {
 			exc.setCode(SBMLException.Code.MissingOrInconsistentLevel);
-		else if (error.getErrorId() == libsbmlConstants.MissingOrInconsistentVersion)
+		} else if (error.getErrorId() == libsbmlConstants.MissingOrInconsistentVersion) {
 			exc.setCode(SBMLException.Code.MissingOrInconsistentVersion);
-		else if (error.getErrorId() == libsbmlConstants.AnnotationNotesNotAllowedLevel1)
+		} else if (error.getErrorId() == libsbmlConstants.AnnotationNotesNotAllowedLevel1) {
 			exc.setCode(SBMLException.Code.AnnotationNotesNotAllowedLevel1);
-		else if (error.getErrorId() == libsbmlConstants.MissingModel)
+		} else if (error.getErrorId() == libsbmlConstants.MissingModel) {
 			exc.setCode(SBMLException.Code.MissingModel);
-		else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInModel)
+		} else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInModel) {
 			exc.setCode(SBMLException.Code.IncorrectOrderInModel);
-		else if (error.getErrorId() == libsbmlConstants.EmptyListElement)
+		} else if (error.getErrorId() == libsbmlConstants.EmptyListElement) {
 			exc.setCode(SBMLException.Code.EmptyListElement);
-		else if (error.getErrorId() == libsbmlConstants.NeedCompartmentIfHaveSpecies)
+		} else if (error.getErrorId() == libsbmlConstants.NeedCompartmentIfHaveSpecies) {
 			exc.setCode(SBMLException.Code.NeedCompartmentIfHaveSpecies);
-		else if (error.getErrorId() == libsbmlConstants.FunctionDefMathNotLambda)
+		} else if (error.getErrorId() == libsbmlConstants.FunctionDefMathNotLambda) {
 			exc.setCode(SBMLException.Code.FunctionDefMathNotLambda);
-		else if (error.getErrorId() == libsbmlConstants.InvalidApplyCiInLambda)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidApplyCiInLambda) {
 			exc.setCode(SBMLException.Code.InvalidApplyCiInLambda);
-		else if (error.getErrorId() == libsbmlConstants.RecursiveFunctionDefinition)
+		} else if (error.getErrorId() == libsbmlConstants.RecursiveFunctionDefinition) {
 			exc.setCode(SBMLException.Code.RecursiveFunctionDefinition);
-		else if (error.getErrorId() == libsbmlConstants.InvalidCiInLambda)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidCiInLambda) {
 			exc.setCode(SBMLException.Code.InvalidCiInLambda);
-		else if (error.getErrorId() == libsbmlConstants.InvalidFunctionDefReturnType)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidFunctionDefReturnType) {
 			exc.setCode(SBMLException.Code.InvalidFunctionDefReturnType);
-		else if (error.getErrorId() == libsbmlConstants.InvalidUnitDefId)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidUnitDefId) {
 			exc.setCode(SBMLException.Code.InvalidUnitDefId);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSubstanceRedefinition)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSubstanceRedefinition) {
 			exc.setCode(SBMLException.Code.InvalidSubstanceRedefinition);
-		else if (error.getErrorId() == libsbmlConstants.InvalidLengthRedefinition)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidLengthRedefinition) {
 			exc.setCode(SBMLException.Code.InvalidLengthRedefinition);
-		else if (error.getErrorId() == libsbmlConstants.InvalidAreaRedefinition)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidAreaRedefinition) {
 			exc.setCode(SBMLException.Code.InvalidAreaRedefinition);
-		else if (error.getErrorId() == libsbmlConstants.InvalidTimeRedefinition)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidTimeRedefinition) {
 			exc.setCode(SBMLException.Code.InvalidTimeRedefinition);
-		else if (error.getErrorId() == libsbmlConstants.InvalidVolumeRedefinition)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidVolumeRedefinition) {
 			exc.setCode(SBMLException.Code.InvalidVolumeRedefinition);
-		else if (error.getErrorId() == libsbmlConstants.VolumeLitreDefExponentNotOne)
+		} else if (error.getErrorId() == libsbmlConstants.VolumeLitreDefExponentNotOne) {
 			exc.setCode(SBMLException.Code.VolumeLitreDefExponentNotOne);
-		else if (error.getErrorId() == libsbmlConstants.VolumeMetreDefExponentNot3)
+		} else if (error.getErrorId() == libsbmlConstants.VolumeMetreDefExponentNot3) {
 			exc.setCode(SBMLException.Code.VolumeMetreDefExponentNot3);
-		else if (error.getErrorId() == libsbmlConstants.EmptyListOfUnits)
+		} else if (error.getErrorId() == libsbmlConstants.EmptyListOfUnits) {
 			exc.setCode(SBMLException.Code.EmptyListOfUnits);
-		else if (error.getErrorId() == libsbmlConstants.InvalidUnitKind)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidUnitKind) {
 			exc.setCode(SBMLException.Code.InvalidUnitKind);
-		else if (error.getErrorId() == libsbmlConstants.OffsetNoLongerValid)
+		} else if (error.getErrorId() == libsbmlConstants.OffsetNoLongerValid) {
 			exc.setCode(SBMLException.Code.OffsetNoLongerValid);
-		else if (error.getErrorId() == libsbmlConstants.CelsiusNoLongerValid)
+		} else if (error.getErrorId() == libsbmlConstants.CelsiusNoLongerValid) {
 			exc.setCode(SBMLException.Code.CelsiusNoLongerValid);
-		else if (error.getErrorId() == libsbmlConstants.ZeroDimensionalCompartmentSize)
+		} else if (error.getErrorId() == libsbmlConstants.ZeroDimensionalCompartmentSize) {
 			exc.setCode(SBMLException.Code.ZeroDimensionalCompartmentSize);
-		else if (error.getErrorId() == libsbmlConstants.ZeroDimensionalCompartmentUnits)
+		} else if (error.getErrorId() == libsbmlConstants.ZeroDimensionalCompartmentUnits) {
 			exc.setCode(SBMLException.Code.ZeroDimensionalCompartmentUnits);
-		else if (error.getErrorId() == libsbmlConstants.ZeroDimensionalCompartmentConst)
+		} else if (error.getErrorId() == libsbmlConstants.ZeroDimensionalCompartmentConst) {
 			exc.setCode(SBMLException.Code.ZeroDimensionalCompartmentConst);
-		else if (error.getErrorId() == libsbmlConstants.UndefinedOutsideCompartment)
+		} else if (error.getErrorId() == libsbmlConstants.UndefinedOutsideCompartment) {
 			exc.setCode(SBMLException.Code.UndefinedOutsideCompartment);
-		else if (error.getErrorId() == libsbmlConstants.RecursiveCompartmentContainment)
+		} else if (error.getErrorId() == libsbmlConstants.RecursiveCompartmentContainment) {
 			exc.setCode(SBMLException.Code.RecursiveCompartmentContainment);
-		else if (error.getErrorId() == libsbmlConstants.ZeroDCompartmentContainment)
+		} else if (error.getErrorId() == libsbmlConstants.ZeroDCompartmentContainment) {
 			exc.setCode(SBMLException.Code.ZeroDCompartmentContainment);
-		else if (error.getErrorId() == libsbmlConstants.Invalid1DCompartmentUnits)
+		} else if (error.getErrorId() == libsbmlConstants.Invalid1DCompartmentUnits) {
 			exc.setCode(SBMLException.Code.Invalid1DCompartmentUnits);
-		else if (error.getErrorId() == libsbmlConstants.Invalid2DCompartmentUnits)
+		} else if (error.getErrorId() == libsbmlConstants.Invalid2DCompartmentUnits) {
 			exc.setCode(SBMLException.Code.Invalid2DCompartmentUnits);
-		else if (error.getErrorId() == libsbmlConstants.Invalid3DCompartmentUnits)
+		} else if (error.getErrorId() == libsbmlConstants.Invalid3DCompartmentUnits) {
 			exc.setCode(SBMLException.Code.Invalid3DCompartmentUnits);
-		else if (error.getErrorId() == libsbmlConstants.InvalidCompartmentTypeRef)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidCompartmentTypeRef) {
 			exc.setCode(SBMLException.Code.InvalidCompartmentTypeRef);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesCompartmentRef)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesCompartmentRef) {
 			exc.setCode(SBMLException.Code.InvalidSpeciesCompartmentRef);
-		else if (error.getErrorId() == libsbmlConstants.HasOnlySubsNoSpatialUnits)
+		} else if (error.getErrorId() == libsbmlConstants.HasOnlySubsNoSpatialUnits) {
 			exc.setCode(SBMLException.Code.HasOnlySubsNoSpatialUnits);
-		else if (error.getErrorId() == libsbmlConstants.NoSpatialUnitsInZeroD)
+		} else if (error.getErrorId() == libsbmlConstants.NoSpatialUnitsInZeroD) {
 			exc.setCode(SBMLException.Code.NoSpatialUnitsInZeroD);
-		else if (error.getErrorId() == libsbmlConstants.NoConcentrationInZeroD)
+		} else if (error.getErrorId() == libsbmlConstants.NoConcentrationInZeroD) {
 			exc.setCode(SBMLException.Code.NoConcentrationInZeroD);
-		else if (error.getErrorId() == libsbmlConstants.SpatialUnitsInOneD)
+		} else if (error.getErrorId() == libsbmlConstants.SpatialUnitsInOneD) {
 			exc.setCode(SBMLException.Code.SpatialUnitsInOneD);
-		else if (error.getErrorId() == libsbmlConstants.SpatialUnitsInTwoD)
+		} else if (error.getErrorId() == libsbmlConstants.SpatialUnitsInTwoD) {
 			exc.setCode(SBMLException.Code.SpatialUnitsInTwoD);
-		else if (error.getErrorId() == libsbmlConstants.SpatialUnitsInThreeD)
+		} else if (error.getErrorId() == libsbmlConstants.SpatialUnitsInThreeD) {
 			exc.setCode(SBMLException.Code.SpatialUnitsInThreeD);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesSusbstanceUnits)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesSusbstanceUnits) {
 			exc.setCode(SBMLException.Code.InvalidSpeciesSusbstanceUnits);
-		else if (error.getErrorId() == libsbmlConstants.BothAmountAndConcentrationSet)
+		} else if (error.getErrorId() == libsbmlConstants.BothAmountAndConcentrationSet) {
 			exc.setCode(SBMLException.Code.BothAmountAndConcentrationSet);
-		else if (error.getErrorId() == libsbmlConstants.NonBoundarySpeciesAssignedAndUsed)
+		} else if (error.getErrorId() == libsbmlConstants.NonBoundarySpeciesAssignedAndUsed) {
 			exc.setCode(SBMLException.Code.NonBoundarySpeciesAssignedAndUsed);
-		else if (error.getErrorId() == libsbmlConstants.NonConstantSpeciesUsed)
+		} else if (error.getErrorId() == libsbmlConstants.NonConstantSpeciesUsed) {
 			exc.setCode(SBMLException.Code.NonConstantSpeciesUsed);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesTypeRef)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesTypeRef) {
 			exc.setCode(SBMLException.Code.InvalidSpeciesTypeRef);
-		else if (error.getErrorId() == libsbmlConstants.MultSpeciesSameTypeInCompartment)
+		} else if (error.getErrorId() == libsbmlConstants.MultSpeciesSameTypeInCompartment) {
 			exc.setCode(SBMLException.Code.MultSpeciesSameTypeInCompartment);
-		else if (error.getErrorId() == libsbmlConstants.MissingSpeciesCompartment)
+		} else if (error.getErrorId() == libsbmlConstants.MissingSpeciesCompartment) {
 			exc.setCode(SBMLException.Code.MissingSpeciesCompartment);
-		else if (error.getErrorId() == libsbmlConstants.SpatialSizeUnitsRemoved)
+		} else if (error.getErrorId() == libsbmlConstants.SpatialSizeUnitsRemoved) {
 			exc.setCode(SBMLException.Code.SpatialSizeUnitsRemoved);
-		else if (error.getErrorId() == libsbmlConstants.InvalidParameterUnits)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidParameterUnits) {
 			exc.setCode(SBMLException.Code.InvalidParameterUnits);
-		else if (error.getErrorId() == libsbmlConstants.InvalidInitAssignSymbol)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidInitAssignSymbol) {
 			exc.setCode(SBMLException.Code.InvalidInitAssignSymbol);
-		else if (error.getErrorId() == libsbmlConstants.MultipleInitAssignments)
+		} else if (error.getErrorId() == libsbmlConstants.MultipleInitAssignments) {
 			exc.setCode(SBMLException.Code.MultipleInitAssignments);
-		else if (error.getErrorId() == libsbmlConstants.InitAssignmentAndRuleForSameId)
+		} else if (error.getErrorId() == libsbmlConstants.InitAssignmentAndRuleForSameId) {
 			exc.setCode(SBMLException.Code.InitAssignmentAndRuleForSameId);
-		else if (error.getErrorId() == libsbmlConstants.InvalidAssignRuleVariable)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidAssignRuleVariable) {
 			exc.setCode(SBMLException.Code.InvalidAssignRuleVariable);
-		else if (error.getErrorId() == libsbmlConstants.InvalidRateRuleVariable)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidRateRuleVariable) {
 			exc.setCode(SBMLException.Code.InvalidRateRuleVariable);
-		else if (error.getErrorId() == libsbmlConstants.AssignmentToConstantEntity)
+		} else if (error.getErrorId() == libsbmlConstants.AssignmentToConstantEntity) {
 			exc.setCode(SBMLException.Code.AssignmentToConstantEntity);
-		else if (error.getErrorId() == libsbmlConstants.RateRuleForConstantEntity)
+		} else if (error.getErrorId() == libsbmlConstants.RateRuleForConstantEntity) {
 			exc.setCode(SBMLException.Code.RateRuleForConstantEntity);
-		else if (error.getErrorId() == libsbmlConstants.CircularRuleDependency)
+		} else if (error.getErrorId() == libsbmlConstants.CircularRuleDependency) {
 			exc.setCode(SBMLException.Code.CircularRuleDependency);
-		else if (error.getErrorId() == libsbmlConstants.ConstraintMathNotBoolean)
+		} else if (error.getErrorId() == libsbmlConstants.ConstraintMathNotBoolean) {
 			exc.setCode(SBMLException.Code.ConstraintMathNotBoolean);
-		else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInConstraint)
+		} else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInConstraint) {
 			exc.setCode(SBMLException.Code.IncorrectOrderInConstraint);
-		else if (error.getErrorId() == libsbmlConstants.ConstraintNotInXHTMLNamespace)
+		} else if (error.getErrorId() == libsbmlConstants.ConstraintNotInXHTMLNamespace) {
 			exc.setCode(SBMLException.Code.ConstraintNotInXHTMLNamespace);
-		else if (error.getErrorId() == libsbmlConstants.ConstraintContainsXMLDecl)
+		} else if (error.getErrorId() == libsbmlConstants.ConstraintContainsXMLDecl) {
 			exc.setCode(SBMLException.Code.ConstraintContainsXMLDecl);
-		else if (error.getErrorId() == libsbmlConstants.ConstraintContainsDOCTYPE)
+		} else if (error.getErrorId() == libsbmlConstants.ConstraintContainsDOCTYPE) {
 			exc.setCode(SBMLException.Code.ConstraintContainsDOCTYPE);
-		else if (error.getErrorId() == libsbmlConstants.InvalidConstraintContent)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidConstraintContent) {
 			exc.setCode(SBMLException.Code.InvalidConstraintContent);
-		else if (error.getErrorId() == libsbmlConstants.NoReactantsOrProducts)
+		} else if (error.getErrorId() == libsbmlConstants.NoReactantsOrProducts) {
 			exc.setCode(SBMLException.Code.NoReactantsOrProducts);
-		else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInReaction)
+		} else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInReaction) {
 			exc.setCode(SBMLException.Code.IncorrectOrderInReaction);
-		else if (error.getErrorId() == libsbmlConstants.EmptyListInReaction)
+		} else if (error.getErrorId() == libsbmlConstants.EmptyListInReaction) {
 			exc.setCode(SBMLException.Code.EmptyListInReaction);
-		else if (error.getErrorId() == libsbmlConstants.InvalidReactantsProductsList)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidReactantsProductsList) {
 			exc.setCode(SBMLException.Code.InvalidReactantsProductsList);
-		else if (error.getErrorId() == libsbmlConstants.InvalidModifiersList)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidModifiersList) {
 			exc.setCode(SBMLException.Code.InvalidModifiersList);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesReference)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSpeciesReference) {
 			exc.setCode(SBMLException.Code.InvalidSpeciesReference);
-		else if (error.getErrorId() == libsbmlConstants.BothStoichiometryAndMath)
+		} else if (error.getErrorId() == libsbmlConstants.BothStoichiometryAndMath) {
 			exc.setCode(SBMLException.Code.BothStoichiometryAndMath);
-		else if (error.getErrorId() == libsbmlConstants.UndeclaredSpeciesRef)
+		} else if (error.getErrorId() == libsbmlConstants.UndeclaredSpeciesRef) {
 			exc.setCode(SBMLException.Code.UndeclaredSpeciesRef);
-		else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInKineticLaw)
+		} else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInKineticLaw) {
 			exc.setCode(SBMLException.Code.IncorrectOrderInKineticLaw);
-		else if (error.getErrorId() == libsbmlConstants.EmptyListInKineticLaw)
+		} else if (error.getErrorId() == libsbmlConstants.EmptyListInKineticLaw) {
 			exc.setCode(SBMLException.Code.EmptyListInKineticLaw);
-		else if (error.getErrorId() == libsbmlConstants.NonConstantLocalParameter)
+		} else if (error.getErrorId() == libsbmlConstants.NonConstantLocalParameter) {
 			exc.setCode(SBMLException.Code.NonConstantLocalParameter);
-		else if (error.getErrorId() == libsbmlConstants.SubsUnitsNoLongerValid)
+		} else if (error.getErrorId() == libsbmlConstants.SubsUnitsNoLongerValid) {
 			exc.setCode(SBMLException.Code.SubsUnitsNoLongerValid);
-		else if (error.getErrorId() == libsbmlConstants.TimeUnitsNoLongerValid)
+		} else if (error.getErrorId() == libsbmlConstants.TimeUnitsNoLongerValid) {
 			exc.setCode(SBMLException.Code.TimeUnitsNoLongerValid);
-		else if (error.getErrorId() == libsbmlConstants.UndeclaredSpeciesInStoichMath)
+		} else if (error.getErrorId() == libsbmlConstants.UndeclaredSpeciesInStoichMath) {
 			exc.setCode(SBMLException.Code.UndeclaredSpeciesInStoichMath);
-		else if (error.getErrorId() == libsbmlConstants.MissingTriggerInEvent)
+		} else if (error.getErrorId() == libsbmlConstants.MissingTriggerInEvent) {
 			exc.setCode(SBMLException.Code.MissingTriggerInEvent);
-		else if (error.getErrorId() == libsbmlConstants.TriggerMathNotBoolean)
+		} else if (error.getErrorId() == libsbmlConstants.TriggerMathNotBoolean) {
 			exc.setCode(SBMLException.Code.TriggerMathNotBoolean);
-		else if (error.getErrorId() == libsbmlConstants.MissingEventAssignment)
+		} else if (error.getErrorId() == libsbmlConstants.MissingEventAssignment) {
 			exc.setCode(SBMLException.Code.MissingEventAssignment);
-		else if (error.getErrorId() == libsbmlConstants.TimeUnitsEvent)
+		} else if (error.getErrorId() == libsbmlConstants.TimeUnitsEvent) {
 			exc.setCode(SBMLException.Code.TimeUnitsEvent);
-		else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInEvent)
+		} else if (error.getErrorId() == libsbmlConstants.IncorrectOrderInEvent) {
 			exc.setCode(SBMLException.Code.IncorrectOrderInEvent);
-		else if (error.getErrorId() == libsbmlConstants.ValuesFromTriggerTimeNeedDelay)
+		} else if (error.getErrorId() == libsbmlConstants.ValuesFromTriggerTimeNeedDelay) {
 			exc.setCode(SBMLException.Code.ValuesFromTriggerTimeNeedDelay);
-		else if (error.getErrorId() == libsbmlConstants.InvalidEventAssignmentVariable)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidEventAssignmentVariable) {
 			exc.setCode(SBMLException.Code.InvalidEventAssignmentVariable);
-		else if (error.getErrorId() == libsbmlConstants.EventAssignmentForConstantEntity)
+		} else if (error.getErrorId() == libsbmlConstants.EventAssignmentForConstantEntity) {
 			exc.setCode(SBMLException.Code.EventAssignmentForConstantEntity);
-		else if (error.getErrorId() == libsbmlConstants.CompartmentShouldHaveSize)
+		} else if (error.getErrorId() == libsbmlConstants.CompartmentShouldHaveSize) {
 			exc.setCode(SBMLException.Code.CompartmentShouldHaveSize);
-		else if (error.getErrorId() == libsbmlConstants.ParameterShouldHaveUnits)
+		} else if (error.getErrorId() == libsbmlConstants.ParameterShouldHaveUnits) {
 			exc.setCode(SBMLException.Code.ParameterShouldHaveUnits);
-		else if (error.getErrorId() == libsbmlConstants.LocalParameterShadowsId)
+		} else if (error.getErrorId() == libsbmlConstants.LocalParameterShadowsId) {
 			exc.setCode(SBMLException.Code.LocalParameterShadowsId);
-		else if (error.getErrorId() == libsbmlConstants.CannotConvertToL1V1)
+		} else if (error.getErrorId() == libsbmlConstants.CannotConvertToL1V1) {
 			exc.setCode(SBMLException.Code.CannotConvertToL1V1);
-		else if (error.getErrorId() == libsbmlConstants.NoEventsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoEventsInL1) {
 			exc.setCode(SBMLException.Code.NoEventsInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoFunctionDefinitionsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoFunctionDefinitionsInL1) {
 			exc.setCode(SBMLException.Code.NoFunctionDefinitionsInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoConstraintsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoConstraintsInL1) {
 			exc.setCode(SBMLException.Code.NoConstraintsInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoInitialAssignmentsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoInitialAssignmentsInL1) {
 			exc.setCode(SBMLException.Code.NoInitialAssignmentsInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoSpeciesTypesInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoSpeciesTypesInL1) {
 			exc.setCode(SBMLException.Code.NoSpeciesTypesInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoCompartmentTypeInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoCompartmentTypeInL1) {
 			exc.setCode(SBMLException.Code.NoCompartmentTypeInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoNon3DComparmentsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoNon3DComparmentsInL1) {
 			exc.setCode(SBMLException.Code.NoNon3DComparmentsInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoFancyStoichiometryMathInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoFancyStoichiometryMathInL1) {
 			exc.setCode(SBMLException.Code.NoFancyStoichiometryMathInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoNonIntegerStoichiometryInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoNonIntegerStoichiometryInL1) {
 			exc.setCode(SBMLException.Code.NoNonIntegerStoichiometryInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoUnitMultipliersOrOffsetsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoUnitMultipliersOrOffsetsInL1) {
 			exc.setCode(SBMLException.Code.NoUnitMultipliersOrOffsetsInL1);
-		else if (error.getErrorId() == libsbmlConstants.SpeciesCompartmentRequiredInL1)
+		} else if (error.getErrorId() == libsbmlConstants.SpeciesCompartmentRequiredInL1) {
 			exc.setCode(SBMLException.Code.SpeciesCompartmentRequiredInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoSpeciesSpatialSizeUnitsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoSpeciesSpatialSizeUnitsInL1) {
 			exc.setCode(SBMLException.Code.NoSpeciesSpatialSizeUnitsInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoSBOTermsInL1)
+		} else if (error.getErrorId() == libsbmlConstants.NoSBOTermsInL1) {
 			exc.setCode(SBMLException.Code.NoSBOTermsInL1);
-		else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL1)
+		} else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL1) {
 			exc.setCode(SBMLException.Code.StrictUnitsRequiredInL1);
-		else if (error.getErrorId() == libsbmlConstants.NoConstraintsInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.NoConstraintsInL2v1) {
 			exc.setCode(SBMLException.Code.NoConstraintsInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.NoInitialAssignmentsInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.NoInitialAssignmentsInL2v1) {
 			exc.setCode(SBMLException.Code.NoInitialAssignmentsInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.NoSpeciesTypeInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.NoSpeciesTypeInL2v1) {
 			exc.setCode(SBMLException.Code.NoSpeciesTypeInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.NoCompartmentTypeInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.NoCompartmentTypeInL2v1) {
 			exc.setCode(SBMLException.Code.NoCompartmentTypeInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.NoSBOTermsInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.NoSBOTermsInL2v1) {
 			exc.setCode(SBMLException.Code.NoSBOTermsInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.NoIdOnSpeciesReferenceInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.NoIdOnSpeciesReferenceInL2v1) {
 			exc.setCode(SBMLException.Code.NoIdOnSpeciesReferenceInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.NoDelayedEventAssignmentInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.NoDelayedEventAssignmentInL2v1) {
 			exc.setCode(SBMLException.Code.NoDelayedEventAssignmentInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL2v1)
+		} else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL2v1) {
 			exc.setCode(SBMLException.Code.StrictUnitsRequiredInL2v1);
-		else if (error.getErrorId() == libsbmlConstants.SBOTermNotUniversalInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.SBOTermNotUniversalInL2v2) {
 			exc.setCode(SBMLException.Code.SBOTermNotUniversalInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.NoUnitOffsetInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.NoUnitOffsetInL2v2) {
 			exc.setCode(SBMLException.Code.NoUnitOffsetInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.NoKineticLawTimeUnitsInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.NoKineticLawTimeUnitsInL2v2) {
 			exc.setCode(SBMLException.Code.NoKineticLawTimeUnitsInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.NoKineticLawSubstanceUnitsInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.NoKineticLawSubstanceUnitsInL2v2) {
 			exc.setCode(SBMLException.Code.NoKineticLawSubstanceUnitsInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.NoDelayedEventAssignmentInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.NoDelayedEventAssignmentInL2v2) {
 			exc.setCode(SBMLException.Code.NoDelayedEventAssignmentInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.ModelSBOBranchChangedBeyondL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.ModelSBOBranchChangedBeyondL2v2) {
 			exc.setCode(SBMLException.Code.ModelSBOBranchChangedBeyondL2v2);
-		else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL2v2) {
 			exc.setCode(SBMLException.Code.StrictUnitsRequiredInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.StrictSBORequiredInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.StrictSBORequiredInL2v2) {
 			exc.setCode(SBMLException.Code.StrictSBORequiredInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationInvalidInL2v2)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationInvalidInL2v2) {
 			exc.setCode(SBMLException.Code.DuplicateAnnotationInvalidInL2v2);
-		else if (error.getErrorId() == libsbmlConstants.NoUnitOffsetInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.NoUnitOffsetInL2v3) {
 			exc.setCode(SBMLException.Code.NoUnitOffsetInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.NoKineticLawTimeUnitsInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.NoKineticLawTimeUnitsInL2v3) {
 			exc.setCode(SBMLException.Code.NoKineticLawTimeUnitsInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.NoKineticLawSubstanceUnitsInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.NoKineticLawSubstanceUnitsInL2v3) {
 			exc.setCode(SBMLException.Code.NoKineticLawSubstanceUnitsInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.NoSpeciesSpatialSizeUnitsInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.NoSpeciesSpatialSizeUnitsInL2v3) {
 			exc.setCode(SBMLException.Code.NoSpeciesSpatialSizeUnitsInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.NoEventTimeUnitsInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.NoEventTimeUnitsInL2v3) {
 			exc.setCode(SBMLException.Code.NoEventTimeUnitsInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.NoDelayedEventAssignmentInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.NoDelayedEventAssignmentInL2v3) {
 			exc.setCode(SBMLException.Code.NoDelayedEventAssignmentInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.ModelSBOBranchChangedBeyondL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.ModelSBOBranchChangedBeyondL2v3) {
 			exc.setCode(SBMLException.Code.ModelSBOBranchChangedBeyondL2v3);
-		else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.StrictUnitsRequiredInL2v3) {
 			exc.setCode(SBMLException.Code.StrictUnitsRequiredInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.StrictSBORequiredInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.StrictSBORequiredInL2v3) {
 			exc.setCode(SBMLException.Code.StrictSBORequiredInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationInvalidInL2v3)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationInvalidInL2v3) {
 			exc.setCode(SBMLException.Code.DuplicateAnnotationInvalidInL2v3);
-		else if (error.getErrorId() == libsbmlConstants.NoUnitOffsetInL2v4)
+		} else if (error.getErrorId() == libsbmlConstants.NoUnitOffsetInL2v4) {
 			exc.setCode(SBMLException.Code.NoUnitOffsetInL2v4);
-		else if (error.getErrorId() == libsbmlConstants.NoKineticLawTimeUnitsInL2v4)
+		} else if (error.getErrorId() == libsbmlConstants.NoKineticLawTimeUnitsInL2v4) {
 			exc.setCode(SBMLException.Code.NoKineticLawTimeUnitsInL2v4);
-		else if (error.getErrorId() == libsbmlConstants.NoKineticLawSubstanceUnitsInL2v4)
+		} else if (error.getErrorId() == libsbmlConstants.NoKineticLawSubstanceUnitsInL2v4) {
 			exc.setCode(SBMLException.Code.NoKineticLawSubstanceUnitsInL2v4);
-		else if (error.getErrorId() == libsbmlConstants.NoSpeciesSpatialSizeUnitsInL2v4)
+		} else if (error.getErrorId() == libsbmlConstants.NoSpeciesSpatialSizeUnitsInL2v4) {
 			exc.setCode(SBMLException.Code.NoSpeciesSpatialSizeUnitsInL2v4);
-		else if (error.getErrorId() == libsbmlConstants.NoEventTimeUnitsInL2v4)
+		} else if (error.getErrorId() == libsbmlConstants.NoEventTimeUnitsInL2v4) {
 			exc.setCode(SBMLException.Code.NoEventTimeUnitsInL2v4);
-		else if (error.getErrorId() == libsbmlConstants.ModelSBOBranchChangedInL2v4)
+		} else if (error.getErrorId() == libsbmlConstants.ModelSBOBranchChangedInL2v4) {
 			exc.setCode(SBMLException.Code.ModelSBOBranchChangedInL2v4);
-		else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationInvalidInL2v4)
+		} else if (error.getErrorId() == libsbmlConstants.DuplicateAnnotationInvalidInL2v4) {
 			exc.setCode(SBMLException.Code.DuplicateAnnotationInvalidInL2v4);
-		else if (error.getErrorId() == libsbmlConstants.InvalidSBMLLevelVersion)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidSBMLLevelVersion) {
 			exc.setCode(SBMLException.Code.InvalidSBMLLevelVersion);
-		else if (error.getErrorId() == libsbmlConstants.InvalidRuleOrdering)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidRuleOrdering) {
 			exc.setCode(SBMLException.Code.InvalidRuleOrdering);
-		else if (error.getErrorId() == libsbmlConstants.SubsUnitsAllowedInKL)
+		} else if (error.getErrorId() == libsbmlConstants.SubsUnitsAllowedInKL) {
 			exc.setCode(SBMLException.Code.SubsUnitsAllowedInKL);
-		else if (error.getErrorId() == libsbmlConstants.TimeUnitsAllowedInKL)
+		} else if (error.getErrorId() == libsbmlConstants.TimeUnitsAllowedInKL) {
 			exc.setCode(SBMLException.Code.TimeUnitsAllowedInKL);
-		else if (error.getErrorId() == libsbmlConstants.FormulaInLevel1KL)
+		} else if (error.getErrorId() == libsbmlConstants.FormulaInLevel1KL) {
 			exc.setCode(SBMLException.Code.FormulaInLevel1KL);
-		else if (error.getErrorId() == libsbmlConstants.TimeUnitsRemoved)
+		} else if (error.getErrorId() == libsbmlConstants.TimeUnitsRemoved) {
 			exc.setCode(SBMLException.Code.TimeUnitsRemoved);
-		else if (error.getErrorId() == libsbmlConstants.BadMathML)
+		} else if (error.getErrorId() == libsbmlConstants.BadMathML) {
 			exc.setCode(SBMLException.Code.BadMathML);
-		else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfDouble)
+		} else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfDouble) {
 			exc.setCode(SBMLException.Code.FailedMathMLReadOfDouble);
-		else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfInteger)
+		} else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfInteger) {
 			exc.setCode(SBMLException.Code.FailedMathMLReadOfInteger);
-		else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfExponential)
+		} else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfExponential) {
 			exc.setCode(SBMLException.Code.FailedMathMLReadOfExponential);
-		else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfRational)
+		} else if (error.getErrorId() == libsbmlConstants.FailedMathMLReadOfRational) {
 			exc.setCode(SBMLException.Code.FailedMathMLReadOfRational);
-		else if (error.getErrorId() == libsbmlConstants.BadMathMLNodeType)
+		} else if (error.getErrorId() == libsbmlConstants.BadMathMLNodeType) {
 			exc.setCode(SBMLException.Code.BadMathMLNodeType);
-		else if (error.getErrorId() == libsbmlConstants.NoTimeSymbolInFunctionDef)
+		} else if (error.getErrorId() == libsbmlConstants.NoTimeSymbolInFunctionDef) {
 			exc.setCode(SBMLException.Code.NoTimeSymbolInFunctionDef);
-		else if (error.getErrorId() == libsbmlConstants.UndeclaredUnits)
+		} else if (error.getErrorId() == libsbmlConstants.UndeclaredUnits) {
 			exc.setCode(SBMLException.Code.UndeclaredUnits);
-		else if (error.getErrorId() == libsbmlConstants.UnrecognisedSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.UnrecognisedSBOTerm) {
 			exc.setCode(SBMLException.Code.UnrecognisedSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.ObseleteSBOTerm)
+		} else if (error.getErrorId() == libsbmlConstants.ObseleteSBOTerm) {
 			exc.setCode(SBMLException.Code.ObseleteSBOTerm);
-		else if (error.getErrorId() == libsbmlConstants.IncorrectCompartmentSpatialDimensions)
+		} else if (error.getErrorId() == libsbmlConstants.IncorrectCompartmentSpatialDimensions) {
 			exc
 					.setCode(SBMLException.Code.IncorrectCompartmentSpatialDimensions);
-		else if (error.getErrorId() == libsbmlConstants.CompartmentTypeNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.CompartmentTypeNotValidAttribute) {
 			exc.setCode(SBMLException.Code.CompartmentTypeNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.ConstantNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.ConstantNotValidAttribute) {
 			exc.setCode(SBMLException.Code.ConstantNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.MetaIdNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.MetaIdNotValidAttribute) {
 			exc.setCode(SBMLException.Code.MetaIdNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.SBOTermNotValidAttributeBeforeL2V3)
+		} else if (error.getErrorId() == libsbmlConstants.SBOTermNotValidAttributeBeforeL2V3) {
 			exc.setCode(SBMLException.Code.SBOTermNotValidAttributeBeforeL2V3);
-		else if (error.getErrorId() == libsbmlConstants.InvalidL1CompartmentUnits)
+		} else if (error.getErrorId() == libsbmlConstants.InvalidL1CompartmentUnits) {
 			exc.setCode(SBMLException.Code.InvalidL1CompartmentUnits);
-		else if (error.getErrorId() == libsbmlConstants.L1V1CompartmentVolumeReqd)
+		} else if (error.getErrorId() == libsbmlConstants.L1V1CompartmentVolumeReqd) {
 			exc.setCode(SBMLException.Code.L1V1CompartmentVolumeReqd);
-		else if (error.getErrorId() == libsbmlConstants.CompartmentTypeNotValidComponent)
+		} else if (error.getErrorId() == libsbmlConstants.CompartmentTypeNotValidComponent) {
 			exc.setCode(SBMLException.Code.CompartmentTypeNotValidComponent);
-		else if (error.getErrorId() == libsbmlConstants.ConstraintNotValidComponent)
+		} else if (error.getErrorId() == libsbmlConstants.ConstraintNotValidComponent) {
 			exc.setCode(SBMLException.Code.ConstraintNotValidComponent);
-		else if (error.getErrorId() == libsbmlConstants.EventNotValidComponent)
+		} else if (error.getErrorId() == libsbmlConstants.EventNotValidComponent) {
 			exc.setCode(SBMLException.Code.EventNotValidComponent);
-		else if (error.getErrorId() == libsbmlConstants.SBOTermNotValidAttributeBeforeL2V2)
+		} else if (error.getErrorId() == libsbmlConstants.SBOTermNotValidAttributeBeforeL2V2) {
 			exc.setCode(SBMLException.Code.SBOTermNotValidAttributeBeforeL2V2);
-		else if (error.getErrorId() == libsbmlConstants.FuncDefNotValidComponent)
+		} else if (error.getErrorId() == libsbmlConstants.FuncDefNotValidComponent) {
 			exc.setCode(SBMLException.Code.FuncDefNotValidComponent);
-		else if (error.getErrorId() == libsbmlConstants.InitialAssignNotValidComponent)
+		} else if (error.getErrorId() == libsbmlConstants.InitialAssignNotValidComponent) {
 			exc.setCode(SBMLException.Code.InitialAssignNotValidComponent);
-		else if (error.getErrorId() == libsbmlConstants.VariableNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.VariableNotValidAttribute) {
 			exc.setCode(SBMLException.Code.VariableNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.UnitsNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.UnitsNotValidAttribute) {
 			exc.setCode(SBMLException.Code.UnitsNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.ConstantSpeciesNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.ConstantSpeciesNotValidAttribute) {
 			exc.setCode(SBMLException.Code.ConstantSpeciesNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.SpatialSizeUnitsNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.SpatialSizeUnitsNotValidAttribute) {
 			exc.setCode(SBMLException.Code.SpatialSizeUnitsNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.SpeciesTypeNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.SpeciesTypeNotValidAttribute) {
 			exc.setCode(SBMLException.Code.SpeciesTypeNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.HasOnlySubsUnitsNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.HasOnlySubsUnitsNotValidAttribute) {
 			exc.setCode(SBMLException.Code.HasOnlySubsUnitsNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.IdNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.IdNotValidAttribute) {
 			exc.setCode(SBMLException.Code.IdNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.NameNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.NameNotValidAttribute) {
 			exc.setCode(SBMLException.Code.NameNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.SpeciesTypeNotValidComponent)
+		} else if (error.getErrorId() == libsbmlConstants.SpeciesTypeNotValidComponent) {
 			exc.setCode(SBMLException.Code.SpeciesTypeNotValidComponent);
-		else if (error.getErrorId() == libsbmlConstants.StoichiometryMathNotValidComponent)
+		} else if (error.getErrorId() == libsbmlConstants.StoichiometryMathNotValidComponent) {
 			exc.setCode(SBMLException.Code.StoichiometryMathNotValidComponent);
-		else if (error.getErrorId() == libsbmlConstants.MultiplierNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.MultiplierNotValidAttribute) {
 			exc.setCode(SBMLException.Code.MultiplierNotValidAttribute);
-		else if (error.getErrorId() == libsbmlConstants.OffsetNotValidAttribute)
+		} else if (error.getErrorId() == libsbmlConstants.OffsetNotValidAttribute) {
 			exc.setCode(SBMLException.Code.OffsetNotValidAttribute);
+		}
 
 		exc.setFatal(error.isFatal());
 		exc.setError(error.isError());
@@ -713,7 +721,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 */
 	public LibSBMLReader(Object model) throws Exception {
 		this();
-		this.model = convert2Model(model);
+		this.model = convertModel(model);
 	}
 
 	/**
@@ -972,125 +980,154 @@ public class LibSBMLReader implements SBMLInputConverter {
 		return ast;
 	}
 
+	/**
+	 * 
+	 * @param document
+	 * @return
+	 * @throws IOException
+	 */
+	public SBMLDocument convertSBMLDocument(Object document) throws IOException {
+		org.sbml.libsbml.SBMLDocument doc = null;
+		if (document instanceof String) {
+			doc = readSBMLfromFile(document.toString());
+		} else if (document instanceof File) {
+			doc = readSBMLfromFile(((File) document).getAbsolutePath());
+		} else if (document instanceof org.sbml.libsbml.SBMLDocument) {
+			doc = (org.sbml.libsbml.SBMLDocument) document;
+		} else {
+			throw new IllegalArgumentException("sbml" + error
+					+ "org.sbml.libsbml.SBMLDocument");
+		}
+		SBMLDocument jdoc = new SBMLDocument((int) doc.getLevel(), (int) doc
+				.getVersion());
+		copySBaseProperties(jdoc, doc);
+		if (doc.getModel() != null) {
+			jdoc.setModel(readModel(jdoc, doc.getModel()));
+		}
+		return jdoc;
+	}
+
+	/**
+	 * 
+	 * @param sbmldoc
+	 * @param model
+	 * @return
+	 */
+	private Model readModel(SBMLDocument sbmldoc, Object model) {
+		if (!(model instanceof org.sbml.libsbml.Model)) {
+			throw new IllegalArgumentException("model" + error
+					+ "org.sbml.libsbml.Model");
+		}
+		this.originalModel = (org.sbml.libsbml.Model) model;
+		if (sbmldoc == null) {
+			sbmldoc = new SBMLDocument((int) originalModel.getLevel(),
+					(int) originalModel.getVersion());
+			copySBaseProperties(sbmldoc, originalModel.getSBMLDocument());
+		}
+		this.model = sbmldoc.createModel(originalModel.getId());
+		copyNamedSBaseProperties(this.model, originalModel);
+		int i;
+		for (i = 0; i < originalModel.getNumFunctionDefinitions(); i++) {
+			this.model
+					.addFunctionDefinition(readFunctionDefinition(originalModel
+							.getFunctionDefinition(i)));
+			fireIOEvent(this.model.getFunctionDefinition(i));
+		}
+		for (i = 0; i < originalModel.getNumUnitDefinitions(); i++) {
+			this.model.addUnitDefinition(readUnitDefinition(originalModel
+					.getUnitDefinition(i)));
+			fireIOEvent(this.model.getUnitDefinition(i));
+		}
+		// This is something, libSBML wouldn't do...
+		addPredefinedUnitDefinitions(this.model);
+		for (i = 0; i < originalModel.getNumCompartmentTypes(); i++) {
+			this.model.addCompartmentType(readCompartmentType(originalModel
+					.getCompartmentType(i)));
+			fireIOEvent(this.model.getCompartmentType(i));
+		}
+		for (i = 0; i < originalModel.getNumSpeciesTypes(); i++) {
+			this.model.addSpeciesType(readSpeciesType(originalModel
+					.getSpeciesType(i)));
+			fireIOEvent(this.model.getSpeciesType(i));
+		}
+		for (i = 0; i < originalModel.getNumCompartments(); i++) {
+			this.model.addCompartment(readCompartment(originalModel
+					.getCompartment(i)));
+			fireIOEvent(this.model.getCompartment(i));
+		}
+		for (i = 0; i < originalModel.getNumSpecies(); i++) {
+			this.model.addSpecies(readSpecies(originalModel.getSpecies(i)));
+			fireIOEvent(this.model.getSpecies(i));
+		}
+		for (i = 0; i < originalModel.getNumParameters(); i++) {
+			this.model
+					.addParameter(readParameter(originalModel.getParameter(i)));
+			fireIOEvent(this.model.getParameter(i));
+		}
+		for (i = 0; i < originalModel.getNumInitialAssignments(); i++) {
+			this.model.addInitialAssignment(readInitialAssignment(originalModel
+					.getInitialAssignment(i)));
+			fireIOEvent(this.model.getInitialAssignment(i));
+		}
+		for (i = 0; i < originalModel.getNumRules(); i++) {
+			this.model.addRule(readRule(originalModel.getRule(i)));
+			fireIOEvent(this.model.getRule(i));
+		}
+		for (i = 0; i < originalModel.getNumConstraints(); i++) {
+			this.model.addConstraint(readConstraint(originalModel
+					.getConstraint(i)));
+			fireIOEvent(this.model.getConstraint(i));
+		}
+		for (i = 0; i < originalModel.getNumReactions(); i++) {
+			org.sbml.libsbml.Reaction rOrig = originalModel.getReaction(i);
+			Reaction r = readReaction(rOrig);
+			this.model.addReaction(r);
+			if (rOrig.isSetKineticLaw())
+				r.setKineticLaw(readKineticLaw(rOrig.getKineticLaw()));
+			fireIOEvent(this.model.getReaction(i));
+		}
+		for (i = 0; i < originalModel.getNumEvents(); i++) {
+			this.model.addEvent(readEvent(originalModel.getEvent(i)));
+			fireIOEvent(this.model.getEvent(i));
+		}
+		addAllSBaseChangeListenersTo(this.model);
+		fireIOEvent(null);
+		return this.model;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.sbml.SBMLReader#readModel(java.lang.Object)
 	 */
-	public Model convert2Model(Object model) throws Exception {
+	public Model convertModel(Object model) throws Exception {
 		if (model instanceof String) {
-			File file = new File(model.toString());
-			if (!file.exists() || !file.isFile()) {
-				throw new FileNotFoundException(file.getAbsolutePath());
-			}
-			if (!file.canRead()) {
-				throw new IOException(file.getAbsolutePath());
-			}
-			org.sbml.libsbml.SBMLDocument doc = (new org.sbml.libsbml.SBMLReader())
-					.readSBML(file.getAbsolutePath());
-			setOfDocuments.add(doc);
-			model = doc.getModel();
+			org.sbml.libsbml.SBMLDocument doc = readSBMLfromFile(model
+					.toString());
+			return readModel(null, doc.getModel());
 		}
-		if (model instanceof org.sbml.libsbml.Model) {
-			this.originalModel = (org.sbml.libsbml.Model) model;
-			SBMLDocument sbmldoc = new SBMLDocument((int) originalModel
-					.getLevel(), (int) originalModel.getVersion());
-			copySBaseProperties(sbmldoc, originalModel.getSBMLDocument());
-			this.model = sbmldoc.createModel(originalModel.getId());
-			copyNamedSBaseProperties(this.model, originalModel);
-			int i;
-			if (originalModel.isSetModelHistory()) {
-				History mh = new History();
-				org.sbml.libsbml.ModelHistory libHist = originalModel
-						.getModelHistory();
-				for (i = 0; i < libHist.getNumCreators(); i++) {
-					Creator mc = new Creator();
-					org.sbml.libsbml.ModelCreator creator = originalModel
-							.getModelHistory().getCreator(i);
-					mc.setGivenName(creator.getGivenName());
-					mc.setFamilyName(creator.getFamilyName());
-					mc.setEmail(creator.getEmail());
-					mc.setOrganization(creator.getOrganization());
-					mh.addCreator(mc);
-				}
-				if (libHist.isSetCreatedDate())
-					mh.setCreatedDate(convertDate(libHist.getCreatedDate()));
-				if (libHist.isSetModifiedDate())
-					mh.setModifiedDate(convertDate(libHist.getModifiedDate()));
-				for (i = 0; i < libHist.getNumModifiedDates(); i++)
-					mh.addModifiedDate(convertDate(libHist.getModifiedDate(i)));
-				this.model.setModelHistory(mh);
-				fireIOEvent(mh);
-			}
-			for (i = 0; i < originalModel.getNumFunctionDefinitions(); i++) {
-				this.model
-						.addFunctionDefinition(readFunctionDefinition(originalModel
-								.getFunctionDefinition(i)));
-				fireIOEvent(this.model.getFunctionDefinition(i));
-			}
-			for (i = 0; i < originalModel.getNumUnitDefinitions(); i++) {
-				this.model.addUnitDefinition(readUnitDefinition(originalModel
-						.getUnitDefinition(i)));
-				fireIOEvent(this.model.getUnitDefinition(i));
-			}
-			// This is something, libSBML wouldn't do...
-			addPredefinedUnitDefinitions(this.model);
-			for (i = 0; i < originalModel.getNumCompartmentTypes(); i++) {
-				this.model.addCompartmentType(readCompartmentType(originalModel
-						.getCompartmentType(i)));
-				fireIOEvent(this.model.getCompartmentType(i));
-			}
-			for (i = 0; i < originalModel.getNumSpeciesTypes(); i++) {
-				this.model.addSpeciesType(readSpeciesType(originalModel
-						.getSpeciesType(i)));
-				fireIOEvent(this.model.getSpeciesType(i));
-			}
-			for (i = 0; i < originalModel.getNumCompartments(); i++) {
-				this.model.addCompartment(readCompartment(originalModel
-						.getCompartment(i)));
-				fireIOEvent(this.model.getCompartment(i));
-			}
-			for (i = 0; i < originalModel.getNumSpecies(); i++) {
-				this.model.addSpecies(readSpecies(originalModel.getSpecies(i)));
-				fireIOEvent(this.model.getSpecies(i));
-			}
-			for (i = 0; i < originalModel.getNumParameters(); i++) {
-				this.model.addParameter(readParameter(originalModel
-						.getParameter(i)));
-				fireIOEvent(this.model.getParameter(i));
-			}
-			for (i = 0; i < originalModel.getNumInitialAssignments(); i++) {
-				this.model
-						.addInitialAssignment(readInitialAssignment(originalModel
-								.getInitialAssignment(i)));
-				fireIOEvent(this.model.getInitialAssignment(i));
-			}
-			for (i = 0; i < originalModel.getNumRules(); i++) {
-				this.model.addRule(readRule(originalModel.getRule(i)));
-				fireIOEvent(this.model.getRule(i));
-			}
-			for (i = 0; i < originalModel.getNumConstraints(); i++) {
-				this.model.addConstraint(readConstraint(originalModel
-						.getConstraint(i)));
-				fireIOEvent(this.model.getConstraint(i));
-			}
-			for (i = 0; i < originalModel.getNumReactions(); i++) {
-				org.sbml.libsbml.Reaction rOrig = originalModel.getReaction(i);
-				Reaction r = readReaction(rOrig);
-				this.model.addReaction(r);
-				if (rOrig.isSetKineticLaw())
-					r.setKineticLaw(readKineticLaw(rOrig.getKineticLaw()));
-				fireIOEvent(this.model.getReaction(i));
-			}
-			for (i = 0; i < originalModel.getNumEvents(); i++) {
-				this.model.addEvent(readEvent(originalModel.getEvent(i)));
-				fireIOEvent(this.model.getEvent(i));
-			}
-			addAllSBaseChangeListenersTo(this.model);
-			fireIOEvent(null);
-			return this.model;
+		return readModel(null, model);
+	}
+
+	/**
+	 * 
+	 * @param string
+	 * @return
+	 * @throws IOException
+	 */
+	private org.sbml.libsbml.SBMLDocument readSBMLfromFile(String string)
+			throws IOException {
+		File file = new File(model.toString());
+		if (!file.exists() || !file.isFile()) {
+			throw new FileNotFoundException(file.getAbsolutePath());
 		}
-		return null;
+		if (!file.canRead()) {
+			throw new IOException(file.getAbsolutePath());
+		}
+		org.sbml.libsbml.SBMLDocument doc = (new org.sbml.libsbml.SBMLReader())
+				.readSBML(file.getAbsolutePath());
+		setOfDocuments.add(doc);
+		return doc;
 	}
 
 	/*
@@ -1208,6 +1245,41 @@ public class LibSBMLReader implements SBMLInputConverter {
 		for (int i = 0; i < libSBase.getNumCVTerms(); i++) {
 			sbase.addCVTerm(readCVTerm(libSBase.getCVTerm(i)));
 		}
+		if (libSBase.isSetModelHistory()) {
+			sbase.setHistory(readHistory(libSBase.getModelHistory()));
+		}
+	}
+
+	/**
+	 * 
+	 * @param libHist
+	 * @return
+	 */
+	private History readHistory(org.sbml.libsbml.ModelHistory libHist) {
+		int i;
+		History mh = new History();
+		for (i = 0; i < libHist.getNumCreators(); i++) {
+			Creator mc = new Creator();
+			org.sbml.libsbml.ModelCreator creator = originalModel
+					.getModelHistory().getCreator(i);
+			mc.setGivenName(creator.getGivenName());
+			mc.setFamilyName(creator.getFamilyName());
+			mc.setEmail(creator.getEmail());
+			mc.setOrganization(creator.getOrganization());
+			mh.addCreator(mc);
+		}
+		if (libHist.isSetCreatedDate()) {
+			mh.setCreatedDate(convertDate(libHist.getCreatedDate()));
+		}
+		if (libHist.isSetModifiedDate()) {
+			mh.setModifiedDate(convertDate(libHist.getModifiedDate()));
+		}
+		for (i = 0; i < libHist.getNumModifiedDates(); i++) {
+			mh.addModifiedDate(convertDate(libHist.getModifiedDate(i)));
+		}
+		this.model.setModelHistory(mh);
+		fireIOEvent(mh);
+		return mh;
 	}
 
 	/**
@@ -1432,26 +1504,52 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * @return
 	 */
 	private Event readEvent(Object event) {
-		if (!(event instanceof org.sbml.libsbml.Event))
+		if (!(event instanceof org.sbml.libsbml.Event)) {
 			throw new IllegalArgumentException("event" + error
 					+ "org.sbml.libsbml.Event");
+		}
 		org.sbml.libsbml.Event eve = (org.sbml.libsbml.Event) event;
 		Event ev = new Event((int) eve.getLevel(), (int) eve.getVersion());
 		copyNamedSBaseProperties(ev, eve);
-		if (eve.isSetTrigger())
+		if (eve.isSetTrigger()) {
 			ev.setTrigger(readTrigger(eve.getTrigger()));
-		if (eve.isSetDelay())
+		}
+		if (eve.isSetPriority()) {
+			ev.setPriority(readPriority(eve.getPriority()));
+		}
+		if (eve.isSetDelay()) {
 			ev.setDelay(readDelay(eve.getDelay()));
+		}
 		for (int i = 0; i < eve.getNumEventAssignments(); i++) {
 			ev
 					.addEventAssignment(readEventAssignment(eve
 							.getEventAssignment(i)));
 		}
-		if (eve.isSetTimeUnits())
+		if (eve.isSetTimeUnits()) {
 			ev.setTimeUnits(eve.getTimeUnits());
+		}
 		ev.setUseValuesFromTriggerTime(eve.getUseValuesFromTriggerTime());
 		return ev;
 
+	}
+
+	/**
+	 * 
+	 * @param priority
+	 * @return
+	 */
+	private Priority readPriority(Object priority) {
+		if (!(priority instanceof org.sbml.libsbml.Priority)) {
+			throw new IllegalArgumentException("event" + error
+					+ "org.sbml.libsbml.Priority");
+		}
+		org.sbml.libsbml.Priority libPriority = (org.sbml.libsbml.Priority) priority;
+		Priority p = new Priority();
+		copySBaseProperties(p, libPriority);
+		if (libPriority.isSetMath()) {
+			convert(libPriority.getMath(), p);
+		}
+		return p;
 	}
 
 	/**
@@ -1533,10 +1631,12 @@ public class LibSBMLReader implements SBMLInputConverter {
 		KineticLaw kinlaw = new KineticLaw((int) kl.getLevel(), (int) kl
 				.getVersion());
 		copySBaseProperties(kinlaw, kl);
-		for (int i = 0; i < kl.getNumParameters(); i++)
+		for (int i = 0; i < kl.getNumParameters(); i++) {
 			kinlaw.addParameter(readLocalParameter(kl.getParameter(i)));
-		if (kl.isSetMath())
+		}
+		if (kl.isSetMath()) {
 			kinlaw.setMath(convert(kl.getMath(), kinlaw));
+		}
 		addAllSBaseChangeListenersTo(kinlaw);
 		return kinlaw;
 	}
@@ -1674,21 +1774,26 @@ public class LibSBMLReader implements SBMLInputConverter {
 		Species s = new Species(spec.getId(), (int) spec.getLevel(), (int) spec
 				.getVersion());
 		copyNamedSBaseProperties(s, spec);
-		if (spec.isSetCharge())
+		if (spec.isSetCharge()) {
 			s.setCharge(spec.getCharge());
-		if (spec.isSetCompartment())
+		}
+		if (spec.isSetCompartment()) {
 			s.setCompartment(getModel().getCompartment(spec.getCompartment()));
+		}
 		s.setBoundaryCondition(spec.getBoundaryCondition());
 		s.setConstant(spec.getConstant());
 		s.setHasOnlySubstanceUnits(spec.getHasOnlySubstanceUnits());
-		if (spec.isSetInitialAmount())
+		if (spec.isSetInitialAmount()) {
 			s.setInitialAmount(spec.getInitialAmount());
-		else if (spec.isSetInitialConcentration())
+		} else if (spec.isSetInitialConcentration()) {
 			s.setInitialConcentration(spec.getInitialConcentration());
-		if (spec.isSetSubstanceUnits())
+		}
+		if (spec.isSetSubstanceUnits()) {
 			s.setSubstanceUnits(this.model.getUnitDefinition(spec.getUnits()));
-		if (spec.isSetSpeciesType())
+		}
+		if (spec.isSetSpeciesType()) {
 			s.setSpeciesType(this.model.getSpeciesType(spec.getSpeciesType()));
+		}
 		addAllSBaseChangeListenersTo(s);
 		return s;
 	}
@@ -1699,18 +1804,20 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * @see org.sbml.SBMLReader#readSpeciesReference(java.lang.Object)
 	 */
 	private SpeciesReference readSpeciesReference(Object speciesReference) {
-		if (!(speciesReference instanceof org.sbml.libsbml.SpeciesReference))
+		if (!(speciesReference instanceof org.sbml.libsbml.SpeciesReference)) {
 			throw new IllegalArgumentException("speciesReference" + error
-					+ "org.sbml.libsbml.SpeciesReference.");
+					+ "org.sbml.libsbml.SpeciesReference");
+		}
 		org.sbml.libsbml.SpeciesReference specref = (org.sbml.libsbml.SpeciesReference) speciesReference;
 		SpeciesReference spec = new SpeciesReference(model.getSpecies(specref
 				.getSpecies()));
 		copyNamedSBaseProperties(spec, specref);
-		if (specref.isSetStoichiometryMath())
+		if (specref.isSetStoichiometryMath()) {
 			spec.setStoichiometryMath(readStoichiometricMath(specref
 					.getStoichiometryMath()));
-		else
+		} else {
 			spec.setStoichiometry(specref.getStoichiometry());
+		}
 		addAllSBaseChangeListenersTo(spec);
 		return spec;
 	}
@@ -1759,8 +1866,15 @@ public class LibSBMLReader implements SBMLInputConverter {
 		Trigger trig = new Trigger((int) trigg.getLevel(), (int) trigg
 				.getVersion());
 		copySBaseProperties(trig, trigg);
-		if (trigg.isSetMath())
+		if (trigg.isSetInitialValue()) {
+			trig.setInitialValue(trigg.getInitialValue());
+		}
+		if (trigg.isSetPersistent()) {
+			trig.setPersistent(trigg.getPersistent());
+		}
+		if (trigg.isSetMath()) {
 			trig.setMath(convert(trigg.getMath(), trig));
+		}
 		return trig;
 
 	}
