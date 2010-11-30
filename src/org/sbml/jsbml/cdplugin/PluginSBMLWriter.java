@@ -2091,9 +2091,10 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 					contains = i;
 				}
 			}
-			if (contains < 0) {
-				po.getCVTerms().remove(i);
-			}
+			// TODO: next CellDesigner version:
+//			if (contains < 0) {
+//				po.getCVTerms().remove(i);
+//			}
 		}
 		return change;
 	}
@@ -2272,14 +2273,15 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 	 * @param constraint
 	 * @return
 	 */
-	private PluginConstraint writeConstraint(Constraint constraint) {
-		PluginConstraint c = new PluginConstraint(libsbml
-				.formulaToString(convert(constraint.getMath())));
-		saveSBaseProperties(constraint, c);
-		if (constraint.isSetMessage())
-			c.setMessage(constraint.getMessage());
-		return c;
+    private PluginConstraint writeConstraint(Constraint constraint) {
+	PluginConstraint c = new PluginConstraint(libsbml
+		.formulaToString(convert(constraint.getMath())));
+	saveSBaseProperties(constraint, c);
+	if (constraint.isSetMessage()) {
+	    c.setMessage(constraint.getMessageString());
 	}
+	return c;
+    }
 
 	/**
 	 * 

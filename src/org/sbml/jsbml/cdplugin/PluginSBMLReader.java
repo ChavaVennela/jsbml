@@ -152,7 +152,7 @@ public class PluginSBMLReader implements SBMLInputConverter {
 		this(possibleEnzymes);
 		this.originalmodel = model;
 		this.setIOListeners = new HashSet<IOProgressListener>();
-		this.model = convert2Model(model);
+		this.model = convertModel(model);
 	}
 
 	/**
@@ -859,7 +859,7 @@ public class PluginSBMLReader implements SBMLInputConverter {
 	 * 
 	 * @see org.sbml.jsbml.SBMLReader#readModel(java.lang.Object)
 	 */
-	public Model convert2Model(Object model) {
+	public Model convertModel(Object model) {
 		if (!(model instanceof PluginModel)) {
 			throw new IllegalArgumentException("model" + error
 					+ "PluginModel but received "
