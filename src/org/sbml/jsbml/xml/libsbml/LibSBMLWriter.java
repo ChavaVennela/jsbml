@@ -2066,11 +2066,14 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		org.sbml.libsbml.Constraint c = new org.sbml.libsbml.Constraint(
 				constraint.getLevel(), constraint.getVersion());
 		saveSBaseProperties(constraint, c);
-		if (constraint.isSetMath() && !equal(constraint.getMath(), c.getMath()))
+		if (constraint.isSetMath() && !equal(constraint.getMath(), c.getMath())) {
 			c.setMath(convert(constraint.getMath()));
+		}
 		if (constraint.isSetMessage()
-				&& !constraint.getMessage().equals(c.getMessageString()))
-			c.setMessage(new org.sbml.libsbml.XMLNode(constraint.getMessage()));
+				&& !constraint.getMessage().equals(c.getMessageString())) {
+			c.setMessage(new org.sbml.libsbml.XMLNode(constraint
+					.getMessageString()));
+		}
 		return c;
 	}
 
