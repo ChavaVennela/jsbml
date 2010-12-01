@@ -48,6 +48,7 @@ import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.Delay;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
+import org.sbml.jsbml.ExplicitRule;
 import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
@@ -844,17 +845,18 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 			boolean contains = false;
 			for (int j = 0; j < model.getNumRules() && !contains; j++) {
 				Rule r = model.getRule(j);
-				if ((c instanceof org.sbml.libsbml.RateRule
-						&& r instanceof RateRule && ((org.sbml.libsbml.RateRule) c)
+				if (((c instanceof org.sbml.libsbml.RateRule)
+						&& (r instanceof RateRule) && ((org.sbml.libsbml.RateRule) c)
 						.getVariable().equals(((RateRule) r).getVariable()))
 						|| (c instanceof org.sbml.libsbml.AssignmentRule
 								&& r instanceof AssignmentRule && ((AssignmentRule) r)
 								.getVariable().equals(
 										((org.sbml.libsbml.AssignmentRule) c)
 												.getVariable()))
-						|| (c instanceof org.sbml.libsbml.AlgebraicRule && r instanceof AlgebraicRule))
-					if (equal(r.getMath(), c.getMath()))
+						|| ((c instanceof org.sbml.libsbml.AlgebraicRule) && (r instanceof AlgebraicRule)))
+					if (equal(r.getMath(), c.getMath())) {
 						contains = true;
+					}
 			}
 			if (!contains) {
 				fireIOEvent(mo.getListOfRules().remove(i));
@@ -1033,30 +1035,44 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 			for (long j = 0; j < modelOrig.getNumRules() && contains < 0; j++) {
 				boolean equal = false;
 				org.sbml.libsbml.Rule ruleOrig = modelOrig.getRule(j);
-				if (rule instanceof RateRule
-						&& ruleOrig instanceof org.sbml.libsbml.RateRule) {
-					equal = ((RateRule) rule).getVariable().equals(
-							((org.sbml.libsbml.RateRule) ruleOrig)
-									.getVariable());
-				} else if (rule instanceof AssignmentRule
-						&& ruleOrig instanceof org.sbml.libsbml.AssignmentRule) {
-					equal = ((AssignmentRule) rule).getVariable().equals(
-							((org.sbml.libsbml.AssignmentRule) ruleOrig)
-									.getVariable());
-				} else if (rule instanceof AlgebraicRule
-						&& ruleOrig instanceof org.sbml.libsbml.AlgebraicRule) {
+				if ((rule instanceof AlgebraicRule)
+						&& (ruleOrig instanceof org.sbml.libsbml.AlgebraicRule)) {
 					equal = true;
+				} else {
+					if ((rule instanceof RateRule)
+							&& (ruleOrig instanceof org.sbml.libsbml.RateRule)) {
+						equal = ((RateRule) rule).getVariable().equals(
+								((org.sbml.libsbml.RateRule) ruleOrig)
+										.getVariable());
+					} else if ((rule instanceof AssignmentRule)
+							&& (ruleOrig instanceof org.sbml.libsbml.AssignmentRule)) {
+						equal = ((AssignmentRule) rule).getVariable().equals(
+								((org.sbml.libsbml.AssignmentRule) ruleOrig)
+										.getVariable());
+					}
+					equal &= ((ExplicitRule) rule).isSetUnits()
+							&& ruleOrig.isSetUnits();
+					if (equal && ruleOrig.isSetUnits()) {
+						equal &= ruleOrig.getUnits().equals(((ExplicitRule) rule).getUnits());
+					}
 				}
-				if (equal)
+				if (equal) {
 					equal &= equal(rule.getMath(), ruleOrig.getMath());
-				if (equal)
+				}
+				if (equal) {
 					contains = j;
+				}
 			}
 			if (contains < 0) {
 				modelOrig.addRule(writeRule(rule));
 			} else {
+				org.sbml.libsbml.Rule ruleOrig = modelOrig.getRule(contains);
 				// math is equal anyway...
-				saveSBaseProperties(rule, modelOrig.getRule(contains));
+				saveSBaseProperties(rule, ruleOrig);
+				if (ruleOrig.isSetUnits() && (rule instanceof ExplicitRule)
+						&& (((ExplicitRule) rule).isSetUnits())) {
+					ruleOrig.setUnits(((ExplicitRule) rule).getUnits());
+				}
 			}
 			fireIOEvent(rule);
 		}
@@ -2421,6 +2437,9 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 				if (((RateRule) rule).isSetVariable()) {
 					r.setVariable(((RateRule) rule).getVariable());
 				}
+			}
+			if (((ExplicitRule) rule).isSetUnits()) {
+				r.setUnits(((ExplicitRule) rule).getUnits());
 			}
 		}
 		if (rule.isSetMath()) {
