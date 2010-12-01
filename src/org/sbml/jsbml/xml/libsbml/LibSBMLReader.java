@@ -51,6 +51,7 @@ import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.Delay;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
+import org.sbml.jsbml.ExplicitRule;
 import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
@@ -1757,6 +1758,11 @@ public class LibSBMLReader implements SBMLInputConverter {
 		copySBaseProperties(r, libRule);
 		if (libRule.isSetMath()) {
 			r.setMath(convert(libRule.getMath(), r));
+		}
+		if ((r instanceof ExplicitRule) && r.isSetLevel() && r.isSetVersion()
+				&& (r.getLevelAndVersion().compareTo(2, 1) < 0)
+				&& libRule.isSetUnits() && libRule.isParameter()) {
+			((ExplicitRule) r).setUnits(libRule.getUnits());
 		}
 		return r;
 	}
