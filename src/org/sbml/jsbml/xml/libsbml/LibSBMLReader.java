@@ -1529,7 +1529,9 @@ public class LibSBMLReader implements SBMLInputConverter {
 		if (eve.isSetTimeUnits()) {
 			ev.setTimeUnits(eve.getTimeUnits());
 		}
-		ev.setUseValuesFromTriggerTime(eve.getUseValuesFromTriggerTime());
+		if (eve.isSetUseValuesFromTriggerTime()) {
+			ev.setUseValuesFromTriggerTime(eve.getUseValuesFromTriggerTime());
+		}
 		return ev;
 
 	}
