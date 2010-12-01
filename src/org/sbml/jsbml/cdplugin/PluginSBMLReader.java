@@ -1015,26 +1015,31 @@ public class PluginSBMLReader implements SBMLInputConverter {
 	 * @param rule
 	 * @return
 	 */
-	private Rule readRule(Object rule) {
-		if (!(rule instanceof PluginRule))
-			throw new IllegalArgumentException("rule" + error + "PluginRule.");
-		PluginRule libRule = (PluginRule) rule;
-		Rule r;
-		if (libRule instanceof PluginAlgebraicRule)
-			r = new AlgebraicRule(level, version);
-		else if (libRule instanceof PluginAssignmentRule)
-			r = new AssignmentRule(model
-					.findVariable(((PluginAssignmentRule) libRule)
-							.getVariable()));
-		else
-			r = new RateRule(model.findVariable(((PluginRateRule) libRule)
-					.getVariable()));
-		copySBaseProperties(r, libRule);
-		if (libRule.getMath() != null)
-			r.setMath(convert(libRule.getMath(), r));
-		addAllSBaseChangeListenersTo(r);
-		return r;
+    private Rule readRule(Object rule) {
+	if (!(rule instanceof PluginRule)) {
+	    throw new IllegalArgumentException("rule" + error + "PluginRule.");
 	}
+	PluginRule libRule = (PluginRule) rule;
+	Rule r;
+	if (libRule instanceof PluginAlgebraicRule) {
+	    r = new AlgebraicRule(level, version);
+	} else {
+	    if (libRule instanceof PluginAssignmentRule) {
+		r = new AssignmentRule(model
+			.findVariable(((PluginAssignmentRule) libRule)
+				.getVariable()));
+	    } else {
+		r = new RateRule(model.findVariable(((PluginRateRule) libRule)
+			.getVariable()));
+	    }
+	}
+	copySBaseProperties(r, libRule);
+	if (libRule.getMath() != null) {
+	    r.setMath(convert(libRule.getMath(), r));
+	}
+	addAllSBaseChangeListenersTo(r);
+	return r;
+    }
 
 	/**
 	 * 

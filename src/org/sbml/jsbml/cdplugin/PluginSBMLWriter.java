@@ -2535,33 +2535,37 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 	 * @param parent
 	 * @return
 	 */
-	private PluginRule writeRule(Rule rule, Object... parent) {
-		if (parent.length != 1 || !(parent[0] instanceof PluginModel))
-			throw new IllegalArgumentException(
-					"parent must be of type PluginModel!");
-		PluginRule r;
-		if (rule.isAlgebraic()) {
-			r = new PluginAlgebraicRule((PluginModel) parent[0]);
-		} else {
-			if (rule.isAssignment()) {
-				r = new PluginAssignmentRule((PluginModel) parent[0]);
-				if (((AssignmentRule) rule).isSetVariable())
-					((PluginAssignmentRule) r)
-							.setVariable(((AssignmentRule) rule).getVariable());
-			} else {
-				r = new PluginRateRule((PluginModel) parent[0]);
-				if (((RateRule) rule).isSetVariable())
-					((PluginRateRule) r).setVariable(((RateRule) rule)
-							.getVariable());
-			}
+    private PluginRule writeRule(Rule rule, Object... parent) {
+	if (parent.length != 1 || !(parent[0] instanceof PluginModel))
+	    throw new IllegalArgumentException(
+		"parent must be of type PluginModel!");
+	PluginRule r;
+	if (rule.isAlgebraic()) {
+	    r = new PluginAlgebraicRule((PluginModel) parent[0]);
+	} else {
+	    if (rule.isAssignment()) {
+		r = new PluginAssignmentRule((PluginModel) parent[0]);
+		if (((AssignmentRule) rule).isSetVariable()) {
+		    ((PluginAssignmentRule) r)
+			    .setVariable(((AssignmentRule) rule).getVariable());
 		}
-		if (rule.isSetMath())
-			r.setMath(convert(rule.getMath()));
-		saveSBaseProperties(rule, r);
-		if (rule.getFormula() != null)
-			r.setFormula(rule.getFormula());
-		return r;
+	    } else {
+		r = new PluginRateRule((PluginModel) parent[0]);
+		if (((RateRule) rule).isSetVariable()) {
+		    ((PluginRateRule) r).setVariable(((RateRule) rule)
+			    .getVariable());
+		}
+	    }
 	}
+	if (rule.isSetMath()) {
+	    r.setMath(convert(rule.getMath()));
+	}
+	saveSBaseProperties(rule, r);
+	if (rule.getFormula() != null) {
+	    r.setFormula(rule.getFormula());
+	}
+	return r;
+    }
 
 	/*
 	 * (non-Javadoc)
