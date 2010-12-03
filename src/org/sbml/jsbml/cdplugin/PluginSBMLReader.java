@@ -143,7 +143,7 @@ public class PluginSBMLReader implements SBMLInputConverter {
 	private Set<IOProgressListener> setIOListeners;
 
 	/**
-	 * get a model from the celldesigneroutput, converts it to sbmlsqueezer
+	 * get a model from the CellDesigner output, converts it to JSBML
 	 * format and stores it
 	 * 
 	 * @param model
@@ -154,6 +154,17 @@ public class PluginSBMLReader implements SBMLInputConverter {
 		this.setIOListeners = new HashSet<IOProgressListener>();
 		this.model = convertModel(model);
 	}
+	
+	
+
+	/**
+	 * @return the model
+	 */
+	public Model getModel() {
+	    return model;
+	}
+
+
 
 	/**
 	 * 
@@ -1171,129 +1182,131 @@ public class PluginSBMLReader implements SBMLInputConverter {
 	 * @param unit
 	 * @return
 	 */
-	private Unit readUnit(Object unit) {
-		if (!(unit instanceof PluginUnit))
-			throw new IllegalArgumentException("unit" + error + "PluginUnit");
-		PluginUnit libUnit = (PluginUnit) unit;
-		Unit u = new Unit(level, version);
-		copySBaseProperties(u, libUnit);
-		switch (libUnit.getKind()) {
-		case libsbmlConstants.UNIT_KIND_AMPERE:
-			u.setKind(Unit.Kind.AMPERE);
-			break;
-		case libsbmlConstants.UNIT_KIND_BECQUEREL:
-			u.setKind(Unit.Kind.BECQUEREL);
-			break;
-		case libsbmlConstants.UNIT_KIND_CANDELA:
-			u.setKind(Unit.Kind.CANDELA);
-			break;
-		case libsbmlConstants.UNIT_KIND_CELSIUS:
-			u.setKind(Unit.Kind.CELSIUS);
-			break;
-		case libsbmlConstants.UNIT_KIND_COULOMB:
-			u.setKind(Unit.Kind.COULOMB);
-			break;
-		case libsbmlConstants.UNIT_KIND_DIMENSIONLESS:
-			u.setKind(Unit.Kind.DIMENSIONLESS);
-			break;
-		case libsbmlConstants.UNIT_KIND_FARAD:
-			u.setKind(Unit.Kind.FARAD);
-			break;
-		case libsbmlConstants.UNIT_KIND_GRAM:
-			u.setKind(Unit.Kind.GRAM);
-			break;
-		case libsbmlConstants.UNIT_KIND_GRAY:
-			u.setKind(Unit.Kind.GRAY);
-			break;
-		case libsbmlConstants.UNIT_KIND_HENRY:
-			u.setKind(Unit.Kind.HENRY);
-			break;
-		case libsbmlConstants.UNIT_KIND_HERTZ:
-			u.setKind(Unit.Kind.HERTZ);
-			break;
-		case libsbmlConstants.UNIT_KIND_INVALID:
-			u.setKind(Unit.Kind.INVALID);
-			break;
-		case libsbmlConstants.UNIT_KIND_ITEM:
-			u.setKind(Unit.Kind.ITEM);
-			break;
-		case libsbmlConstants.UNIT_KIND_JOULE:
-			u.setKind(Unit.Kind.JOULE);
-			break;
-		case libsbmlConstants.UNIT_KIND_KATAL:
-			u.setKind(Unit.Kind.KATAL);
-			break;
-		case libsbmlConstants.UNIT_KIND_KELVIN:
-			u.setKind(Unit.Kind.KELVIN);
-			break;
-		case libsbmlConstants.UNIT_KIND_KILOGRAM:
-			u.setKind(Unit.Kind.KILOGRAM);
-			break;
-		case libsbmlConstants.UNIT_KIND_LITER:
-			u.setKind(Unit.Kind.LITER);
-			break;
-		case libsbmlConstants.UNIT_KIND_LITRE:
-			u.setKind(Unit.Kind.LITRE);
-			break;
-		case libsbmlConstants.UNIT_KIND_LUMEN:
-			u.setKind(Unit.Kind.LUMEN);
-			break;
-		case libsbmlConstants.UNIT_KIND_LUX:
-			u.setKind(Unit.Kind.LUX);
-			break;
-		case libsbmlConstants.UNIT_KIND_METER:
-			u.setKind(Unit.Kind.METER);
-			break;
-		case libsbmlConstants.UNIT_KIND_METRE:
-			u.setKind(Unit.Kind.METRE);
-			break;
-		case libsbmlConstants.UNIT_KIND_MOLE:
-			u.setKind(Unit.Kind.MOLE);
-			break;
-		case libsbmlConstants.UNIT_KIND_NEWTON:
-			u.setKind(Unit.Kind.NEWTON);
-			break;
-		case libsbmlConstants.UNIT_KIND_OHM:
-			u.setKind(Unit.Kind.OHM);
-			break;
-		case libsbmlConstants.UNIT_KIND_PASCAL:
-			u.setKind(Unit.Kind.PASCAL);
-			break;
-		case libsbmlConstants.UNIT_KIND_RADIAN:
-			u.setKind(Unit.Kind.RADIAN);
-			break;
-		case libsbmlConstants.UNIT_KIND_SECOND:
-			u.setKind(Unit.Kind.SECOND);
-			break;
-		case libsbmlConstants.UNIT_KIND_SIEMENS:
-			u.setKind(Unit.Kind.SIEMENS);
-			break;
-		case libsbmlConstants.UNIT_KIND_SIEVERT:
-			u.setKind(Unit.Kind.SIEVERT);
-			break;
-		case libsbmlConstants.UNIT_KIND_STERADIAN:
-			u.setKind(Unit.Kind.STERADIAN);
-			break;
-		case libsbmlConstants.UNIT_KIND_TESLA:
-			u.setKind(Unit.Kind.TESLA);
-			break;
-		case libsbmlConstants.UNIT_KIND_VOLT:
-			u.setKind(Unit.Kind.VOLT);
-			break;
-		case libsbmlConstants.UNIT_KIND_WATT:
-			u.setKind(Unit.Kind.WATT);
-			break;
-		case libsbmlConstants.UNIT_KIND_WEBER:
-			u.setKind(Unit.Kind.WEBER);
-			break;
-		}
-		u.setExponent(libUnit.getExponent());
-		u.setMultiplier(libUnit.getMultiplier());
-		u.setScale(libUnit.getScale());
-		u.setOffset(libUnit.getOffset());
-		addAllSBaseChangeListenersTo(u);
-		return u;
+    private Unit readUnit(Object unit) {
+	if (!(unit instanceof PluginUnit))
+	    throw new IllegalArgumentException("unit" + error + "PluginUnit");
+	PluginUnit libUnit = (PluginUnit) unit;
+	Unit u = new Unit(level, version);
+	copySBaseProperties(u, libUnit);
+	switch (libUnit.getKind()) {
+	case libsbmlConstants.UNIT_KIND_AMPERE:
+	    u.setKind(Unit.Kind.AMPERE);
+	    break;
+	case libsbmlConstants.UNIT_KIND_BECQUEREL:
+	    u.setKind(Unit.Kind.BECQUEREL);
+	    break;
+	case libsbmlConstants.UNIT_KIND_CANDELA:
+	    u.setKind(Unit.Kind.CANDELA);
+	    break;
+	case libsbmlConstants.UNIT_KIND_CELSIUS:
+	    u.setKind(Unit.Kind.CELSIUS);
+	    break;
+	case libsbmlConstants.UNIT_KIND_COULOMB:
+	    u.setKind(Unit.Kind.COULOMB);
+	    break;
+	case libsbmlConstants.UNIT_KIND_DIMENSIONLESS:
+	    u.setKind(Unit.Kind.DIMENSIONLESS);
+	    break;
+	case libsbmlConstants.UNIT_KIND_FARAD:
+	    u.setKind(Unit.Kind.FARAD);
+	    break;
+	case libsbmlConstants.UNIT_KIND_GRAM:
+	    u.setKind(Unit.Kind.GRAM);
+	    break;
+	case libsbmlConstants.UNIT_KIND_GRAY:
+	    u.setKind(Unit.Kind.GRAY);
+	    break;
+	case libsbmlConstants.UNIT_KIND_HENRY:
+	    u.setKind(Unit.Kind.HENRY);
+	    break;
+	case libsbmlConstants.UNIT_KIND_HERTZ:
+	    u.setKind(Unit.Kind.HERTZ);
+	    break;
+	case libsbmlConstants.UNIT_KIND_INVALID:
+	    u.setKind(Unit.Kind.INVALID);
+	    break;
+	case libsbmlConstants.UNIT_KIND_ITEM:
+	    u.setKind(Unit.Kind.ITEM);
+	    break;
+	case libsbmlConstants.UNIT_KIND_JOULE:
+	    u.setKind(Unit.Kind.JOULE);
+	    break;
+	case libsbmlConstants.UNIT_KIND_KATAL:
+	    u.setKind(Unit.Kind.KATAL);
+	    break;
+	case libsbmlConstants.UNIT_KIND_KELVIN:
+	    u.setKind(Unit.Kind.KELVIN);
+	    break;
+	case libsbmlConstants.UNIT_KIND_KILOGRAM:
+	    u.setKind(Unit.Kind.KILOGRAM);
+	    break;
+	case libsbmlConstants.UNIT_KIND_LITER:
+	    u.setKind(Unit.Kind.LITER);
+	    break;
+	case libsbmlConstants.UNIT_KIND_LITRE:
+	    u.setKind(Unit.Kind.LITRE);
+	    break;
+	case libsbmlConstants.UNIT_KIND_LUMEN:
+	    u.setKind(Unit.Kind.LUMEN);
+	    break;
+	case libsbmlConstants.UNIT_KIND_LUX:
+	    u.setKind(Unit.Kind.LUX);
+	    break;
+	case libsbmlConstants.UNIT_KIND_METER:
+	    u.setKind(Unit.Kind.METER);
+	    break;
+	case libsbmlConstants.UNIT_KIND_METRE:
+	    u.setKind(Unit.Kind.METRE);
+	    break;
+	case libsbmlConstants.UNIT_KIND_MOLE:
+	    u.setKind(Unit.Kind.MOLE);
+	    break;
+	case libsbmlConstants.UNIT_KIND_NEWTON:
+	    u.setKind(Unit.Kind.NEWTON);
+	    break;
+	case libsbmlConstants.UNIT_KIND_OHM:
+	    u.setKind(Unit.Kind.OHM);
+	    break;
+	case libsbmlConstants.UNIT_KIND_PASCAL:
+	    u.setKind(Unit.Kind.PASCAL);
+	    break;
+	case libsbmlConstants.UNIT_KIND_RADIAN:
+	    u.setKind(Unit.Kind.RADIAN);
+	    break;
+	case libsbmlConstants.UNIT_KIND_SECOND:
+	    u.setKind(Unit.Kind.SECOND);
+	    break;
+	case libsbmlConstants.UNIT_KIND_SIEMENS:
+	    u.setKind(Unit.Kind.SIEMENS);
+	    break;
+	case libsbmlConstants.UNIT_KIND_SIEVERT:
+	    u.setKind(Unit.Kind.SIEVERT);
+	    break;
+	case libsbmlConstants.UNIT_KIND_STERADIAN:
+	    u.setKind(Unit.Kind.STERADIAN);
+	    break;
+	case libsbmlConstants.UNIT_KIND_TESLA:
+	    u.setKind(Unit.Kind.TESLA);
+	    break;
+	case libsbmlConstants.UNIT_KIND_VOLT:
+	    u.setKind(Unit.Kind.VOLT);
+	    break;
+	case libsbmlConstants.UNIT_KIND_WATT:
+	    u.setKind(Unit.Kind.WATT);
+	    break;
+	case libsbmlConstants.UNIT_KIND_WEBER:
+	    u.setKind(Unit.Kind.WEBER);
+	    break;
 	}
+	u.setExponent(libUnit.getExponent());
+	u.setMultiplier(libUnit.getMultiplier());
+	u.setScale(libUnit.getScale());
+	if (u.isSetOffset()) {
+	    u.setOffset(libUnit.getOffset());
+	}
+	addAllSBaseChangeListenersTo(u);
+	return u;
+    }
 
 	/**
 	 * 
