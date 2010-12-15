@@ -1112,13 +1112,13 @@ public class LibSBMLReader implements SBMLInputConverter {
 
 	/**
 	 * 
-	 * @param string
+	 * @param fileName
 	 * @return
 	 * @throws IOException
 	 */
-	private org.sbml.libsbml.SBMLDocument readSBMLfromFile(String string)
+	private org.sbml.libsbml.SBMLDocument readSBMLfromFile(String fileName)
 			throws IOException {
-		File file = new File(model.toString());
+		File file = new File(fileName);
 		if (!file.exists() || !file.isFile()) {
 			throw new FileNotFoundException(file.getAbsolutePath());
 		}
