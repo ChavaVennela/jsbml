@@ -2012,7 +2012,9 @@ public class LibSBMLReader implements SBMLInputConverter {
 		u.setExponent(libUnit.getExponent());
 		u.setMultiplier(libUnit.getMultiplier());
 		u.setScale(libUnit.getScale());
-		u.setOffset(libUnit.getOffset());
+		if (libUnit.getOffset() != 0d) {
+			u.setOffset(libUnit.getOffset());
+		}
 		return u;
 	}
 
