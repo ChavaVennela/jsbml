@@ -171,7 +171,7 @@
             includes="**/*.png **/*.gif **/*.xsd **/*.tmpl **/data/* **/*.xml **/*.cfg **/*.obo" > 
         </fileset>
     </copy>
-    <jar jarfile="${build.dir}/${name}.jar"
+    <jar jarfile="${build.dir}/${name}-${version}.jar"
          basedir="${build.dest}"/>
   </target>
 
