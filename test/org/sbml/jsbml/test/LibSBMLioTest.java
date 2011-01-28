@@ -1,31 +1,23 @@
 /*
  * $Id: FormulaTest.java 102 2009-12-13 19:52:50Z andreas-draeger $
  * $URL: https://jsbml.svn.sourceforge.net/svnroot/jsbml/trunk/src/org/sbml/jsbml/io/FormulaTest.java $
+ * ----------------------------------------------------------------------------
+ * This file is part of JSBML. Please visit <http://sbml.org/Software/JSBML>
+ * for the latest version of JSBML and more information about SBML.
  *
- * 
- *==================================================================================
- * Copyright (c) 2009 The jsbml team.
+ * Copyright (C) 2009-2011 jointly by the following organizations:
+ * 1. The University of Tuebingen, Germany
+ * 2. EMBL European Bioinformatics Institute (EBML-EBI), Hinxton, UK
+ * 3. The California Institute of Technology, Pasadena, CA, USA
  *
- * This file is part of jsbml, the pure java SBML library. Please visit
- * http://sbml.org for more information about SBML, and http://jsbml.sourceforge.net/
- * to get the latest version of jsbml.
- *
- * jsbml is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * jsbml is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with jsbml.  If not, see <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html>.
- *
- *===================================================================================
- *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation. A copy of the license agreement is provided
+ * in the file named "LICENSE.txt" included with this software distribution
+ * and also available online as <http://sbml.org/Software/JSBML/License>.
+ * ----------------------------------------------------------------------------
  */
+
 package org.sbml.jsbml.test;
 
 import java.io.FileNotFoundException;
@@ -41,7 +33,7 @@ import org.sbml.jsbml.xml.stax.SBMLReader;
  * @author Andreas Dr&auml;ger
  * @date 2010-12-01
  */
-public class FormulaTest {
+public class LibSBMLioTest {
 
 	static {
 		try {
@@ -64,7 +56,7 @@ public class FormulaTest {
 		org.sbml.libsbml.SBMLReader libReader = new org.sbml.libsbml.SBMLReader(); 
 		org.sbml.libsbml.SBMLDocument libDoc = libReader.readSBML(args[0]);
 		LibSBMLReader libTranslator = new LibSBMLReader();
-		SBMLDocument doc1 = SBMLReader.readSBML(args[0]);
+		SBMLDocument doc1 = new SBMLReader().readSBML(args[0]);
 		SBMLDocument doc2 = libTranslator.convertSBMLDocument(libDoc);
 		System.out.println(doc1.equals(doc2));
 	}
