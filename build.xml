@@ -38,7 +38,7 @@
     <property name="build.dir" value="${basedir}/build"/>
     <property name="build.src" value="${basedir}/build/src"/>
     <property name="build.dest" value="${basedir}/build/classes"/>
-    <property name="build.javadocs" value="${basedir}/doc"/>
+    <property name="build.javadocs" value="${basedir}/doc/api"/>
     <property name="jars.dir" value="${basedir}/lib"/>
     <property name="dist.root" value="${basedir}/dist"/>
     <property name="dist.dir" value="${dist.root}/${name}-${version}"/>
