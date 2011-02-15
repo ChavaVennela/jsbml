@@ -65,6 +65,7 @@ import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.AlgebraicRule;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.CallableSBase;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
@@ -79,7 +80,6 @@ import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
-import org.sbml.jsbml.NamedSBaseWithDerivedUnit;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
@@ -250,12 +250,13 @@ public class PluginSBMLReader implements SBMLInputConverter {
 						break;
 					}
 			if (ast.getVariable() == null) {
-				NamedSBaseWithDerivedUnit nsb = model
-						.findNamedSBaseWithDerivedUnit(math.getName());
-				if (nsb == null)
+				CallableSBase csb = model
+						.findCallableSBase(math.getName());
+				if (csb == null) {
 					ast.setName(math.getName());
-				else
-					ast.setVariable(nsb);
+				} else {
+					ast.setVariable(csb);
+				}
 			}
 			break;
 		case libsbmlConstants.AST_CONSTANT_PI:

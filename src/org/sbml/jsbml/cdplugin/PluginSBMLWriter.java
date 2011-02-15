@@ -1414,7 +1414,12 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 			change = true;
 		}
 		if (c.getSpatialDimensions() != comp.getSpatialDimensions()) {
-			comp.setSpatialDimensions(c.getSpatialDimensions());
+		    // TODO: Logging!
+		    long dim = (long) c.getSpatialDimensions(); 
+		    if (dim - c.getSpatialDimensions() != 0d) {
+			System.err.printf("invalid spatial dimensions %f.\n", c.getSpatialDimensions());
+		    }
+			comp.setSpatialDimensions(dim);
 			change = true;
 		}
 		if (c.isSetUnits() && !c.getUnits().equals(comp.getUnits())) {
