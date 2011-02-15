@@ -17,47 +17,38 @@
  * and also available online as <http://sbml.org/Software/JSBML/License>.
  * ----------------------------------------------------------------------------
  */
+package org.sbml.jsbml.libsbmlio;
 
-package org.sbml.jsbml.test;
-
-import java.io.IOException;
-
-import javax.xml.stream.XMLStreamException;
-
+import org.sbml.gui.JSBMLvisualizer;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.xml.libsbml.LibSBMLReader;
-import org.sbml.jsbml.xml.stax.SBMLReader;
 
 /**
  * @author Andreas Dr&auml;ger
- * @date 2010-12-01
+ * @date 2011-02-03
  */
-public class LibSBMLioTest {
+public class SimpleApplication {
 
-	static {
+	/**
+	 * @param args the path to a valid SBML file.
+	 */
+	public static void main(String[] args) {
 		try {
+			// Load LibSBML:
 			System.loadLibrary("sbmlj");
 			// Extra check to be sure we have access to libSBML:
 			Class.forName("org.sbml.libsbml.libsbml");
+
+			// Read SBML file using LibSBML and convert it to JSBML:
+			LibSBMLReader reader = new LibSBMLReader();
+			SBMLDocument doc = reader.convertSBMLDocument(args[0]);
+			
+			// Run some application:
+			new JSBMLvisualizer(doc);
+			
 		} catch (Throwable e) {
 			e.printStackTrace();
-			System.exit(1);
 		}
 	}
-	
-	/**
-	 * 
-	 * @param args just the path to one SBML file.
-	 * @throws XMLStreamException 
-	 * @throws IOException 
-	 */
-	public static void main(String args[]) throws XMLStreamException, IOException {
-		org.sbml.libsbml.SBMLReader libReader = new org.sbml.libsbml.SBMLReader(); 
-		org.sbml.libsbml.SBMLDocument libDoc = libReader.readSBML(args[0]);
-		LibSBMLReader libTranslator = new LibSBMLReader();
-		SBMLDocument doc1 = new SBMLReader().readSBML(args[0]);
-		SBMLDocument doc2 = libTranslator.convertSBMLDocument(libDoc);
-		System.out.println(doc1.equals(doc2));
-	}
-	
+
 }

@@ -35,6 +35,7 @@ import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.AlgebraicRule;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.CallableSBase;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
@@ -52,7 +53,6 @@ import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.NamedSBase;
-import org.sbml.jsbml.NamedSBaseWithDerivedUnit;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.Priority;
 import org.sbml.jsbml.RateRule;
@@ -801,8 +801,8 @@ public class LibSBMLReader implements SBMLInputConverter {
 				}
 			}
 			if (ast.getVariable() == null) {
-				NamedSBaseWithDerivedUnit nsb = model
-						.findNamedSBaseWithDerivedUnit(math.getName());
+				CallableSBase nsb = model
+						.findCallableSBase(math.getName());
 				if (nsb == null) {
 					ast.setName(math.getName());
 				} else {
