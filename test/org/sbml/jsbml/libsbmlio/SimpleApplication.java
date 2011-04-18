@@ -19,8 +19,8 @@
  */
 package org.sbml.jsbml.libsbmlio;
 
-import org.sbml.gui.JSBMLvisualizer;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.test.gui.JTreeOfSBML;
 import org.sbml.jsbml.xml.libsbml.LibSBMLReader;
 
 /**
@@ -44,7 +44,7 @@ public class SimpleApplication {
 			SBMLDocument doc = reader.convertSBMLDocument(args[0]);
 			
 			// Run some application:
-			new JSBMLvisualizer(doc);
+			new JTreeOfSBML(doc);
 			
 		} catch (Throwable e) {
 			e.printStackTrace();
