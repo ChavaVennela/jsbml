@@ -88,7 +88,6 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLInputConverter;
 import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SBase;
-import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.SpeciesType;
@@ -98,6 +97,7 @@ import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.util.IOProgressListener;
+import org.sbml.jsbml.util.SBaseChangeListener;
 import org.sbml.libsbml.libsbml;
 import org.sbml.libsbml.libsbmlConstants;
 
@@ -124,7 +124,7 @@ public class PluginSBMLReader implements SBMLInputConverter {
 	/**
 	 * 
 	 */
-	protected LinkedList<SBaseChangedListener> listOfSBaseChangeListeners;
+	protected LinkedList<SBaseChangeListener> listOfSBaseChangeListeners;
 	/**
 	 * 
 	 */
@@ -173,7 +173,7 @@ public class PluginSBMLReader implements SBMLInputConverter {
 		super();
 		this.possibleEnzymes = possibleEnzymes;
 		this.setIOListeners = new HashSet<IOProgressListener>();
-		this.listOfSBaseChangeListeners = new LinkedList<SBaseChangedListener>();
+		this.listOfSBaseChangeListeners = new LinkedList<SBaseChangeListener>();
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class PluginSBMLReader implements SBMLInputConverter {
 	 * @param sb
 	 */
 	public void addAllSBaseChangeListenersTo(SBase sb) {
-		for (SBaseChangedListener listener : listOfSBaseChangeListeners)
+		for (SBaseChangeListener listener : listOfSBaseChangeListeners)
 			sb.addChangeListener(listener);
 	}
 
