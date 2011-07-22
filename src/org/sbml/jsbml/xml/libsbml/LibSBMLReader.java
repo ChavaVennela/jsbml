@@ -62,7 +62,6 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBMLInputConverter;
 import org.sbml.jsbml.SBase;
-import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.SpeciesType;
@@ -73,6 +72,7 @@ import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.util.IOProgressListener;
+import org.sbml.jsbml.util.SBaseChangeListener;
 import org.sbml.libsbml.SBMLError;
 import org.sbml.libsbml.libsbmlConstants;
 
@@ -684,7 +684,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 	/**
 	 * 
 	 */
-	protected LinkedList<SBaseChangedListener> listOfSBaseChangeListeners;
+	protected LinkedList<SBaseChangeListener> listOfSBaseChangeListeners;
 
 	/**
 	 * 
@@ -701,7 +701,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * 
 	 */
 	public LibSBMLReader() {
-		listOfSBaseChangeListeners = new LinkedList<SBaseChangedListener>();
+		listOfSBaseChangeListeners = new LinkedList<SBaseChangeListener>();
 		setOfDocuments = new HashSet<org.sbml.libsbml.SBMLDocument>();
 		setEventListeners = new HashSet<IOProgressListener>();
 	}
@@ -721,7 +721,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * @param sb
 	 */
 	private void addAllSBaseChangeListenersTo(SBase sb) {
-		for (SBaseChangedListener listener : listOfSBaseChangeListeners)
+		for (SBaseChangeListener listener : listOfSBaseChangeListeners)
 			sb.addChangeListener(listener);
 	}
 
@@ -739,7 +739,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * 
 	 * @param sbcl
 	 */
-	public void addSBaseChangeListener(SBaseChangedListener sbcl) {
+	public void addSBaseChangeListener(SBaseChangeListener sbcl) {
 		if (!listOfSBaseChangeListeners.contains(sbcl))
 			listOfSBaseChangeListeners.add(sbcl);
 	}

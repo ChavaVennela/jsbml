@@ -1543,7 +1543,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		if (m.isSetModifiedDate())
 			mo.setModifiedDate(convertDate(m.getModifiedDate()));
 		// add creators
-		for (Creator mc : m.getListCreators()) {
+		for (Creator mc : m.getListOfCreators()) {
 			boolean equal = false;
 			boolean nothingSet = true;
 			for (long i = 0; i < mo.getNumCreators() && !equal; i++) {
