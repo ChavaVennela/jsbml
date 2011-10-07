@@ -72,13 +72,14 @@ import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
 import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.util.IOProgressListener;
-import org.sbml.jsbml.util.SBaseChangeListener;
+import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.libsbml.SBMLError;
 import org.sbml.libsbml.libsbmlConstants;
 
 /**
  * @author Andreas Dr&auml;ger
- * 
+ * @version $Rev$
+ * @since 0.8
  */
 @SuppressWarnings("deprecation")
 public class LibSBMLReader implements SBMLInputConverter {
@@ -684,7 +685,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 	/**
 	 * 
 	 */
-	protected LinkedList<SBaseChangeListener> listOfSBaseChangeListeners;
+	protected LinkedList<TreeNodeChangeListener> listOfTreeNodeChangeListeners;
 
 	/**
 	 * 
@@ -701,7 +702,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * 
 	 */
 	public LibSBMLReader() {
-		listOfSBaseChangeListeners = new LinkedList<SBaseChangeListener>();
+		listOfTreeNodeChangeListeners = new LinkedList<TreeNodeChangeListener>();
 		setOfDocuments = new HashSet<org.sbml.libsbml.SBMLDocument>();
 		setEventListeners = new HashSet<IOProgressListener>();
 	}
@@ -720,9 +721,10 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * 
 	 * @param sb
 	 */
-	private void addAllSBaseChangeListenersTo(SBase sb) {
-		for (SBaseChangeListener listener : listOfSBaseChangeListeners)
-			sb.addChangeListener(listener);
+	private void addAllTreeNodeChangeListenersTo(SBase sb) {
+		for (TreeNodeChangeListener listener : listOfTreeNodeChangeListeners) {
+			sb.addTreeNodeChangeListener(listener);
+		}
 	}
 
 	/*
@@ -739,9 +741,9 @@ public class LibSBMLReader implements SBMLInputConverter {
 	 * 
 	 * @param sbcl
 	 */
-	public void addSBaseChangeListener(SBaseChangeListener sbcl) {
-		if (!listOfSBaseChangeListeners.contains(sbcl))
-			listOfSBaseChangeListeners.add(sbcl);
+	public void addTreeNodeChangeListener(TreeNodeChangeListener sbcl) {
+		if (!listOfTreeNodeChangeListeners.contains(sbcl))
+			listOfTreeNodeChangeListeners.add(sbcl);
 	}
 
 	/**
@@ -1082,7 +1084,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 			this.model.addEvent(readEvent(originalModel.getEvent(i)));
 			fireIOEvent(this.model.getEvent(i));
 		}
-		addAllSBaseChangeListenersTo(this.model);
+		addAllTreeNodeChangeListenersTo(this.model);
 		fireIOEvent(null);
 		return this.model;
 	}
@@ -1631,7 +1633,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 		if (kl.isSetMath()) {
 			kinlaw.setMath(convert(kl.getMath(), kinlaw));
 		}
-		addAllSBaseChangeListenersTo(kinlaw);
+		addAllTreeNodeChangeListenersTo(kinlaw);
 		return kinlaw;
 	}
 
@@ -1668,7 +1670,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 			 * mod.setSBOTerm(SBO.getEnzymaticCatalysis());
 			 */
 		}
-		addAllSBaseChangeListenersTo(mod);
+		addAllTreeNodeChangeListenersTo(mod);
 		return mod;
 	}
 
@@ -1695,7 +1697,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 			else
 				para.setUnits(this.model.getUnitDefinition(p.getUnits()));
 		}
-		addAllSBaseChangeListenersTo(para);
+		addAllTreeNodeChangeListenersTo(para);
 		return para;
 	}
 
@@ -1721,7 +1723,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 					.addModifier(readModifierSpeciesReference(r.getModifier(i)));
 		reaction.setFast(r.getFast());
 		reaction.setReversible(r.getReversible());
-		addAllSBaseChangeListenersTo(reaction);
+		addAllTreeNodeChangeListenersTo(reaction);
 		return reaction;
 	}
 
@@ -1793,7 +1795,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 		if (spec.isSetSpeciesType()) {
 			s.setSpeciesType(this.model.getSpeciesType(spec.getSpeciesType()));
 		}
-		addAllSBaseChangeListenersTo(s);
+		addAllTreeNodeChangeListenersTo(s);
 		return s;
 	}
 
@@ -1817,7 +1819,7 @@ public class LibSBMLReader implements SBMLInputConverter {
 		} else {
 			spec.setStoichiometry(specref.getStoichiometry());
 		}
-		addAllSBaseChangeListenersTo(spec);
+		addAllTreeNodeChangeListenersTo(spec);
 		return spec;
 	}
 
