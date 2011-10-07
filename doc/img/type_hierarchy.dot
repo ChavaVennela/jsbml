@@ -27,14 +27,15 @@ strict digraph G{
   /*
    * Interfaces
    */
-  SBMLInputConverter [label="SBML\nInputConverter"];
+  SBMLInputConverter  [label="SBML\nInputConverter"];
+  SBMLOutputConverter [label="SBML\nOutputConverter"];
 
   /*
    * Objects
    */
    
-  PluginSBMLReader   [label="Plugin\nSBMLReader"];
-  PluginSBMLWriter   [label="Plugin\nSBMLWriter"];
+  PluginSBMLReader    [label="Plugin\nSBMLReader"];
+  PluginSBMLWriter    [label="Plugin\nSBMLWriter"];
   
          
   /*********************
