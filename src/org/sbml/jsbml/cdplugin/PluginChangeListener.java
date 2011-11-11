@@ -1,6 +1,6 @@
 /*
- * $Id:  PluginChangeListener.java 10:50:22 draeger $
- * $URL: PluginChangeListener.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of the SBMLeditor API library.
  *
