@@ -1,6 +1,6 @@
 /*
- * $Id: PluginSBMLWriter.java 181 2010-04-20 07:28:21Z andreas-draeger $
- * $URL: https://jsbml.svn.sourceforge.net/svnroot/jsbml/modules/CellDesigner/src/org/sbml/jsbml/PluginSBMLWriter.java $
+ * $Id$
+ * $URL$
  * ----------------------------------------------------------------------------
  * This file is part of JSBML. Please visit <http://sbml.org/Software/JSBML>
  * for the latest version of JSBML and more information about SBML.
