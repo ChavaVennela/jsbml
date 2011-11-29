@@ -19,8 +19,10 @@
  */
 package org.sbml.jsbml.libsbmlio;
 
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.test.gui.JTreeOfSBML;
+import org.sbml.jsbml.xml.libsbml.LibSBMLChangeListener;
 import org.sbml.jsbml.xml.libsbml.LibSBMLReader;
 
 /**
@@ -32,6 +34,7 @@ public class SimpleApplication {
 	/**
 	 * @param args the path to a valid SBML file.
 	 */
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		try {
 			// Load LibSBML:
@@ -43,8 +46,22 @@ public class SimpleApplication {
 			LibSBMLReader reader = new LibSBMLReader();
 			SBMLDocument doc = reader.convertSBMLDocument(args[0]);
 			
+			org.sbml.libsbml.SBMLDocument libDoc = reader.getOriginalModel().getSBMLDocument();
+			doc.addTreeNodeChangeListener(new LibSBMLChangeListener(doc, libDoc));
+			
+			/*
+			 * Some tests
+			 */
+			Model model = doc.getModel();
+			if (model == null) {
+				model = doc.createModel("test_model");
+			}
+			model.createCompartmentType("ct001");
+			
 			// Run some application:
 			new JTreeOfSBML(doc);
+			
+			System.out.println(new org.sbml.libsbml.SBMLWriter().writeSBMLToString(libDoc));
 			
 		} catch (Throwable e) {
 			e.printStackTrace();
