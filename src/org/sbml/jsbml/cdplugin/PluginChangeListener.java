@@ -21,28 +21,54 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.tree.TreeNode;
 
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
+import jp.sbi.celldesigner.plugin.PluginAlgebraicRule;
+import jp.sbi.celldesigner.plugin.PluginAssignmentRule;
 import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
+import jp.sbi.celldesigner.plugin.PluginConstraint;
+import jp.sbi.celldesigner.plugin.PluginEvent;
+import jp.sbi.celldesigner.plugin.PluginEventAssignment;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
 import jp.sbi.celldesigner.plugin.PluginInitialAssignment;
 import jp.sbi.celldesigner.plugin.PluginKineticLaw;
 import jp.sbi.celldesigner.plugin.PluginModel;
 import jp.sbi.celldesigner.plugin.PluginParameter;
+import jp.sbi.celldesigner.plugin.PluginRateRule;
 import jp.sbi.celldesigner.plugin.PluginReaction;
+import jp.sbi.celldesigner.plugin.PluginRule;
 import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
+import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
+import org.omg.Dynamic.Parameter;
+import org.sbml.jsbml.AlgebraicRule;
+import org.sbml.jsbml.AssignmentRule;
+import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
+import org.sbml.jsbml.Delay;
+import org.sbml.jsbml.Event;
+import org.sbml.jsbml.EventAssignment;
+import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
+import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
+import org.sbml.jsbml.Priority;
+import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
+import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
+import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.SpeciesType;
+import org.sbml.jsbml.StoichiometryMath;
+import org.sbml.jsbml.Trigger;
+import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 
@@ -194,43 +220,94 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginCompartmentType pt = plugModel.getCompartmentType(ct.getId());
 			plugModel.removeCompartmentType(ct.getId());
 			plugin.notifySBaseDeleted(pt);
-			
-		} else if (node instanceof PluginModel) {
-			PluginModel pt = (PluginModel) node;
-			plugin.notifySBaseDeleted(pt);
-			
-		} else if (node instanceof PluginReaction) {
-			PluginReaction pt = (PluginReaction) node;
-			plugin.notifySBaseDeleted(pt);
-			
-		} else if (node instanceof PluginSimpleSpeciesReference) {
-			PluginSimpleSpeciesReference pt = (PluginSimpleSpeciesReference) node;
-			plugin.notifySBaseDeleted(pt);
-		} else if (node instanceof PluginSpeciesType) {
-			PluginSpeciesType pt = (PluginSpeciesType) node;
-			plugin.notifySBaseDeleted(pt);
-		} else if (node instanceof PluginCompartment) {
-			PluginCompartment pt = (PluginCompartment) node;
-			plugin.notifySBaseDeleted(pt);
-		} else if (node instanceof PluginParameter) {
-			PluginParameter pt = (PluginParameter) node;
-			plugin.notifySBaseDeleted(pt);
-		} else if (node instanceof PluginSpecies) {
-			PluginSpecies pt = (PluginSpecies) node;
-			plugin.notifySBaseDeleted(pt);
-		} else if (node instanceof PluginUnitDefinition) {
-			PluginUnitDefinition pt = (PluginUnitDefinition) node;
-			plugin.notifySBaseDeleted(pt);
-		} else if (node instanceof PluginFunctionDefinition) {
-			PluginFunctionDefinition pt = (PluginFunctionDefinition) node;
-			plugin.notifySBaseDeleted(pt);
 		}
-		// ...
-		else if (node instanceof InitialAssignment) {
-      PluginInitialAssignment plugInitAss; // find corresponding InitialAssignment from hash
-      // delete in plugin
-      // notify CellDesigner if possible.
-      // don't forget to update hashes after creating a new PluginInitialAssignment
+		else if (node instanceof Species) {
+			Species sp = (Species) node;
+			PluginSpecies ps = plugModel.getSpecies(sp.getId());
+			plugModel.removeSpecies(sp.getId());
+			plugin.notifySBaseDeleted(ps);
+		} else if (node instanceof Reaction) {
+			Reaction react = (Reaction) node;
+			PluginReaction preac= plugModel.getReaction(react.getId());
+			plugModel.removeReaction(react.getId());
+			plugin.notifySBaseDeleted(preac);
+		} else if (node instanceof SpeciesType) {
+			SpeciesType speciestype = (SpeciesType) node;
+			PluginSpeciesType pspec = plugModel.getSpeciesType(speciestype.getId());
+			plugModel.removeSpeciesType(speciestype.getId());
+			plugin.notifySBaseDeleted(pspec);
+		} else if (node instanceof org.sbml.jsbml.Parameter) {
+			org.sbml.jsbml.Parameter param = (org.sbml.jsbml.Parameter) node;
+			PluginParameter plugParam = plugModel.getParameter(param.getId());
+			plugModel.removeParameter(param.getId());
+			plugin.notifySBaseDeleted(plugParam);
+		} else if (node instanceof FunctionDefinition) {
+			FunctionDefinition funcdef = (FunctionDefinition) node;
+			PluginFunctionDefinition plugFuncdef = plugModel.getFunctionDefinition(funcdef.getId());
+			plugModel.removeFunctionDefinition(funcdef.getId());
+			plugin.notifySBaseDeleted(plugFuncdef);
+		} else if (node instanceof Compartment) {
+			Compartment comp = (Compartment) node;
+			PluginCompartment plugComp = plugModel.getCompartment(comp.getId());
+			plugModel.removeCompartment(comp.getId());
+			plugin.notifySBaseDeleted(plugComp);
+		} else if (node instanceof SpeciesReference){
+			SpeciesReference specRef = (SpeciesReference) node;
+			//TODO Speciesreference has no ID, crosscheck this
+		} else if (node instanceof LocalParameter){
+			LocalParameter locparam = (LocalParameter) node;
+			//TODO Has no counterpart in CD
+		} else if (node instanceof SimpleSpeciesReference){
+			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
+			//TODO Has no ID, crosscheck this
+		} else if (node instanceof UnitDefinition){
+			UnitDefinition undef = (UnitDefinition) node;
+			PluginUnitDefinition plugUndef = plugModel.getUnitDefinition(undef.getId());
+			plugModel.removeUnitDefinition(undef.getId());
+			plugin.notifySBaseDeleted(plugUndef);
+		} else if (node instanceof Event){
+			Event event = (Event) node;
+			PluginEvent plugEvent = plugModel.getEvent(event.getId());
+			plugModel.removeEvent(event.getId());
+			plugin.notifySBaseDeleted(plugEvent);
+		} else if (node instanceof RateRule){
+			RateRule rule = (RateRule) node;
+			//TODO crosscheck, no ID available
+		} else if (node instanceof AssignmentRule){
+			AssignmentRule assignRule = (AssignmentRule) node;
+			//TODO crosscheck, no ID available
+		} else if (node instanceof KineticLaw) {
+			KineticLaw klaw = (KineticLaw) node;
+			//TODO crosscheck, no ID available
+		} else if (node instanceof InitialAssignment){
+			InitialAssignment iAssign = (InitialAssignment) node;
+			//TODO crosscheck, no ID available
+		} else if (node instanceof EventAssignment){
+			EventAssignment eAssign = (EventAssignment) node;
+			//TODO crosscheck, no ID available
+		} else if (node instanceof StoichiometryMath){
+			StoichiometryMath stoich = (StoichiometryMath) node;
+			//TODO no class in CD for that ?
+		} else if (node instanceof Trigger){
+			Trigger trig = (Trigger) node;
+			//TODO no class in CD for that ?
+		} else if (node instanceof Rule){
+			Rule rule = (Rule) node;
+			//TODO only getIndex() exists, getId() doesn't exist. Crosscheck why.
+		} else if (node instanceof AlgebraicRule){
+			AlgebraicRule alrule = (AlgebraicRule) node;
+			//TODO Id not available
+		} else if (node instanceof Constraint){
+			Constraint ct = (Constraint) node;
+			//TODO is this really getIndex()? getId() doesnt exist...
+			PluginConstraint plugct = plugModel.getConstraint(ct.getIndex(ct));
+		} else if (node instanceof Delay){
+			Delay dl = (Delay) node;
+			//TODO no counter class in CD available
+		} else if (node instanceof Priority){
+			Priority prt = (Priority) node;
+		//TODO no counter class in CD available
+		}
     }
 	}
-}
+
