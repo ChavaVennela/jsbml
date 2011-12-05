@@ -21,28 +21,22 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.tree.TreeNode;
 
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
-import jp.sbi.celldesigner.plugin.PluginAlgebraicRule;
-import jp.sbi.celldesigner.plugin.PluginAssignmentRule;
 import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
 import jp.sbi.celldesigner.plugin.PluginConstraint;
 import jp.sbi.celldesigner.plugin.PluginEvent;
-import jp.sbi.celldesigner.plugin.PluginEventAssignment;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
 import jp.sbi.celldesigner.plugin.PluginInitialAssignment;
 import jp.sbi.celldesigner.plugin.PluginKineticLaw;
 import jp.sbi.celldesigner.plugin.PluginModel;
 import jp.sbi.celldesigner.plugin.PluginParameter;
-import jp.sbi.celldesigner.plugin.PluginRateRule;
 import jp.sbi.celldesigner.plugin.PluginReaction;
-import jp.sbi.celldesigner.plugin.PluginRule;
 import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
-import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
-import org.omg.Dynamic.Parameter;
+import org.apache.log4j.Logger;
 import org.sbml.jsbml.AlgebraicRule;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.Compartment;
@@ -54,6 +48,7 @@ import org.sbml.jsbml.EventAssignment;
 import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
+import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
@@ -73,6 +68,7 @@ import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 
 /**
+ * @author Alexander Peltzer
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  * @date 10:50:22
@@ -84,6 +80,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
    * 
    */
 	private CellDesignerPlugin plugin;
+	
+	/**
+	 * 
+	 */
+	private static final transient Logger logger = Logger.getLogger(PluginChangeListener.class);
 	
 	/**
 	 * 
@@ -203,8 +204,9 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		  // copy all properties
 		  // notify CellDesigner if possible.
       // don't forget to update hashes after creating a new PluginInitialAssignment
+		} else {
+			logger.warn(String.format("Could not process %s.", node.toString()));
 		}
-		
 	}
 
 	/*
@@ -256,7 +258,10 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			//TODO Speciesreference has no ID, crosscheck this
 		} else if (node instanceof LocalParameter){
 			LocalParameter locparam = (LocalParameter) node;
-			//TODO Has no counterpart in CD
+			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
+			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
+			Reaction r = kl.getParentSBMLObject();			
+			//TODO USE PARAMETER in PluginKineticLaw.
 		} else if (node instanceof SimpleSpeciesReference){
 			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
 			//TODO Has no ID, crosscheck this
