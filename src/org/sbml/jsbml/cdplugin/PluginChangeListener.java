@@ -28,6 +28,7 @@ import jp.sbi.celldesigner.plugin.PluginEvent;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
 import jp.sbi.celldesigner.plugin.PluginInitialAssignment;
 import jp.sbi.celldesigner.plugin.PluginKineticLaw;
+import jp.sbi.celldesigner.plugin.PluginListOf;
 import jp.sbi.celldesigner.plugin.PluginModel;
 import jp.sbi.celldesigner.plugin.PluginParameter;
 import jp.sbi.celldesigner.plugin.PluginReaction;
@@ -38,7 +39,9 @@ import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
 import org.apache.log4j.Logger;
 import org.sbml.jsbml.AlgebraicRule;
+import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.AssignmentRule;
+import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
@@ -63,6 +66,7 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.SpeciesType;
 import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Trigger;
+import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
@@ -308,11 +312,22 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginConstraint plugct = plugModel.getConstraint(ct.getIndex(ct));
 		} else if (node instanceof Delay){
 			Delay dl = (Delay) node;
+			
 			//TODO no counter class in CD available
 		} else if (node instanceof Priority){
 			Priority prt = (Priority) node;
 		//TODO no counter class in CD available
-		}
+		} else if (node instanceof Unit){
+			Unit ut = (Unit) node;
+			//
+		} else if (node instanceof SBMLDocument){
+			SBMLDocument doc = (SBMLDocument) node;
+			//
+		} else if (node instanceof ListOf){
+			ListOf listof = (ListOf) node;
+			//PluginListOf pluglistof = plugModel.getListof???
+			//TODO parse all lists or what has to be done here
+		} 
     }
 	}
 
