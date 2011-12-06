@@ -18,11 +18,11 @@ package org.sbml.jsbml.xml.libsbml;
 
 import java.beans.PropertyChangeEvent;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.AbstractMathContainer;
-import org.sbml.jsbml.AbstractNamedSBase;
 import org.sbml.jsbml.AbstractNamedSBaseWithUnit;
 import org.sbml.jsbml.AbstractSBase;
 import org.sbml.jsbml.AlgebraicRule;
@@ -46,14 +46,12 @@ import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
-import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.Priority;
 import org.sbml.jsbml.QuantityWithUnit;
 import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
-import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -131,12 +129,16 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (ct.isSetNotes()){
 						libCt.setNotes(ct.getNotesString());
 					}
+					libDoc.getModel().addCompartmentType(libCt);
 				} else if (sbase instanceof UnitDefinition){
 					UnitDefinition udef = (UnitDefinition) sbase;
 					org.sbml.libsbml.UnitDefinition libUdef = (org.sbml.libsbml.UnitDefinition) libSbase;
+					libDoc.getModel().addUnitDefinition(libUdef);
 					if (udef.isSetListOfUnits()){
 						for (org.sbml.jsbml.Unit u : udef.getListOfUnits()){
 							//make a recursion for every unit u in the list of units
+							DefaultMutableTreeNode newnode = new DefaultMutableTreeNode(u);
+							nodeAdded(newnode);
 						}
 					}
 				} else if (sbase instanceof Model){
@@ -155,37 +157,89 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						libModel.setLengthUnits(model.getLengthUnits());
 					}
 					if (model.isSetListOfCompartments()){
+						// makes a recursion for all compartments in the list
 						for (Compartment comp : model.getListOfCompartments()){
-							//make recursion 
+							DefaultMutableTreeNode compnode = new DefaultMutableTreeNode(comp);
+							nodeAdded(compnode);
 						}
 					}
 					if (model.isSetListOfCompartmentTypes()){
+						// makes a recursion for all compartment types in the list
 						for (CompartmentType comptype : model.getListOfCompartmentTypes()){
-							//make recursion
+							DefaultMutableTreeNode comptypenode = new DefaultMutableTreeNode(comptype);
+							nodeAdded(comptypenode);
 						}
 					}
 					if (model.isSetListOfConstraints()){
+						// makes a recursion for all constraints in the list
 						for (Constraint constr : model.getListOfConstraints()){
-							//make recursion
+							DefaultMutableTreeNode constrnode = new DefaultMutableTreeNode(constr);
+							nodeAdded(constrnode);
 						}
 					}
 					if (model.isSetListOfEvents()){
+						// makes a recursion for all events in the list
 						for (Event event : model.getListOfEvents()){
-							//make recursion
+							DefaultMutableTreeNode eventnode = new DefaultMutableTreeNode(event);
+							nodeAdded(eventnode);
 						}
 					}
 					if (model.isSetListOfFunctionDefinitions()){
+						// makes a recursion for all function definitions in the list
 						for (FunctionDefinition funcdef : model.getListOfFunctionDefinitions()){
-							//make recursion
+							DefaultMutableTreeNode funcdefnode = new DefaultMutableTreeNode(funcdef);
+							nodeAdded(funcdefnode);
 						}
 					}
-					if (model.isSetListOfInitialAssignments());
-					if (model.isSetListOfParameters());
-					if (model.isSetListOfReactions());
-					if (model.isSetListOfRules());
-					if (model.isSetListOfSpecies());
-					if (model.isSetListOfSpeciesTypes());
-					if (model.isSetListOfUnitDefinitions());
+					if (model.isSetListOfInitialAssignments()){
+						// makes a recursion for all initial assignments in the list
+						for (InitialAssignment initassign : model.getListOfInitialAssignments()){
+							DefaultMutableTreeNode initassignnode = new DefaultMutableTreeNode(initassign);
+							nodeAdded(initassignnode);
+						}
+					}
+					if (model.isSetListOfParameters()){
+						// makes a recursion for all parameters in the list
+						for (Parameter param : model.getListOfParameters()){
+							DefaultMutableTreeNode paramnode = new DefaultMutableTreeNode(param);
+							nodeAdded(paramnode);
+						}
+					}
+					if (model.isSetListOfReactions()){
+						// makes a recursion for all reactions in the list
+						for (Reaction reac : model.getListOfReactions()){
+							DefaultMutableTreeNode reacnode = new DefaultMutableTreeNode(reac);
+							nodeAdded(reacnode);
+						}
+					}
+					if (model.isSetListOfRules()){
+						// makes a recursion for all rules in the list
+						for (Rule rule : model.getListOfRules()){
+							DefaultMutableTreeNode rulenode = new DefaultMutableTreeNode(rule);
+							nodeAdded(rulenode);
+						}
+					}
+					if (model.isSetListOfSpecies()){
+						// makes a recursion for all species in the list
+						for (Species spec : model.getListOfSpecies()){
+							DefaultMutableTreeNode specnode = new DefaultMutableTreeNode(spec);
+							nodeAdded(specnode);
+						}
+					}
+					if (model.isSetListOfSpeciesTypes()){
+						// makes a recursion for all species types in the list
+						for (SpeciesType spectype : model.getListOfSpeciesTypes()){
+							DefaultMutableTreeNode spectypenode = new DefaultMutableTreeNode(spectype);
+							nodeAdded(spectypenode);
+						}
+					}
+					if (model.isSetListOfUnitDefinitions()){
+						// makes a recursion for all unit definitions in the list
+						for (UnitDefinition unitdef : model.getListOfUnitDefinitions()){
+							DefaultMutableTreeNode unitdefnode = new DefaultMutableTreeNode(unitdef);
+							nodeAdded(unitdefnode);
+						}
+					}
 					if (model.isSetSubstanceUnits()){
 						libModel.setSubstanceUnits(model.getSubstanceUnits());
 					}
@@ -195,6 +249,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (model.isSetVolumeUnits()){
 						libModel.setVolumeUnits(model.getVolumeUnits());
 					}
+					libDoc.setModel(libModel);
 				} else if (sbase instanceof Reaction){
 					Reaction reac = (Reaction) sbase;
 					org.sbml.libsbml.Reaction libReac = (org.sbml.libsbml.Reaction) libSbase;
@@ -205,31 +260,44 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						libReac.setFast(reac.getFast());
 					}
 					if (reac.isSetKineticLaw()){
-						//libReac.setKineticLaw(reac.getKineticLaw());
+						DefaultMutableTreeNode kinlawnode = new DefaultMutableTreeNode(reac.getKineticLaw());
+						nodeAdded(kinlawnode);
 					}
 					if (reac.isSetListOfModifiers()){
+						// makes a recursion for all modifiers in the list
 						for (ModifierSpeciesReference modi : reac.getListOfModifiers()){
-							//make recursion
+							DefaultMutableTreeNode modinode = new DefaultMutableTreeNode(modi);
+							nodeAdded(modinode);
 						}
 					}
 					if (reac.isSetListOfProducts()){
+						// makes a recursion for all products in the list
 						for (SpeciesReference product : reac.getListOfProducts()){
-							//make recursion
+							DefaultMutableTreeNode productnode = new DefaultMutableTreeNode(product);
+							nodeAdded(productnode);
 						}
 					}
 					if (reac.isSetListOfReactants()){
+						// makes a recursion for all reactants in the list
 						for (SpeciesReference reactant : reac.getListOfReactants()){
-							//make recursion
+							DefaultMutableTreeNode reactantnode = new DefaultMutableTreeNode(reactant);
+							nodeAdded(reactantnode);
 						}
 					}
 					if (reac.isSetReversible()){
 						libReac.setReversible(reac.getReversible());
 					}
+					libDoc.getModel().addReaction(libReac);
 				} else if (sbase instanceof SimpleSpeciesReference){
 					SimpleSpeciesReference siSpecRef = (SimpleSpeciesReference) sbase;
 					org.sbml.libsbml.SimpleSpeciesReference libSiSpecRef = (org.sbml.libsbml.SimpleSpeciesReference) libSbase;
 					if (siSpecRef.isSetSpecies()){
 						libSiSpecRef.setSpecies(siSpecRef.getSpecies());
+					}
+					if (sbase instanceof ModifierSpeciesReference){
+						// search the associated reaction to add the modifier
+						Reaction parentreac = (Reaction)sbase.getParentSBMLObject().getParentSBMLObject();
+						libDoc.getModel().getReaction(parentreac.getId()).addModifier((org.sbml.libsbml.ModifierSpeciesReference) libSiSpecRef);
 					}
 					if (sbase instanceof SpeciesReference){
 						SpeciesReference specRef = (SpeciesReference) sbase;
@@ -240,14 +308,59 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						if (specRef.isSetStoichiometry()){
 							libSpecRef.setStoichiometry(specRef.getStoichiometry());
 						}
+						// search the associated reaction
+						Reaction parentreac = (Reaction)sbase.getParentSBMLObject().getParentSBMLObject();
+						// ask if its a product or a reactant and add it to the corresponding reaction in libDoc
+						if (specRef.getParentSBMLObject().toString().equals("ListOfProducts")){
+							libDoc.getModel().getReaction(parentreac.getId()).addProduct(libSpecRef);
+						} else if (specRef.getParentSBMLObject().toString().equals("ListOfReactants")){
+							libDoc.getModel().getReaction(parentreac.getId()).addReactant(libSpecRef);
+						}
 					}
 				} else if (sbase instanceof AbstractNamedSBaseWithUnit){
 					if (sbase instanceof Event){
-
+						Event event = (Event) sbase;
+						org.sbml.libsbml.Event libEvent = (org.sbml.libsbml.Event) libSbase;
+						if (event.isSetDelay()){
+							//libEvent.setDelay(event.getDelay());
+						}
+						if (event.isSetListOfEventAssignments()){
+							for (EventAssignment eventassign : event.getListOfEventAssignments()){
+								DefaultMutableTreeNode eventassignnode = new DefaultMutableTreeNode(eventassign);
+								nodeAdded(eventassignnode);
+							}
+						}
+						if (event.isSetPriority()){
+							//libEvent.setPriority(event.getPriority());
+						}
+						if (event.isSetTimeUnits()){
+							libEvent.setTimeUnits(event.getTimeUnits());
+						}
+						if (event.isSetTrigger()){
+							//libEvent.setTrigger(event.getTrigger());
+						}
+						if (event.isSetUnits()){
+							// are there units in events of libsbml?
+						}
+						if (event.isSetUseValuesFromTriggerTime()){
+							libEvent.setUseValuesFromTriggerTime(event.getUseValuesFromTriggerTime());
+						}
+						libDoc.getModel().addEvent(libEvent);
 					}
 					else if (sbase instanceof QuantityWithUnit){
-						if (sbase instanceof LocalParameter);
-
+						if (sbase instanceof LocalParameter){
+							LocalParameter locParam = (LocalParameter) sbase;
+							org.sbml.libsbml.LocalParameter libLocParam = (org.sbml.libsbml.LocalParameter) libSbase;
+							if (locParam.isSetValue()){
+								libLocParam.setValue(locParam.getValue());
+							}
+							// search the associated kinetic law
+							KineticLaw kinLaw =(KineticLaw)locParam.getParentSBMLObject().getParentSBMLObject();
+							// search the reaction where the kinetic law is in
+							Reaction reac = (Reaction) kinLaw.getParentSBMLObject();
+							// find the corresponding reaction in libDoc and the KineticLaw in it and add the local parameter
+							libDoc.getModel().getReaction(reac.getId()).getKineticLaw().addLocalParameter(libLocParam);
+						}
 						else if (sbase instanceof Symbol){
 							if (sbase instanceof Compartment){
 								Compartment c = (Compartment) sbase;
@@ -273,6 +386,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 								if (c.isSetVolume()){
 									libC.setVolume(c.getVolume());
 								}
+								libDoc.getModel().addCompartment(libC);
 							} else if (sbase instanceof Species){
 								Species spec = (Species) sbase;
 								org.sbml.libsbml.Species libS = (org.sbml.libsbml.Species) libSbase;
@@ -312,6 +426,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 								if (spec.isSetUnits()){
 									libS.setUnits(spec.getUnits());
 								}
+								libDoc.getModel().addSpecies(libS);
 							} else if (sbase instanceof Parameter){
 								Parameter param = (Parameter) sbase;
 								org.sbml.libsbml.Parameter libParam = (org.sbml.libsbml.Parameter) libSbase;
@@ -324,6 +439,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 								if (param.isSetValue()){
 									libParam.setValue(param.getValue());
 								}
+								libDoc.getModel().addParameter(libParam);
 							} 
 						}
 					}
@@ -346,14 +462,38 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				if (unit.isSetKind()){
 					//libUnit.setKind(unit.getKind());
 				}
-
+				if (unit.getParent().getParent() instanceof UnitDefinition){
+					//search the associated unit definition
+					UnitDefinition udef = (UnitDefinition) unit.getParent().getParent();
+					//search the corresponding unit definition in libsbml and add the new unit
+					libDoc.getModel().getUnitDefinition(udef.getId()).addUnit(libUnit);
+				}
+				
 			} else if (node instanceof SBMLDocument){
 				
 			} else if (node instanceof ListOf<?>){
 				
 			} else if (node instanceof AbstractMathContainer){
 				if (sbase instanceof FunctionDefinition);
-				else if (sbase instanceof KineticLaw);
+				else if (sbase instanceof KineticLaw){
+					KineticLaw kinLaw = (KineticLaw) sbase;
+					org.sbml.libsbml.KineticLaw libKinLaw = (org.sbml.libsbml.KineticLaw) libSbase;
+					if (kinLaw.isSetListOfLocalParameters()){
+						//recursion
+					}
+					if (kinLaw.isSetListOfParameters()){
+						//recursion
+					}
+					if (kinLaw.isSetSubstanceUnits()){
+						libKinLaw.setSubstanceUnits(kinLaw.getSubstanceUnits());
+					}
+					if (kinLaw.isSetTimeUnits()){
+						libKinLaw.setTimeUnits(kinLaw.getTimeUnits());
+					}
+					if (kinLaw.isSetUnits()){
+						// are there units in KineticLaw in libsbml?
+					}
+				}
 				else if (sbase instanceof InitialAssignment);
 				else if (sbase instanceof EventAssignment);
 				else if (sbase instanceof StoichiometryMath);
