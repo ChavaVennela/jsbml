@@ -25,6 +25,7 @@ import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
 import jp.sbi.celldesigner.plugin.PluginConstraint;
 import jp.sbi.celldesigner.plugin.PluginEvent;
+import jp.sbi.celldesigner.plugin.PluginEventAssignment;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
 import jp.sbi.celldesigner.plugin.PluginInitialAssignment;
 import jp.sbi.celldesigner.plugin.PluginKineticLaw;
@@ -34,6 +35,7 @@ import jp.sbi.celldesigner.plugin.PluginParameter;
 import jp.sbi.celldesigner.plugin.PluginReaction;
 import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
+import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
@@ -45,10 +47,12 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
+import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.Delay;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
 import org.sbml.jsbml.FunctionDefinition;
+import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
 import org.sbml.jsbml.ListOf;
@@ -70,6 +74,7 @@ import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
+import org.sbml.libsbml.SBase;
 
 /**
  * @author Alexander Peltzer
@@ -80,36 +85,37 @@ import org.sbml.jsbml.util.TreeNodeChangeListener;
 @SuppressWarnings("deprecation")
 public class PluginChangeListener implements TreeNodeChangeListener {
 
-  /**
+	/**
    * 
    */
 	private CellDesignerPlugin plugin;
-	
+
 	/**
 	 * 
 	 */
-	private static final transient Logger logger = Logger.getLogger(PluginChangeListener.class);
-	
+	private static final transient Logger logger = Logger
+			.getLogger(PluginChangeListener.class);
+
 	/**
 	 * 
 	 */
 	private PluginModel plugModel;
-	
+
 	/**
 	 * 
 	 * @param plugin
 	 */
-  public PluginChangeListener(SBMLDocument doc, CellDesignerPlugin plugin) {
-	  this.plugin = plugin;
-	  this.plugModel = plugin.getSelectedModel();
-    if (doc != null) {
-      Model model = doc.getModel();
-      if (model != null) {
-        
-      }
-    }
+	public PluginChangeListener(SBMLDocument doc, CellDesignerPlugin plugin) {
+		this.plugin = plugin;
+		this.plugModel = plugin.getSelectedModel();
+		if (doc != null) {
+			Model model = doc.getModel();
+			if (model != null) {
+
+			}
+		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -126,31 +132,32 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 
 		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)) {
 
-		} 
+		}
 		// TODO Auto-generated method stub
 		else if (prop.equals(TreeNodeChangeEvent.charge)) {
-		  Species species = (Species) event.getSource();
-		  PluginSpecies plugSpec = plugModel.getSpecies(species.getId());
-		  plugSpec.setCharge(species.getCharge());
-		  plugin.notifySBaseChanged(plugSpec);
+			Species species = (Species) event.getSource();
+			PluginSpecies plugSpec = plugModel.getSpecies(species.getId());
+			plugSpec.setCharge(species.getCharge());
+			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.math)) {
-		  MathContainer mathContainer = (MathContainer) event.getSource();
-		  // TODO check which corresponding element can be found in CellDesigner
-		  if (mathContainer instanceof Constraint) {
-		    // TODO
-		    Constraint c = (Constraint) mathContainer;
-		    
-		  }
-		  // ...
-		  else if (mathContainer instanceof KineticLaw) {
-		    Reaction r = ((KineticLaw) mathContainer).getParent();
-		    PluginReaction plugReac = plugModel.getReaction(r.getId());
-		    if (plugReac != null) {
-		      PluginKineticLaw plugKl = plugReac.getKineticLaw();
-//		      plugKl.setMath(); // see PluginSBMLWriter
-		      
-		    }
-		  }
+			MathContainer mathContainer = (MathContainer) event.getSource();
+			// TODO check which corresponding element can be found in
+			// CellDesigner
+			if (mathContainer instanceof Constraint) {
+				// TODO
+				Constraint c = (Constraint) mathContainer;
+
+			}
+			// ...
+			else if (mathContainer instanceof KineticLaw) {
+				Reaction r = ((KineticLaw) mathContainer).getParent();
+				PluginReaction plugReac = plugModel.getReaction(r.getId());
+				if (plugReac != null) {
+					PluginKineticLaw plugKl = plugReac.getKineticLaw();
+					// plugKl.setMath(); // see PluginSBMLWriter
+
+				}
+			}
 		}
 		// TODO Auto-generated method stub
 	}
@@ -164,50 +171,142 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 	 */
 	public void nodeAdded(TreeNode node) {
 		if (node instanceof CompartmentType) {
-      CompartmentType ct = (CompartmentType) node;
-      PluginCompartmentType pt = new PluginCompartmentType(ct.getId());
-      if (ct.isSetName() && !pt.getName().equals(ct.getName())) {
-        pt.setName(ct.getName());
-      }
-			plugin.notifySBaseAdded(pt);
+			CompartmentType ct = (CompartmentType) node;
+			PluginCompartmentType pt = new PluginCompartmentType(ct.getId());
+			if (ct.isSetName() && !pt.getName().equals(ct.getName())) {
+				pt.setName(ct.getName());
+			}
+			plugin.notifySBaseAdded(pt); 
+		} else if (node instanceof Species) {
+			Species sp = (Species) node;
+			//TODO Is species type right here in the constructor ?
+			PluginSpecies plugsp = new PluginSpecies(sp.getSpeciesType(), sp.getName());
+			if (sp.isSetName() && !sp.getName().equals(plugsp.getName())) {
+				//TODO PluginSpecies.setName() is not visible. Is this intended ? The other classes allow a setName() call.
+				plugsp.setNotes(sp.getName());
+				plugin.notifySBaseAdded(plugsp);
+			}
+		} else if (node instanceof Reaction) {
+			Reaction react = (Reaction) node;
+			PluginReaction plugreac = new PluginReaction();
+			if (react.isSetName() && !react.getName().equals(plugreac.getName())){
+				plugreac.setName(react.getName());
+				plugin.notifySBaseAdded(plugreac);
+			}
 			
-		} else if (node instanceof PluginModel) {
-			PluginModel pt = (PluginModel) node;
-			plugin.notifySBaseAdded(pt);
+		} else if (node instanceof SpeciesType) {
+			SpeciesType speciestype = (SpeciesType) node;
+			PluginSpeciesType plugspectype = new PluginSpeciesType(speciestype.getId());
+			if (speciestype.isSetName() && !speciestype.getName().equals(plugspectype.getName())){
+				plugspectype.setName(speciestype.getName());
+				plugin.notifySBaseAdded(plugspectype);
+			}
+		} else if (node instanceof org.sbml.jsbml.Parameter) {
+			org.sbml.jsbml.Parameter param = (org.sbml.jsbml.Parameter) node;
+			if (param.getParent() instanceof KineticLaw){
+				PluginParameter plugparam = new PluginParameter((PluginKineticLaw) param.getParent());
+				if (param.isSetName() && !param.getName().equals(plugparam.getName())){
+					plugparam.setName(param.getName());
+					plugin.notifySBaseAdded(plugparam);
+				}
+				//TODO I'm not sure if we need to distinguish between KineticLaw as parent or PluginModel as parent in this way.
+			} else if (param.getParent() instanceof Model){
+				PluginParameter plugparam = new PluginParameter((PluginModel) param.getParent());
+				if (param.isSetName() && !param.getName().equals(plugparam.getName())){
+					plugparam.setName(param.getName());
+					plugin.notifySBaseAdded(plugparam);
+				}
+			}
 			
-		} else if (node instanceof PluginReaction) {
-			PluginReaction pt = (PluginReaction) node;
-			plugin.notifySBaseAdded(pt);
+		} else if (node instanceof FunctionDefinition) {
+			FunctionDefinition funcdef = (FunctionDefinition) node;
 			
-		} else if (node instanceof PluginSimpleSpeciesReference) {
-			PluginSimpleSpeciesReference pt = (PluginSimpleSpeciesReference) node;
-			plugin.notifySBaseAdded(pt);
-		} else if (node instanceof PluginSpeciesType) {
-			PluginSpeciesType pt = (PluginSpeciesType) node;
-			plugin.notifySBaseAdded(pt);
-		} else if (node instanceof PluginCompartment) {
-			PluginCompartment pt = (PluginCompartment) node;
-			plugin.notifySBaseAdded(pt);
-		} else if (node instanceof PluginParameter) {
-			PluginParameter pt = (PluginParameter) node;
-			plugin.notifySBaseAdded(pt);
-		} else if (node instanceof PluginSpecies) {
-			PluginSpecies pt = (PluginSpecies) node;
-			plugin.notifySBaseAdded(pt);
-		} else if (node instanceof PluginUnitDefinition) {
-			PluginUnitDefinition pt = (PluginUnitDefinition) node;
-			plugin.notifySBaseAdded(pt);
-		} else if (node instanceof PluginFunctionDefinition) {
-			PluginFunctionDefinition pt = (PluginFunctionDefinition) node;
-			plugin.notifySBaseAdded(pt);
-		}
-
-		// ..
-		else if (node instanceof InitialAssignment) {
-		  PluginInitialAssignment plugInitAss; // create new InitialAssignment
-		  // copy all properties
-		  // notify CellDesigner if possible.
-      // don't forget to update hashes after creating a new PluginInitialAssignment
+		} else if (node instanceof Compartment) {
+			Compartment comp = (Compartment) node;
+			
+		} else if (node instanceof SpeciesReference) {
+			SpeciesReference specRef = (SpeciesReference) node;
+			SBase sbase = (SBase) specRef.getParent();
+			// TODO What do we do with such an SBase Type ?
+		} else if (node instanceof LocalParameter) {
+			LocalParameter locparam = (LocalParameter) node;
+			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
+			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
+			Reaction r = kl.getParentSBMLObject();
+			
+		} else if (node instanceof SimpleSpeciesReference) {
+			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
+			// What to do with Treenode?
+			// TODO Has no ID, crosscheck this
+		} else if (node instanceof UnitDefinition) {
+			UnitDefinition undef = (UnitDefinition) node;
+			
+		} else if (node instanceof Event) {
+			Event event = (Event) node;
+			PluginEvent plugevent = new PluginEvent(event.getId());
+			if (event.isSetName() && !event.getName().equals(plugevent.getName())){
+				plugevent.setName(event.getName());
+			}
+			plugin.notifySBaseAdded(plugevent);
+		} else if (node instanceof RateRule) {
+			RateRule rule = (RateRule) node;
+			// TODO This has to be hashed somehow
+		} else if (node instanceof AssignmentRule) {
+			AssignmentRule assignRule = (AssignmentRule) node;
+			// TODO This has to be hashed somehow
+		} else if (node instanceof KineticLaw) {
+			KineticLaw klaw = (KineticLaw) node;
+			Reaction parentreaction = klaw.getParentSBMLObject();
+			PluginKineticLaw plugklaw = plugModel.getReaction(
+					parentreaction.getId()).getKineticLaw();
+		} else if (node instanceof InitialAssignment) {
+			InitialAssignment iAssign = (InitialAssignment) node;
+			// TODO This has to be hashed somehow.
+		} else if (node instanceof EventAssignment) {
+			EventAssignment eAssign = (EventAssignment) node;
+		} else if (node instanceof StoichiometryMath) {
+			StoichiometryMath stoich = (StoichiometryMath) node;
+			// TODO no class in CD for that ?
+		} else if (node instanceof Trigger) {
+			// TODO no class in CD for that ?
+		} else if (node instanceof Rule) {
+			Rule rule = (Rule) node;
+			// TODO This has to be hashed somehow
+		} else if (node instanceof AlgebraicRule) {
+			AlgebraicRule alrule = (AlgebraicRule) node;
+			// TODO This has to be hashed somehow
+		} else if (node instanceof Constraint) {
+			Constraint ct = (Constraint) node;
+			// TODO This has to be hashed somehow
+		} else if (node instanceof Delay) {
+			Delay dl = (Delay) node;
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof Priority) {
+			Priority prt = (Priority) node;
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof Unit) {
+			Unit ut = (Unit) node;
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof SBMLDocument) {
+			SBMLDocument doc = (SBMLDocument) node;
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof ListOf) {
+			ListOf listof = (ListOf) node;
+			// PluginListOf pluglistof = plugModel.getListof???
+			// TODO Parse all lists or what has to be done here?
+		} else if (node instanceof CVTerm){
+			//TODO
+		} else if (node instanceof History){
+			//TODO
+		} else if (node instanceof Annotation){
+			//TODO
+		} else if (node instanceof Creator){
+			//TODO
+		
 		} else {
 			logger.warn(String.format("Could not process %s.", node.toString()));
 		}
@@ -222,24 +321,24 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 	 */
 	public void nodeRemoved(TreeNode node) {
 		if (node instanceof CompartmentType) {
-		  CompartmentType ct = (CompartmentType) node;
+			CompartmentType ct = (CompartmentType) node;
 			PluginCompartmentType pt = plugModel.getCompartmentType(ct.getId());
 			plugModel.removeCompartmentType(ct.getId());
 			plugin.notifySBaseDeleted(pt);
-		}
-		else if (node instanceof Species) {
+		} else if (node instanceof Species) {
 			Species sp = (Species) node;
 			PluginSpecies ps = plugModel.getSpecies(sp.getId());
 			plugModel.removeSpecies(sp.getId());
 			plugin.notifySBaseDeleted(ps);
 		} else if (node instanceof Reaction) {
 			Reaction react = (Reaction) node;
-			PluginReaction preac= plugModel.getReaction(react.getId());
+			PluginReaction preac = plugModel.getReaction(react.getId());
 			plugModel.removeReaction(react.getId());
 			plugin.notifySBaseDeleted(preac);
 		} else if (node instanceof SpeciesType) {
 			SpeciesType speciestype = (SpeciesType) node;
-			PluginSpeciesType pspec = plugModel.getSpeciesType(speciestype.getId());
+			PluginSpeciesType pspec = plugModel.getSpeciesType(speciestype
+					.getId());
 			plugModel.removeSpeciesType(speciestype.getId());
 			plugin.notifySBaseDeleted(pspec);
 		} else if (node instanceof org.sbml.jsbml.Parameter) {
@@ -249,7 +348,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseDeleted(plugParam);
 		} else if (node instanceof FunctionDefinition) {
 			FunctionDefinition funcdef = (FunctionDefinition) node;
-			PluginFunctionDefinition plugFuncdef = plugModel.getFunctionDefinition(funcdef.getId());
+			PluginFunctionDefinition plugFuncdef = plugModel
+					.getFunctionDefinition(funcdef.getId());
 			plugModel.removeFunctionDefinition(funcdef.getId());
 			plugin.notifySBaseDeleted(plugFuncdef);
 		} else if (node instanceof Compartment) {
@@ -257,77 +357,102 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginCompartment plugComp = plugModel.getCompartment(comp.getId());
 			plugModel.removeCompartment(comp.getId());
 			plugin.notifySBaseDeleted(plugComp);
-		} else if (node instanceof SpeciesReference){
+		} else if (node instanceof SpeciesReference) {
 			SpeciesReference specRef = (SpeciesReference) node;
-			//TODO Speciesreference has no ID, crosscheck this
-		} else if (node instanceof LocalParameter){
+			SBase sbase = (SBase) specRef.getParent();
+			// TODO What do we do with such an SBase Type ?
+
+		} else if (node instanceof LocalParameter) {
 			LocalParameter locparam = (LocalParameter) node;
 			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
 			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
-			Reaction r = kl.getParentSBMLObject();			
-			//TODO USE PARAMETER in PluginKineticLaw.
-		} else if (node instanceof SimpleSpeciesReference){
+			Reaction r = kl.getParentSBMLObject();
+			// PluginKineticLaw plugkl =
+			// plugModel.getReaction(r.getId()).getKineticLaw();
+			// plugin.notifySBaseDeleted(sbase)
+			// TODO USE PARAMETER in PluginKineticLaw.
+		} else if (node instanceof SimpleSpeciesReference) {
 			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
-			//TODO Has no ID, crosscheck this
-		} else if (node instanceof UnitDefinition){
+			// What to do with Treenode?
+			// TODO Has no ID, crosscheck this
+		} else if (node instanceof UnitDefinition) {
 			UnitDefinition undef = (UnitDefinition) node;
-			PluginUnitDefinition plugUndef = plugModel.getUnitDefinition(undef.getId());
+			PluginUnitDefinition plugUndef = plugModel.getUnitDefinition(undef
+					.getId());
 			plugModel.removeUnitDefinition(undef.getId());
 			plugin.notifySBaseDeleted(plugUndef);
-		} else if (node instanceof Event){
+		} else if (node instanceof Event) {
 			Event event = (Event) node;
 			PluginEvent plugEvent = plugModel.getEvent(event.getId());
 			plugModel.removeEvent(event.getId());
 			plugin.notifySBaseDeleted(plugEvent);
-		} else if (node instanceof RateRule){
+		} else if (node instanceof RateRule) {
 			RateRule rule = (RateRule) node;
-			//TODO crosscheck, no ID available
-		} else if (node instanceof AssignmentRule){
+			// TODO This has to be hashed somehow
+		} else if (node instanceof AssignmentRule) {
 			AssignmentRule assignRule = (AssignmentRule) node;
-			//TODO crosscheck, no ID available
+			// TODO This has to be hashed somehow
 		} else if (node instanceof KineticLaw) {
 			KineticLaw klaw = (KineticLaw) node;
-			//TODO crosscheck, no ID available
-		} else if (node instanceof InitialAssignment){
+			Reaction parentreaction = klaw.getParentSBMLObject();
+			PluginKineticLaw plugklaw = plugModel.getReaction(
+					parentreaction.getId()).getKineticLaw();
+			// plugModel.removeR
+			// Do we have to remove the whole Reaction here or only the
+			// KineticLaw ?
+			// TODO crosscheck, no ID available
+		} else if (node instanceof InitialAssignment) {
 			InitialAssignment iAssign = (InitialAssignment) node;
-			//TODO crosscheck, no ID available
-		} else if (node instanceof EventAssignment){
+			// TODO This has to be hashed somehow.
+		} else if (node instanceof EventAssignment) {
 			EventAssignment eAssign = (EventAssignment) node;
-			//TODO crosscheck, no ID available
-		} else if (node instanceof StoichiometryMath){
+			ListOf<EventAssignment> elist = eAssign.getParent();
+			Event e = (Event) elist.getParentSBMLObject();
+			PluginEventAssignment plugEventAssignment = plugModel.getEvent(
+					e.getId()).getEventAssignment(eAssign.getIndex(node));
+			plugin.notifySBaseDeleted(plugEventAssignment);
+		} else if (node instanceof StoichiometryMath) {
 			StoichiometryMath stoich = (StoichiometryMath) node;
-			//TODO no class in CD for that ?
-		} else if (node instanceof Trigger){
-			Trigger trig = (Trigger) node;
-			//TODO no class in CD for that ?
-		} else if (node instanceof Rule){
+			// TODO no class in CD for that ?
+		} else if (node instanceof Trigger) {
+			// TODO no class in CD for that ?
+		} else if (node instanceof Rule) {
 			Rule rule = (Rule) node;
-			//TODO only getIndex() exists, getId() doesn't exist. Crosscheck why.
-		} else if (node instanceof AlgebraicRule){
+			// TODO This has to be hashed somehow
+		} else if (node instanceof AlgebraicRule) {
 			AlgebraicRule alrule = (AlgebraicRule) node;
-			//TODO Id not available
-		} else if (node instanceof Constraint){
+			// TODO This has to be hashed somehow
+		} else if (node instanceof Constraint) {
 			Constraint ct = (Constraint) node;
-			//TODO is this really getIndex()? getId() doesnt exist...
-			PluginConstraint plugct = plugModel.getConstraint(ct.getIndex(ct));
-		} else if (node instanceof Delay){
+			// TODO This has to be hashed somehow
+		} else if (node instanceof Delay) {
 			Delay dl = (Delay) node;
-			
-			//TODO no counter class in CD available
-		} else if (node instanceof Priority){
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof Priority) {
 			Priority prt = (Priority) node;
-		//TODO no counter class in CD available
-		} else if (node instanceof Unit){
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof Unit) {
 			Unit ut = (Unit) node;
-			//
-		} else if (node instanceof SBMLDocument){
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof SBMLDocument) {
 			SBMLDocument doc = (SBMLDocument) node;
-			//
-		} else if (node instanceof ListOf){
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof ListOf) {
 			ListOf listof = (ListOf) node;
-			//PluginListOf pluglistof = plugModel.getListof???
-			//TODO parse all lists or what has to be done here
+			// PluginListOf pluglistof = plugModel.getListof???
+			// TODO Parse all lists or what has to be done here?
+		} else if (node instanceof CVTerm){
+			//TODO
+		} else if (node instanceof History){
+			//TODO
+		} else if (node instanceof Annotation){
+			//TODO
+		} else if (node instanceof Creator){
+			//TODO
 		} 
-    }
 	}
-
+}
