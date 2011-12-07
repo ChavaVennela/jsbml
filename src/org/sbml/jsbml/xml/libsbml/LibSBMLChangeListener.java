@@ -37,11 +37,13 @@ import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.Delay;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
+import org.sbml.jsbml.ExplicitRule;
 import org.sbml.jsbml.FunctionDefinition;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
 import org.sbml.jsbml.ListOf;
+import org.sbml.jsbml.ListOf.Type;
 import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
@@ -52,6 +54,7 @@ import org.sbml.jsbml.QuantityWithUnit;
 import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -136,7 +139,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libDoc.getModel().addUnitDefinition(libUdef);
 					if (udef.isSetListOfUnits()){
 						for (org.sbml.jsbml.Unit u : udef.getListOfUnits()){
-							//make a recursion for every unit u in the list of units
+							//makes a recursion for every unit u in the list of units
 							DefaultMutableTreeNode newnode = new DefaultMutableTreeNode(u);
 							nodeAdded(newnode);
 						}
@@ -253,6 +256,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				} else if (sbase instanceof Reaction){
 					Reaction reac = (Reaction) sbase;
 					org.sbml.libsbml.Reaction libReac = (org.sbml.libsbml.Reaction) libSbase;
+					libDoc.getModel().addReaction(libReac);
 					if (reac.isSetCompartment()){
 						libReac.setCompartment(reac.getCompartment());
 					}
@@ -287,7 +291,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (reac.isSetReversible()){
 						libReac.setReversible(reac.getReversible());
 					}
-					libDoc.getModel().addReaction(libReac);
 				} else if (sbase instanceof SimpleSpeciesReference){
 					SimpleSpeciesReference siSpecRef = (SimpleSpeciesReference) sbase;
 					org.sbml.libsbml.SimpleSpeciesReference libSiSpecRef = (org.sbml.libsbml.SimpleSpeciesReference) libSbase;
@@ -311,9 +314,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						// search the associated reaction
 						Reaction parentreac = (Reaction)sbase.getParentSBMLObject().getParentSBMLObject();
 						// ask if its a product or a reactant and add it to the corresponding reaction in libDoc
-						if (specRef.getParentSBMLObject().toString().equals("ListOfProducts")){
+						if (specRef.getParentSBMLObject().equals(Type.listOfProducts)){
 							libDoc.getModel().getReaction(parentreac.getId()).addProduct(libSpecRef);
-						} else if (specRef.getParentSBMLObject().toString().equals("ListOfReactants")){
+						} else if (specRef.getParentSBMLObject().equals(Type.listOfReactants)){
 							libDoc.getModel().getReaction(parentreac.getId()).addReactant(libSpecRef);
 						}
 					}
@@ -468,21 +471,34 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					//search the corresponding unit definition in libsbml and add the new unit
 					libDoc.getModel().getUnitDefinition(udef.getId()).addUnit(libUnit);
 				}
-				
+
 			} else if (node instanceof SBMLDocument){
-				
+				//is this case really needed?
 			} else if (node instanceof ListOf<?>){
-				
-			} else if (node instanceof AbstractMathContainer){
-				if (sbase instanceof FunctionDefinition);
+				for (SBase sb : (ListOf<?>) node){
+					DefaultMutableTreeNode sbasenode = new DefaultMutableTreeNode(sb);
+					nodeAdded(sbasenode);
+				}	
+			
+			} else if (sbase instanceof AbstractMathContainer){
+				if (sbase instanceof FunctionDefinition){
+					libDoc.getModel().addFunctionDefinition((org.sbml.libsbml.FunctionDefinition)libSbase);
+				}
 				else if (sbase instanceof KineticLaw){
 					KineticLaw kinLaw = (KineticLaw) sbase;
 					org.sbml.libsbml.KineticLaw libKinLaw = (org.sbml.libsbml.KineticLaw) libSbase;
+					if (kinLaw.isSetMath()){
+						//libKinLaw.setMath(kinLaw.getMath());
+					}
 					if (kinLaw.isSetListOfLocalParameters()){
-						//recursion
+						//makes a recursion 
+						for (LocalParameter locParam : kinLaw.getListOfLocalParameters()){
+							DefaultMutableTreeNode locParamnode = new DefaultMutableTreeNode(locParam);
+							nodeAdded(locParamnode);
+						}
 					}
 					if (kinLaw.isSetListOfParameters()){
-						//recursion
+						//recursion? 
 					}
 					if (kinLaw.isSetSubstanceUnits()){
 						libKinLaw.setSubstanceUnits(kinLaw.getSubstanceUnits());
@@ -493,16 +509,85 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (kinLaw.isSetUnits()){
 						// are there units in KineticLaw in libsbml?
 					}
+					Reaction reac = kinLaw.getParentSBMLObject();
+					libDoc.getModel().getReaction(reac.getId()).setKineticLaw(libKinLaw);
 				}
-				else if (sbase instanceof InitialAssignment);
-				else if (sbase instanceof EventAssignment);
-				else if (sbase instanceof StoichiometryMath);
-				else if (sbase instanceof Trigger);
+				else if (sbase instanceof InitialAssignment){
+					InitialAssignment initAssign = (InitialAssignment) sbase;
+					org.sbml.libsbml.InitialAssignment libInitAssign = (org.sbml.libsbml.InitialAssignment) libSbase;
+					if (initAssign.isSetSymbol()){
+						libInitAssign.setSymbol(initAssign.getSymbol());
+					}
+					if (initAssign.isSetVariable()){
+						// no corresponding method in libSBML? 
+					}
+					if (initAssign.isSetMath()){
+						//libInitAssign.setMath(initAssign.getMath());
+					}
+					libDoc.getModel().addInitialAssignment(libInitAssign);
+				}
+				else if (sbase instanceof EventAssignment){
+					EventAssignment eventAssign = (EventAssignment) sbase;
+					org.sbml.libsbml.EventAssignment libEventAssign = (org.sbml.libsbml.EventAssignment) libSbase;
+					if (eventAssign.isSetVariable()){
+						libEventAssign.setVariable(eventAssign.getVariable());
+					}
+					if (eventAssign.isSetMath()){
+						//libEventAssign.setMath(eventAssign.getMath());
+					}
+					libDoc.getModel().getEvent(((Event)eventAssign.getParent().getParent()).getId()).addEventAssignment(libEventAssign);
+				}
+				else if (sbase instanceof StoichiometryMath){
+					StoichiometryMath sMath = (StoichiometryMath) sbase;
+					org.sbml.libsbml.StoichiometryMath libSMath = (org.sbml.libsbml.StoichiometryMath) libSbase;
+					if (sMath.isSetMath()){
+						//libSMath.setMath(sMath.getMath());
+					}
+					libDoc.getModel().getSpeciesReference(sMath.getParent().getId()).setStoichiometryMath(libSMath);
+				}
+				else if (sbase instanceof Trigger){
+					Trigger trig = (Trigger) sbase;
+					org.sbml.libsbml.Trigger LibTrig = (org.sbml.libsbml.Trigger) libSbase;
+					if (trig.isSetInitialValue()){
+						LibTrig.setInitialValue(trig.getInitialValue());
+					}
+					if (trig.isSetPersistent()){
+						LibTrig.setPersistent(trig.getPersistent());
+					}
+					if (trig.isSetMath()){
+						//LibTrig.setMath(trig.getMath());
+					}
+					libDoc.getModel().getEvent(trig.getParent().getId()).setTrigger(LibTrig);
+				}
 				else if (sbase instanceof Rule){
-					if (sbase instanceof AlgebraicRule);
+					Rule rule = (Rule) sbase;
+					org.sbml.libsbml.Rule libRule = (org.sbml.libsbml.Rule) libSbase;
+					if (rule.isSetMath()){
+						//LibRule.setMath(rule.getMath());
+					}
+					if (sbase instanceof AlgebraicRule){
+						//there is nothing more to do
+					}
 					else{
-						if (sbase instanceof RateRule);
-						else if (sbase instanceof AssignmentRule);
+						ExplicitRule expRule = (ExplicitRule) rule;
+						if (sbase instanceof RateRule){
+							org.sbml.libsbml.RateRule libRateRule = (org.sbml.libsbml.RateRule) libRule;
+							if (expRule.isSetVariable()){
+								libRateRule.setVariable(expRule.getVariable());
+							}
+							if (expRule.isSetUnits()){
+								libRateRule.setUnits(expRule.getUnits());
+							}
+						}
+						else if (sbase instanceof AssignmentRule){
+							org.sbml.libsbml.AssignmentRule libAssignRule = (org.sbml.libsbml.AssignmentRule) libRule;
+							if (expRule.isSetVariable()){
+								libAssignRule.setVariable(expRule.getVariable());
+							}
+							if (expRule.isSetUnits()){
+								libAssignRule.setUnits(expRule.getUnits());
+							}
+						}
 					}
 				}
 				else if (sbase instanceof Constraint);
@@ -517,13 +602,13 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			else if (node instanceof Creator);
 		}
 		else if (node instanceof ASTNode){
-			
+
 		}
 		else if (node instanceof TreeNodeAdapter){
-			
+
 		}
 		else if (node instanceof XMLToken){
-			
+
 		}
 	}
 
