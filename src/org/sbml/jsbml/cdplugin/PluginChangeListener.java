@@ -39,6 +39,7 @@ import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.sbml.jsbml.AlgebraicRule;
 import org.sbml.jsbml.Annotation;
@@ -175,8 +176,9 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginCompartmentType pt = new PluginCompartmentType(ct.getId());
 			if (ct.isSetName() && !pt.getName().equals(ct.getName())) {
 				pt.setName(ct.getName());
+				plugin.notifySBaseAdded(pt); 
 			}
-			plugin.notifySBaseAdded(pt); 
+			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof Species) {
 			Species sp = (Species) node;
 			//TODO Is species type right here in the constructor ?
@@ -186,6 +188,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				plugsp.setNotes(sp.getName());
 				plugin.notifySBaseAdded(plugsp);
 			}
+			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof Reaction) {
 			Reaction react = (Reaction) node;
 			PluginReaction plugreac = new PluginReaction();
@@ -193,6 +196,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				plugreac.setName(react.getName());
 				plugin.notifySBaseAdded(plugreac);
 			}
+			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			
 		} else if (node instanceof SpeciesType) {
 			SpeciesType speciestype = (SpeciesType) node;
@@ -201,6 +205,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				plugspectype.setName(speciestype.getName());
 				plugin.notifySBaseAdded(plugspectype);
 			}
+			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof org.sbml.jsbml.Parameter) {
 			org.sbml.jsbml.Parameter param = (org.sbml.jsbml.Parameter) node;
 			if (param.getParent() instanceof KineticLaw){
@@ -209,18 +214,26 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugparam.setName(param.getName());
 					plugin.notifySBaseAdded(plugparam);
 				}
-				//TODO I'm not sure if we need to distinguish between KineticLaw as parent or PluginModel as parent in this way.
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				
 			} else if (param.getParent() instanceof Model){
 				PluginParameter plugparam = new PluginParameter((PluginModel) param.getParent());
 				if (param.isSetName() && !param.getName().equals(plugparam.getName())){
 					plugparam.setName(param.getName());
 					plugin.notifySBaseAdded(plugparam);
 				}
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			}
 			
 		} else if (node instanceof FunctionDefinition) {
 			FunctionDefinition funcdef = (FunctionDefinition) node;
-			
+			PluginFunctionDefinition plugfuncdef = new PluginFunctionDefinition(funcdef.getId());
+			if (funcdef.isSetName() && !plugfuncdef.getName().equals(funcdef.getName())) {
+				plugfuncdef.setName(funcdef.getName());
+				plugin.notifySBaseAdded(plugfuncdef);
+			}
+			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+
 		} else if (node instanceof Compartment) {
 			Compartment comp = (Compartment) node;
 			
@@ -246,8 +259,9 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginEvent plugevent = new PluginEvent(event.getId());
 			if (event.isSetName() && !event.getName().equals(plugevent.getName())){
 				plugevent.setName(event.getName());
+				plugin.notifySBaseAdded(plugevent);
 			}
-			plugin.notifySBaseAdded(plugevent);
+			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof RateRule) {
 			RateRule rule = (RateRule) node;
 			// TODO This has to be hashed somehow
@@ -259,6 +273,10 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			Reaction parentreaction = klaw.getParentSBMLObject();
 			PluginKineticLaw plugklaw = plugModel.getReaction(
 					parentreaction.getId()).getKineticLaw();
+			PluginReaction plugreac = plugModel.getReaction(parentreaction.getId());
+			plugreac.setKineticLaw(plugklaw);
+			plugin.notifySBaseAdded(plugreac);
+			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof InitialAssignment) {
 			InitialAssignment iAssign = (InitialAssignment) node;
 			// TODO This has to be hashed somehow.
@@ -446,6 +464,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			// PluginListOf pluglistof = plugModel.getListof???
 			// TODO Parse all lists or what has to be done here?
 		} else if (node instanceof CVTerm){
+			CVTerm term = (CVTerm) node;
+			
 			//TODO
 		} else if (node instanceof History){
 			//TODO
