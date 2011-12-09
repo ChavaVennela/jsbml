@@ -61,6 +61,8 @@ public class SimpleApplication {
 			// Run some application:
 			new JTreeOfSBML(doc);
 			
+			// TODO: perform changes in the model.
+			
 			System.out.println(new org.sbml.libsbml.SBMLWriter().writeSBMLToString(libDoc));
 			
 		} catch (Throwable e) {

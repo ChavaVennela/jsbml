@@ -71,6 +71,7 @@ import org.sbml.jsbml.xml.XMLToken;
 import org.sbml.libsbml.SBMLDocument;
 
 /**
+ * @author Meike Aichele
  * @author Andreas Dr&auml;ger
  * @version $Rev$
  * @since 0.8
