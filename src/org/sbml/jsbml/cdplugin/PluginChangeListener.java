@@ -568,19 +568,31 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					e.getId()).getEventAssignment(eAssign.getIndex(node));
 			plugin.notifySBaseDeleted(plugEventAssignment);
 		} else if (node instanceof StoichiometryMath) {
-			StoichiometryMath stoich = (StoichiometryMath) node;
-			// TODO no class in CD for that ?
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof Trigger) {
-			// TODO no class in CD for that ?
+			// TODO no counter class in CD available
+			// Therefore unnecessary to implement this?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof Rule) {
 			Rule rule = (Rule) node;
-			// TODO This has to be hashed somehow
+			ListOf<Rule> listofrule = rule.getParent();
+			listofrule.remove(rule);
+			PluginSBase plugbase = (PluginSBase) listofrule.getParent();
+			plugin.notifySBaseChanged(plugbase);
 		} else if (node instanceof AlgebraicRule) {
 			AlgebraicRule alrule = (AlgebraicRule) node;
-			// TODO This has to be hashed somehow
+			ListOf<Rule> listofalgebraicrules = alrule.getParent();
+			listofalgebraicrules.remove(alrule);
+			PluginSBase plugbase = (PluginSBase) listofalgebraicrules.getParent();
+			plugin.notifySBaseChanged(plugbase);
 		} else if (node instanceof Constraint) {
 			Constraint ct = (Constraint) node;
-			// TODO This has to be hashed somehow
+			ListOf<Constraint> listofconstraints = ct.getParent();
+			listofconstraints.remove(ct);
+			PluginSBase plugbase = (PluginSBase) listofconstraints.getParent();
+			plugin.notifySBaseChanged(plugbase);
 		} else if (node instanceof Delay) {
 			Delay dl = (Delay) node;
 			// TODO no counter class in CD available
