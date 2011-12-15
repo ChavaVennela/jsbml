@@ -41,6 +41,7 @@ import jp.sbi.celldesigner.plugin.PluginProtein;
 import jp.sbi.celldesigner.plugin.PluginRateRule;
 import jp.sbi.celldesigner.plugin.PluginReaction;
 import jp.sbi.celldesigner.plugin.PluginRule;
+import jp.sbi.celldesigner.plugin.PluginSBase;
 import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
 import jp.sbi.celldesigner.plugin.PluginSpeciesAlias;
@@ -407,36 +408,36 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			  case listOfEvents:
 			    break;
 			  case listOfFunctionDefinitions:
-          break;
-        case listOfInitialAssignments:
-          break;
-        case listOfLocalParameters:
-          break;
-        case listOfModifiers:
-          break;
-        case listOfParameters:
-          break;
-        case listOfProducts:
-          break;
-        case listOfReactants:
-          break;
-        case listOfReactions:
-          break;
-        case listOfRules:
-          break;
-        case listOfSpecies:
-          break;
-        case listOfSpeciesTypes:
-          break;
-        case listOfUnitDefinitions:
-          break;
-        case listOfUnits:
-          break;
-        case other:
-          // TODO for JSBML packages (later than 0.8).
-        default:
-          // unknown
-          break;
+				  break;
+			  case listOfInitialAssignments:
+				  break;
+			  case listOfLocalParameters:
+				  break;
+			  case listOfModifiers:
+				  break;
+			  case listOfParameters:
+				  break;
+			  case listOfProducts:
+				  break;
+			  case listOfReactants:
+				  break;
+			  case listOfReactions:
+				  break;
+			  case listOfRules:
+				  break;
+			  case listOfSpecies:
+				  break;
+			  case listOfSpeciesTypes:
+				  break;
+			  case listOfUnitDefinitions:
+				  break;
+			  case listOfUnits:
+				  break;
+			  case other:
+				  // TODO for JSBML packages (later than 0.8).
+			  default:
+				  // unknown
+				  break;
 			}
 			PluginListOf pluglistof = new PluginListOf();
 			pluglistof.setNotes(listOf.getNotesString());
@@ -456,8 +457,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof Creator){
 			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 			// TODO no counter class in CD available
-						// Therefore unnecessary to implement this?
-		
+			// Therefore unnecessary to implement this?
 		} else {
 			logger.warn(String.format("Could not process %s.", node.toString()));
 		}
@@ -510,18 +510,13 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseDeleted(plugComp);
 		} else if (node instanceof SpeciesReference) {
 			SpeciesReference specRef = (SpeciesReference) node;
-			SBase sbase = (SBase) specRef.getParent();
-			// TODO What do we do with such an SBase Type ?
-
+			// TODO CD has no removeSpeciesReference Method available
 		} else if (node instanceof LocalParameter) {
 			LocalParameter locparam = (LocalParameter) node;
 			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
 			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
 			Reaction r = kl.getParentSBMLObject();
-			// PluginKineticLaw plugkl =
-			// plugModel.getReaction(r.getId()).getKineticLaw();
-			// plugin.notifySBaseDeleted(sbase)
-			// TODO USE PARAMETER in PluginKineticLaw.
+			//TODO how to do this here ?
 		} else if (node instanceof SimpleSpeciesReference) {
 			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
 			// What to do with Treenode?
@@ -538,26 +533,33 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugModel.removeEvent(event.getId());
 			plugin.notifySBaseDeleted(plugEvent);
 		} else if (node instanceof RateRule) {
-			RateRule rule = (RateRule) node;
-			// TODO This has to be hashed somehow
+			RateRule rrule = (RateRule) node;
+			ListOf<Rule> rulelist = rrule.getParent();
+			rulelist.remove(rrule);
+			PluginSBase plugbase = (PluginSBase) rulelist.getParent();
+			plugin.notifySBaseChanged(plugbase);
+			// TODO Not sure if this is working, should be asked somehow.
 		} else if (node instanceof AssignmentRule) {
 			AssignmentRule assignRule = (AssignmentRule) node;
-			// TODO This has to be hashed somehow
+			ListOf<Rule> rulelist = assignRule.getParent();
+			rulelist.remove(assignRule);
+			PluginSBase plugbase = (PluginSBase) rulelist.getParent();
+			plugin.notifySBaseChanged(plugbase);
+			// TODO Not sure if this is working, should be asked somehow.
 		} else if (node instanceof KineticLaw) {
 			KineticLaw klaw = (KineticLaw) node;
 			Reaction parentreaction = klaw.getParentSBMLObject();
-      PluginReaction plugReac = plugModel.getReaction(parentreaction.getId());
+			PluginReaction plugReac = plugModel.getReaction(parentreaction.getId());
 			PluginKineticLaw plugklaw = plugReac.getKineticLaw();
-			//TODO test this, is null applicable here or not?
 			plugReac.setKineticLaw(null);
 			plugin.notifySBaseDeleted(plugklaw);
-			// plugModel.removeR
-			// Do we have to remove the whole Reaction here or only the
-			// KineticLaw ?
-			// TODO crosscheck, no ID available
 		} else if (node instanceof InitialAssignment) {
 			InitialAssignment iAssign = (InitialAssignment) node;
-			// TODO This has to be hashed somehow.
+			ListOf<InitialAssignment> listinitassignment = iAssign.getParent();
+			listinitassignment.remove(iAssign);
+			PluginSBase plugbase = (PluginSBase) listinitassignment.getParent();
+			plugin.notifySBaseChanged(plugbase);
+			// TODO Not sure if this is working, should be asked somehow.
 		} else if (node instanceof EventAssignment) {
 			EventAssignment eAssign = (EventAssignment) node;
 			ListOf<EventAssignment> elist = eAssign.getParent();
@@ -583,32 +585,41 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			Delay dl = (Delay) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof Priority) {
 			Priority prt = (Priority) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof Unit) {
 			Unit ut = (Unit) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof SBMLDocument) {
 			SBMLDocument doc = (SBMLDocument) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof ListOf<?>) {
 			ListOf<?> listof = (ListOf<?>) node;
 			// PluginListOf pluglistof = plugModel.getListof???
 			// TODO Parse all lists or what has to be done here?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof CVTerm){
 			CVTerm term = (CVTerm) node;
-			
-			//TODO
+			// TODO no counter class in CD available
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof History){
-			//TODO
+			History hist = (History) node;
+			// TODO no counter class in CD available
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof Annotation){
-			//TODO
+			// TODO no counter class in CD available
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		} else if (node instanceof Creator){
-			//TODO
+			// TODO no counter class in CD available
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 		}
 	}
 	
