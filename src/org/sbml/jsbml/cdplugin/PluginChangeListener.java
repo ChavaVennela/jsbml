@@ -20,10 +20,15 @@ import java.beans.PropertyChangeEvent;
 
 import javax.swing.tree.TreeNode;
 
+import jp.sbi.celldesigner.SpeciesAlias;
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
+import jp.sbi.celldesigner.plugin.PluginAlgebraicRule;
+import jp.sbi.celldesigner.plugin.PluginAntiSenseRNA;
+import jp.sbi.celldesigner.plugin.PluginAssignmentRule;
 import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
 import jp.sbi.celldesigner.plugin.PluginConstraint;
+import jp.sbi.celldesigner.plugin.PluginDoSthAbstractAction;
 import jp.sbi.celldesigner.plugin.PluginEvent;
 import jp.sbi.celldesigner.plugin.PluginEventAssignment;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
@@ -32,11 +37,15 @@ import jp.sbi.celldesigner.plugin.PluginKineticLaw;
 import jp.sbi.celldesigner.plugin.PluginListOf;
 import jp.sbi.celldesigner.plugin.PluginModel;
 import jp.sbi.celldesigner.plugin.PluginParameter;
+import jp.sbi.celldesigner.plugin.PluginProtein;
+import jp.sbi.celldesigner.plugin.PluginRateRule;
 import jp.sbi.celldesigner.plugin.PluginReaction;
+import jp.sbi.celldesigner.plugin.PluginRule;
 import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
 import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
+import jp.sbi.celldesigner.plugin.PluginUnit;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
 import org.apache.log4j.Level;
@@ -76,6 +85,7 @@ import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.libsbml.SBase;
+import org.sbml.libsbml.XMLNode;
 
 /**
  * @author Alexander Peltzer
@@ -181,31 +191,30 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof Species) {
 			Species sp = (Species) node;
-			//TODO Is species type right here in the constructor ?
 			PluginSpecies plugsp = new PluginSpecies(sp.getSpeciesType(), sp.getName());
 			if (sp.isSetName() && !sp.getName().equals(plugsp.getName())) {
-				//TODO PluginSpecies.setName() is not visible. Is this intended ? The other classes allow a setName() call.
-				plugsp.setNotes(sp.getName());
 				plugin.notifySBaseAdded(plugsp);
+			} else {
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			}
-			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof Reaction) {
 			Reaction react = (Reaction) node;
 			PluginReaction plugreac = new PluginReaction();
 			if (react.isSetName() && !react.getName().equals(plugreac.getName())){
 				plugreac.setName(react.getName());
 				plugin.notifySBaseAdded(plugreac);
+			} else {
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			}
-			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
-			
 		} else if (node instanceof SpeciesType) {
 			SpeciesType speciestype = (SpeciesType) node;
 			PluginSpeciesType plugspectype = new PluginSpeciesType(speciestype.getId());
 			if (speciestype.isSetName() && !speciestype.getName().equals(plugspectype.getName())){
 				plugspectype.setName(speciestype.getName());
 				plugin.notifySBaseAdded(plugspectype);
+			} else {
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			}
-			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof org.sbml.jsbml.Parameter) {
 			org.sbml.jsbml.Parameter param = (org.sbml.jsbml.Parameter) node;
 			if (param.getParent() instanceof KineticLaw){
@@ -213,61 +222,78 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				if (param.isSetName() && !param.getName().equals(plugparam.getName())){
 					plugparam.setName(param.getName());
 					plugin.notifySBaseAdded(plugparam);
+				} else {
+					logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 				}
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
-				
 			} else if (param.getParent() instanceof Model){
 				PluginParameter plugparam = new PluginParameter((PluginModel) param.getParent());
 				if (param.isSetName() && !param.getName().equals(plugparam.getName())){
 					plugparam.setName(param.getName());
 					plugin.notifySBaseAdded(plugparam);
+				} else {
+					logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 				}
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			}
-			
 		} else if (node instanceof FunctionDefinition) {
 			FunctionDefinition funcdef = (FunctionDefinition) node;
 			PluginFunctionDefinition plugfuncdef = new PluginFunctionDefinition(funcdef.getId());
 			if (funcdef.isSetName() && !plugfuncdef.getName().equals(funcdef.getName())) {
 				plugfuncdef.setName(funcdef.getName());
 				plugin.notifySBaseAdded(plugfuncdef);
+			} else {
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			}
-			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
-
 		} else if (node instanceof Compartment) {
 			Compartment comp = (Compartment) node;
-			
+			PluginCompartment plugcomp = new PluginCompartment(comp.getCompartmentType());
+			if (comp.isSetName() && !plugcomp.getName().equals(comp.getName())) {
+				plugcomp.setName(comp.getName());
+				plugin.notifySBaseAdded(plugcomp);
+			} else {
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+			}
 		} else if (node instanceof SpeciesReference) {
 			SpeciesReference specRef = (SpeciesReference) node;
-			SBase sbase = (SBase) specRef.getParent();
-			// TODO What do we do with such an SBase Type ?
+			PluginSpeciesReference plugspecRef = new PluginSpeciesReference((PluginReaction) specRef.getParent(), null);
+			//TODO SpeciesAlias: How to get this ? The parent object is as well quite unclear. 
+			plugin.notifySBaseAdded(plugspecRef);
 		} else if (node instanceof LocalParameter) {
 			LocalParameter locparam = (LocalParameter) node;
 			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
 			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
 			Reaction r = kl.getParentSBMLObject();
-			
+			//TODO LocalParameter not available in CellDesigner?
 		} else if (node instanceof SimpleSpeciesReference) {
 			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
-			// What to do with Treenode?
-			// TODO Has no ID, crosscheck this
+			//PluginSimpleSpeciesReference plugsimspec = new PluginSimpleSpeciesReference(alias);
+			// TODO Where to get the Species Alias ?
 		} else if (node instanceof UnitDefinition) {
 			UnitDefinition undef = (UnitDefinition) node;
-			
+			PluginUnitDefinition plugundef = new PluginUnitDefinition(undef.getId());
+			if (undef.isSetName() && !plugundef.getName().equals(undef.getName())) {
+				plugundef.setName(undef.getName());
+				plugin.notifySBaseAdded(plugundef);
+			} else {
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+			}
 		} else if (node instanceof Event) {
 			Event event = (Event) node;
 			PluginEvent plugevent = new PluginEvent(event.getId());
 			if (event.isSetName() && !event.getName().equals(plugevent.getName())){
 				plugevent.setName(event.getName());
 				plugin.notifySBaseAdded(plugevent);
+			} else {
+				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 			}
-			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof RateRule) {
 			RateRule rule = (RateRule) node;
-			// TODO This has to be hashed somehow
+			//PluginModel plugmodel = new PluginModel((Model) rule.getModel());
+			//PluginRateRule plugraterule = new PluginRateRule();
+			// TODO Why does this not work ?
 		} else if (node instanceof AssignmentRule) {
 			AssignmentRule assignRule = (AssignmentRule) node;
-			// TODO This has to be hashed somehow
+			// PluginAssignmentRule plugassignrule = new PluginAssignmentRule(assignRule.getModel());
+			// TODO Same problem here.
 		} else if (node instanceof KineticLaw) {
 			KineticLaw klaw = (KineticLaw) node;
 			Reaction parentreaction = klaw.getParentSBMLObject();
@@ -276,54 +302,76 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginReaction plugreac = plugModel.getReaction(parentreaction.getId());
 			plugreac.setKineticLaw(plugklaw);
 			plugin.notifySBaseAdded(plugreac);
-			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof InitialAssignment) {
 			InitialAssignment iAssign = (InitialAssignment) node;
-			// TODO This has to be hashed somehow.
+			PluginInitialAssignment plugiassign = new PluginInitialAssignment(iAssign.getSymbol());
+			plugin.notifySBaseAdded(plugiassign);
 		} else if (node instanceof EventAssignment) {
-			EventAssignment eAssign = (EventAssignment) node;
+			EventAssignment eassign = (EventAssignment) node;
+			//PluginEventAssignment plugeassign = new PluginEventAssignment(eassign.getParent());
+			// TODO: This is a list of <EventAssignments> Are there always only one or more ? 
+			// Do we have to parse them all ?
 		} else if (node instanceof StoichiometryMath) {
 			StoichiometryMath stoich = (StoichiometryMath) node;
-			// TODO no class in CD for that ?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			// TODO no class in CD for that ? What to do with such things ? Log-Message and thats it ?
 		} else if (node instanceof Trigger) {
+			Trigger trig = (Trigger) node;
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 			// TODO no class in CD for that ?
 		} else if (node instanceof Rule) {
 			Rule rule = (Rule) node;
-			// TODO This has to be hashed somehow
+			PluginRule plugrule = new PluginRule();
+			plugin.notifySBaseAdded(plugrule);
 		} else if (node instanceof AlgebraicRule) {
 			AlgebraicRule alrule = (AlgebraicRule) node;
-			// TODO This has to be hashed somehow
+			//PluginModel plugmodel = (PluginModel) alrule.getModel();
+			//PluginAlgebraicRule plugalrule = new PluginAlgebraicRule(alrule.getModel());
+			// TODO PluginModel Problem
 		} else if (node instanceof Constraint) {
 			Constraint ct = (Constraint) node;
-			// TODO This has to be hashed somehow
+			PluginConstraint plugct = new PluginConstraint(ct.getMathMLString());
+			plugin.notifySBaseAdded(plugct);
 		} else if (node instanceof Delay) {
 			Delay dl = (Delay) node;
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
 		} else if (node instanceof Priority) {
 			Priority prt = (Priority) node;
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
 		} else if (node instanceof Unit) {
 			Unit ut = (Unit) node;
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
+			//TODO Unclear how to continue with that information
+			//PluginUnit plugunit = new PluginUnit(ut.getParent().get)
 		} else if (node instanceof SBMLDocument) {
 			SBMLDocument doc = (SBMLDocument) node;
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-		} else if (node instanceof ListOf) {
-			ListOf listof = (ListOf) node;
-			// PluginListOf pluglistof = plugModel.getListof???
+		} else if (node instanceof ListOf<?>) {
+			ListOf<?> listof = (ListOf<?>) node;
+			PluginListOf pluglistof = new PluginListOf();
+			pluglistof.setNotes(listof.getNotesString());
 			// TODO Parse all lists or what has to be done here?
 		} else if (node instanceof CVTerm){
-			//TODO
+			CVTerm cv = (CVTerm) node;
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			//TODO This has to be done with the libsbml.CVTerm Class, fix this.
 		} else if (node instanceof History){
-			//TODO
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			// TODO no counter class in CD available
+						// Therefore unnecessary to implement this?
 		} else if (node instanceof Annotation){
-			//TODO
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			// TODO no counter class in CD available
+						// Therefore unnecessary to implement this?
 		} else if (node instanceof Creator){
-			//TODO
+			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			// TODO no counter class in CD available
+						// Therefore unnecessary to implement this?
 		
 		} else {
 			logger.warn(String.format("Could not process %s.", node.toString()));
