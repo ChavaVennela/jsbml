@@ -43,6 +43,7 @@ import jp.sbi.celldesigner.plugin.PluginReaction;
 import jp.sbi.celldesigner.plugin.PluginRule;
 import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
+import jp.sbi.celldesigner.plugin.PluginSpeciesAlias;
 import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
 import jp.sbi.celldesigner.plugin.PluginUnit;
@@ -74,6 +75,7 @@ import org.sbml.jsbml.RateRule;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -254,9 +256,25 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (node instanceof SpeciesReference) {
 			SpeciesReference specRef = (SpeciesReference) node;
-			PluginSpeciesReference plugspecRef = new PluginSpeciesReference((PluginReaction) specRef.getParent(), null);
-			//TODO SpeciesAlias: How to get this ? The parent object is as well quite unclear. 
-			plugin.notifySBaseAdded(plugspecRef);
+      String type = SBO.convertSBO2Alias(specRef.getSBOTerm());
+      if (type.length() == 0) {
+        // use "unknown"
+        int sbo = 285;
+        type = SBO.convertSBO2Alias(sbo);
+        logger.log(Level.DEBUG, String.format(
+          "No SBO term defined for %s, using %d", 
+          specRef.getElementName(), sbo));
+      }
+      // TODO: use SBML layout extension (later than JSBML 0.8)
+      if (specRef.isSetSpecies()) {
+        PluginSpeciesAlias alias = new PluginSpeciesAlias(plugModel
+            .getSpecies(specRef.getSpecies()), type);
+        PluginSpeciesReference plugspecRef = new PluginSpeciesReference(
+          (PluginReaction) specRef.getParent(), alias);
+        plugin.notifySBaseAdded(plugspecRef);
+      } else {
+        logger.log(Level.DEBUG, "Cannot create PluginSpeciesReference due to missing species annotation.");
+      }
 		} else if (node instanceof LocalParameter) {
 			LocalParameter locparam = (LocalParameter) node;
 			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
@@ -287,6 +305,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (node instanceof RateRule) {
 			RateRule rule = (RateRule) node;
+			PluginRateRule plugraterule = new PluginRateRule(plugModel);
 			//PluginModel plugmodel = new PluginModel((Model) rule.getModel());
 			//PluginRateRule plugraterule = new PluginRateRule();
 			// TODO Why does this not work ?
@@ -352,9 +371,52 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
 		} else if (node instanceof ListOf<?>) {
-			ListOf<?> listof = (ListOf<?>) node;
+			ListOf<?> listOf = (ListOf<?>) node;
+			switch (listOf.getSBaseListType()) {
+			  case listOfCompartments:
+			    break;
+			  case listOfCompartmentTypes:
+			    break;
+			  case listOfConstraints:
+			    break;
+			  case listOfEventAssignments:
+			    break;
+			  case listOfEvents:
+			    break;
+			  case listOfFunctionDefinitions:
+          break;
+        case listOfInitialAssignments:
+          break;
+        case listOfLocalParameters:
+          break;
+        case listOfModifiers:
+          break;
+        case listOfParameters:
+          break;
+        case listOfProducts:
+          break;
+        case listOfReactants:
+          break;
+        case listOfReactions:
+          break;
+        case listOfRules:
+          break;
+        case listOfSpecies:
+          break;
+        case listOfSpeciesTypes:
+          break;
+        case listOfUnitDefinitions:
+          break;
+        case listOfUnits:
+          break;
+        case other:
+          // TODO for JSBML packages (later than 0.8).
+        default:
+          // unknown
+          break;
+			}
 			PluginListOf pluglistof = new PluginListOf();
-			pluglistof.setNotes(listof.getNotesString());
+			pluglistof.setNotes(listOf.getNotesString());
 			// TODO Parse all lists or what has to be done here?
 		} else if (node instanceof CVTerm){
 			CVTerm cv = (CVTerm) node;
@@ -461,8 +523,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof KineticLaw) {
 			KineticLaw klaw = (KineticLaw) node;
 			Reaction parentreaction = klaw.getParentSBMLObject();
-			PluginKineticLaw plugklaw = plugModel.getReaction(
-					parentreaction.getId()).getKineticLaw();
+      PluginReaction plugReac = plugModel.getReaction(parentreaction.getId());
+			PluginKineticLaw plugklaw = plugReac.getKineticLaw();
+			//TODO test this, is null applicable here or not?
+			plugReac.setKineticLaw(null);
+			plugin.notifySBaseDeleted(plugklaw);
 			// plugModel.removeR
 			// Do we have to remove the whole Reaction here or only the
 			// KineticLaw ?
@@ -507,8 +572,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			SBMLDocument doc = (SBMLDocument) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-		} else if (node instanceof ListOf) {
-			ListOf listof = (ListOf) node;
+		} else if (node instanceof ListOf<?>) {
+			ListOf<?> listof = (ListOf<?>) node;
 			// PluginListOf pluglistof = plugModel.getListof???
 			// TODO Parse all lists or what has to be done here?
 		} else if (node instanceof CVTerm){
@@ -521,6 +586,6 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			//TODO
 		} else if (node instanceof Creator){
 			//TODO
-		} 
+		}
 	}
 }
