@@ -57,6 +57,18 @@ public class SimpleApplication {
 				model = doc.createModel("test_model");
 			}
 			model.createCompartmentType("ct001");
+			model.createCompartment("c001");
+			model.createAlgebraicRule();
+			model.createAssignmentRule();
+			model.createConstraint();
+			//model.createDelay();
+			model.createEvent("ev001");
+			model.createEventAssignment();
+			model.createFunctionDefinition("func001");
+			model.createInitialAssignment();
+			model.createParameter("param001");
+			model.createKineticLaw();
+			//model.createKineticParameter("param001");
 			
 			// Run some application:
 			new JTreeOfSBML(doc);
