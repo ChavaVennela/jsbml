@@ -123,8 +123,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 				} else if (node instanceof Model){
 					Model model = (Model) node;
-					org.sbml.libsbml.Model libModel = libDoc.createModel();
+					//org.sbml.libsbml.Model libModel = libDoc.createModel();
 					//TODO call method in LibSBMLReader convertModel();
+					LibSBMLWriter writer = new LibSBMLWriter();
+					libDoc.setModel((org.sbml.libsbml.Model) writer.writeModel(model));
 		
 				} else if (node instanceof Reaction){
 					Reaction reac = (Reaction) node;
@@ -476,19 +478,26 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				}
 			}
 			else if (node instanceof History){
+				History his = (History) node;
 				//TODO
 			}
 			else if (node instanceof Annotation){
-				//TODO
+				Annotation annot = (Annotation) node;
+				//TODO				
 			}
 			else if (node instanceof Creator){
 				//TODO
 			}
 		} else if (node instanceof ASTNode){
-			//TODO
+			ASTNode astnode = (ASTNode) node;
+			convertASTNode(astnode);
+			//TODO: set this ASTNode in libDoc
 		} else if (node instanceof TreeNodeAdapter){
+			TreeNodeAdapter treeNodeAd = (TreeNodeAdapter) node;
 			//TODO
 		} else if (node instanceof XMLToken){
+			XMLToken token = (XMLToken) node;
+			org.sbml.libsbml.XMLToken libToken;
 			//TODO
 		}
 	}

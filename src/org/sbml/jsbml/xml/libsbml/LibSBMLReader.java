@@ -31,10 +31,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.AlgebraicRule;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.CallableSBase;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
@@ -70,7 +72,6 @@ import org.sbml.jsbml.Trigger;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.Variable;
-import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.util.IOProgressListener;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.libsbml.SBMLError;
@@ -1222,6 +1223,11 @@ public class LibSBMLReader implements SBMLInputConverter {
 
 	/**
 	 * 
+	 */
+	private static final transient Logger logger = Logger.getLogger(LibSBMLReader.class);
+	
+	/**
+	 * 
 	 * @param sbase
 	 * @param libSBase
 	 */
@@ -1234,7 +1240,12 @@ public class LibSBMLReader implements SBMLInputConverter {
 			sbase.setSBOTerm(libSBase.getSBOTerm());
 		}
 		if (libSBase.isSetNotes()) {
+			try {
+				// TODO: convert all UTF-8 characters appropriately.
 			sbase.setNotes(libSBase.getNotesString());
+			} catch (Throwable t) {
+				logger.warn(t.getLocalizedMessage());
+			}
 		}
 		for (int i = 0; i < libSBase.getNumCVTerms(); i++) {
 			sbase.addCVTerm(readCVTerm(libSBase.getCVTerm(i)));
