@@ -591,6 +591,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			Constraint ct = (Constraint) node;
 			ListOf<Constraint> listofconstraints = ct.getParent();
 			listofconstraints.remove(ct);
+			// TODO do not delete elements that are already deleted
 			PluginSBase plugbase = (PluginSBase) listofconstraints.getParent();
 			plugin.notifySBaseChanged(plugbase);
 		} else if (node instanceof Delay) {
