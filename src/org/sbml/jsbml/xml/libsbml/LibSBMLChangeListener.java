@@ -507,13 +507,115 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	 */
 	public void nodeRemoved(TreeNode node) {
 		org.sbml.libsbml.Model libModel = libDoc.getModel();
-		if (node instanceof CompartmentType) {
-			CompartmentType ct = (CompartmentType) node;
-			//			org.sbml.libsbml.CompartmentType pt = libModel
-			//					.getCompartmentType(ct.getId());
-			libModel.removeCompartmentType(ct.getId());
+		if (node instanceof AbstractSBase){
+			if (node instanceof org.sbml.jsbml.AbstractNamedSBase){
+				if (node instanceof CompartmentType) {
+					libModel.removeCompartmentType(((CompartmentType) node).getId());
+				} else if (node instanceof UnitDefinition){
+					libModel.removeUnitDefinition(((UnitDefinition) node).getId());
+				} else if (node instanceof Model){
+					libModel.delete();
+				} else if (node instanceof Reaction){
+					libModel.removeReaction(((Reaction) node).getId());
+				} else if (node instanceof SimpleSpeciesReference){
+					if (node instanceof ModifierSpeciesReference){
+						//get the corresponding reaction-ID
+						String reacID =((Reaction) ((ModifierSpeciesReference)node).getParentSBMLObject().getParentSBMLObject()).getId();
+						// search the corresponding reaction and remove the modifier
+						libModel.getReaction(reacID).removeModifier(((ModifierSpeciesReference) node).getId());
+					}
+					if (node instanceof SpeciesReference){
+						SpeciesReference specRef = (SpeciesReference) node;
+						String reacID = ((Reaction)specRef.getParentSBMLObject().getParentSBMLObject()).getId();
+						if (specRef.getParentSBMLObject().equals(Type.listOfProducts)){
+							//search reaction and remove the product
+							libModel.getReaction(reacID).removeProduct(specRef.getId());
+						} else if (specRef.getParentSBMLObject().equals(Type.listOfReactants)){
+							// search reaction and remove the reactant
+							libModel.getReaction(reacID).removeReactant(specRef.getId());
+						}
+					}
+				} else if (node instanceof AbstractNamedSBaseWithUnit){
+					if (node instanceof Event){
+						libModel.removeEvent(((Event) node).getId());
+					}
+					else if (node instanceof QuantityWithUnit){
+						if (node instanceof LocalParameter){
+							//TODO
+						}
+						else if (node instanceof Symbol){
+							if (node instanceof Compartment){
+								libModel.removeCompartment(((Compartment) node).getId());
+							} else if (node instanceof Species){
+								libModel.removeSpecies(((Species) node).getId());
+							} else if (node instanceof Parameter){
+								libModel.removeParameter(((Parameter) node).getId());
+							} 
+						}
+					}
+				}
+			} else if (node instanceof Unit){
+				//TODO search corresponding UnitDefinition and remove the unit
+			} else if (node instanceof SBMLDocument){
+				libDoc.delete();
+			} else if (node instanceof ListOf<?>){
+				//TODO
+			} else if (node instanceof AbstractMathContainer){
+				if (node instanceof FunctionDefinition){
+					libModel.removeFunctionDefinition(((FunctionDefinition) node).getId());
+				}
+				else if (node instanceof KineticLaw){
+					//TODO don't know if it works, when kinlaw is set null
+					Reaction corresreac = ((KineticLaw) node).getParentSBMLObject();
+					libModel.getReaction(corresreac.getId()).setKineticLaw(null);
+				}
+				else if (node instanceof InitialAssignment){
+					//TODO
+				}
+				else if (node instanceof EventAssignment){
+					//TODO search corresponding event
+				}
+				else if (node instanceof StoichiometryMath){
+					//TODO
+				}
+				else if (node instanceof Trigger){
+					//TODO
+				}
+				else if (node instanceof Rule){
+					//is this correct?!?
+					libModel.removeRule(((Rule) node).getMetaId());
+				}
+				else if (node instanceof Constraint){
+					//TODO
+					//libModel.removeConstraint(node.)
+				}
+				else if (node instanceof Delay){
+					//TODO
+				}
+				else if (node instanceof Priority){
+					//TODO
+				}
+			}
+		} else if (node instanceof AnnotationElement){
+			if (node instanceof CVTerm){
+				//TODO
+			}
+			else if (node instanceof History){
+				//TODO
+			}
+			else if (node instanceof Annotation){
+				//TODO				
+			}
+			else if (node instanceof Creator){
+				//TODO
+			}
+		} else if (node instanceof ASTNode){
+			//TODO
+		} else if (node instanceof TreeNodeAdapter){
+			//TODO
+		} else if (node instanceof XMLToken){
+			//TODO
 		}
-		// TODO Auto-generated method stub
 	}
 
 	/* (non-Javadoc)
@@ -544,7 +646,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	}
 	
 	/**
-	 * 
+	 * sets MetaId, SBOTerm, Notes and Annotation in the libSBML object, 
+	 * if it's set in the JSBML object.
 	 * @param sbase
 	 * @param libSBase
 	 */
@@ -565,7 +668,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	}
 	
 	/**
-	 * 
+	 * sets the name and the id in the libSBML object, when it's set in the JSBML object
+	 * and calls the method transferSBaseProperties(SBase, libSBase).
 	 * @param sbase
 	 * @param libSBase
 	 */
@@ -580,7 +684,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	}
 
 	/**
-	 * 
+	 * sets the species in libSBML object if the species is set in the JSBML object
+	 * and calls the method transferNamedSBaseProperties(SBase, libSBase).
 	 * @param sbase
 	 * @param libSBase
 	 */
@@ -592,7 +697,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	}
 	
 	/**
-	 * 
+	 * sets the math ASTNode in the libSBML object if it's set in the JSBML object
+	 * and calls the convert-method for the ASTNodes.
 	 * @param mathCont
 	 * @param libMathCont
 	 */
