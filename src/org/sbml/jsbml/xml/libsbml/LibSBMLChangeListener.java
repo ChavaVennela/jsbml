@@ -123,8 +123,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 				} else if (node instanceof Model){
 					Model model = (Model) node;
-					//org.sbml.libsbml.Model libModel = libDoc.createModel();
-					//TODO call method in LibSBMLReader convertModel();
 					LibSBMLWriter writer = new LibSBMLWriter();
 					libDoc.setModel((org.sbml.libsbml.Model) writer.writeModel(model));
 		
@@ -541,7 +539,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 					else if (node instanceof QuantityWithUnit){
 						if (node instanceof LocalParameter){
-							//TODO
+							// is a LocalParameter a Parameter?
+							libModel.removeParameter(((LocalParameter) node).getId());
 						}
 						else if (node instanceof Symbol){
 							if (node instanceof Compartment){
@@ -555,28 +554,41 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 				}
 			} else if (node instanceof Unit){
-				//TODO search corresponding UnitDefinition and remove the unit
+				// search corresponding UnitDefinition and remove the unit
+				Unit unit = (Unit) node;
+				UnitDefinition udef = (UnitDefinition) unit.getParentSBMLObject().getParentSBMLObject();
+				//TODO: find out number of the unit to remove it
+				libModel.getUnitDefinition(udef.getId()).removeUnit(0);
 			} else if (node instanceof SBMLDocument){
 				libDoc.delete();
 			} else if (node instanceof ListOf<?>){
-				//TODO
+				// make recursion and remove all elements in the list
+				for(Object o : (ListOf<?>)node ){
+					TreeNode newNode = new DefaultMutableTreeNode(o);
+					nodeRemoved(newNode);
+				}
 			} else if (node instanceof AbstractMathContainer){
 				if (node instanceof FunctionDefinition){
 					libModel.removeFunctionDefinition(((FunctionDefinition) node).getId());
 				}
 				else if (node instanceof KineticLaw){
-					//TODO don't know if it works, when kinlaw is set null
+					//TODO: don't know if it works, when kinlaw is set null
 					Reaction corresreac = ((KineticLaw) node).getParentSBMLObject();
 					libModel.getReaction(corresreac.getId()).setKineticLaw(null);
 				}
 				else if (node instanceof InitialAssignment){
-					//TODO
+					// can i use the MetaId here?
+					libModel.getInitialAssignment(((InitialAssignment) node).getMetaId()).delete();
 				}
 				else if (node instanceof EventAssignment){
-					//TODO search corresponding event
+					// search corresponding event and remove
+					Event event = (Event) ((EventAssignment) node).getParentSBMLObject();
+					libModel.getEvent(event.getId()).removeEventAssignment(((EventAssignment) node).getMetaId());
 				}
 				else if (node instanceof StoichiometryMath){
-					//TODO
+					// search corresponding SpeciesReference and delete the StoichiometryMath of it
+					SpeciesReference specRef = (SpeciesReference) ((StoichiometryMath) node).getParentSBMLObject();
+					libModel.getSpeciesReference(specRef.getId()).getStoichiometryMath().delete();
 				}
 				else if (node instanceof Trigger){
 					//TODO
@@ -586,8 +598,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libModel.removeRule(((Rule) node).getMetaId());
 				}
 				else if (node instanceof Constraint){
-					//TODO
-					//libModel.removeConstraint(node.)
+					//TODO: removeConstraint() needs a long-argument
+					//libModel.removeConstraint(node);
 				}
 				else if (node instanceof Delay){
 					//TODO
@@ -598,10 +610,11 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (node instanceof AnnotationElement){
 			if (node instanceof CVTerm){
-				//TODO
+				//TODO: search right CVTerm
+				libDoc.getCVTerm(0).delete();
 			}
 			else if (node instanceof History){
-				//TODO
+				//TODO				
 			}
 			else if (node instanceof Annotation){
 				//TODO				
@@ -611,6 +624,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (node instanceof ASTNode){
 			//TODO
+			
 		} else if (node instanceof TreeNodeAdapter){
 			//TODO
 		} else if (node instanceof XMLToken){
