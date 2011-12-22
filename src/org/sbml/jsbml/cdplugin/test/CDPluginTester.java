@@ -1,13 +1,10 @@
 package org.sbml.jsbml.cdplugin.test;
 
-import java.beans.PropertyChangeEvent;
-
-import org.sbml.jsbml.Event;
-import org.sbml.jsbml.SBMLDocument;
-import org.sbml.jsbml.cdplugin.PluginChangeListener;
-
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
 import jp.sbi.celldesigner.plugin.PluginSBase;
+
+import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.cdplugin.PluginChangeListener;
 
 /**
  * This class is used to test the synchronization between Celldesigner and JSBML.
@@ -24,48 +21,56 @@ public class CDPluginTester extends CellDesignerPlugin {
 	 */
 	
 	public CDPluginTester(){
-		
-		
+		super();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.CellDesignerPlug#SBaseAdded(jp.sbi.celldesigner.plugin.PluginSBase)
+	 */
 	public void SBaseAdded(PluginSBase arg0) {
 		// TODO Auto-generated method stub
-
-		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.CellDesignerPlug#SBaseChanged(jp.sbi.celldesigner.plugin.PluginSBase)
+	 */
 	public void SBaseChanged(PluginSBase arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.CellDesignerPlug#SBaseDeleted(jp.sbi.celldesigner.plugin.PluginSBase)
+	 */
 	public void SBaseDeleted(PluginSBase arg0) {
 		// TODO Auto-generated method stub
-		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.CellDesignerPlug#addPluginMenu()
+	 */
 	public void addPluginMenu() {
 		// TODO Auto-generated method stub
-		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.CellDesignerPlug#modelClosed(jp.sbi.celldesigner.plugin.PluginSBase)
+	 */
 	public void modelClosed(PluginSBase arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.CellDesignerPlug#modelOpened(jp.sbi.celldesigner.plugin.PluginSBase)
+	 */
 	public void modelOpened(PluginSBase arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.CellDesignerPlug#modelSelectChanged(jp.sbi.celldesigner.plugin.PluginSBase)
+	 */
 	public void modelSelectChanged(PluginSBase arg0) {
 		// TODO Auto-generated method stub
 		

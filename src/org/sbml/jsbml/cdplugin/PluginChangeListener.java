@@ -603,28 +603,33 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof Trigger) {
 			Trigger trig = (Trigger) node;
 			PluginEvent plugEvent = plugModel.getEvent(trig.getParent().getId());
-			plugEvent.setTrigger(null); // Why is this function ambiguous ?
-			plugin.notifySBaseDeleted(plugEvent);
+			logger.log(Level.DEBUG, String.format(
+			  "Trying to remove trigger from event %s, but there is no remove method. Please check the result.",
+			  plugEvent.getId()));
+			plugEvent.setTrigger((org.sbml.libsbml.Trigger) null);
+			plugin.notifySBaseChanged(plugEvent);
 		} else if (node instanceof Rule) {
-			Rule rule = (Rule) node;
-			ListOf<Rule> listofRules = rule.getParent();
-			PluginSBase base = (PluginSBase) listofRules.getParent();
-			listofRules.remove(rule);
-			plugin.notifySBaseChanged(base);
-		} else if (node instanceof AlgebraicRule) {
-			AlgebraicRule alrule = (AlgebraicRule) node;
-			// TODO 
+			if (node instanceof AlgebraicRule) {
+				AlgebraicRule alrule = (AlgebraicRule) node;
+				alrule.getFormula();
+				// TODO
+			} else if (node instanceof AssignmentRule) {
+				AssignmentRule assRule = (AssignmentRule) node;
+				assRule.getVariable();
+				assRule.getFormula();
+			} else if (node instanceof RateRule) {
+				// TODO
+			}
 		} else if (node instanceof Constraint) {
 			Constraint ct = (Constraint) node;
-			// TODO 
+			// TODO
 		} else if (node instanceof Delay) {
 			Delay dl = (Delay) node;
-			// TODO 
-			
+			// TODO
 		} else if (node instanceof Priority) {
 			Priority prt = (Priority) node;
-			// TODO 
-			
+			// TODO
+
 		} else if (node instanceof Unit) {
 			Unit ut = (Unit) node;
 			// TODO 
