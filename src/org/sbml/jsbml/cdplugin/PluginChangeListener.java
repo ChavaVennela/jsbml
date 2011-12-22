@@ -547,17 +547,16 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseDeleted(plugComp);
 		} else if (node instanceof SpeciesReference) {
 			SpeciesReference specRef = (SpeciesReference) node;
-			// TODO CD has no removeSpeciesReference Method available
+			// TODO 
 		} else if (node instanceof LocalParameter) {
 			LocalParameter locparam = (LocalParameter) node;
 			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
 			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
 			Reaction r = kl.getParentSBMLObject();
-			// TODO how to do this here ?
+			// TODO 
 		} else if (node instanceof SimpleSpeciesReference) {
 			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
-			// What to do with Treenode?
-			// TODO Has no ID, crosscheck this
+			// TODO 
 		} else if (node instanceof UnitDefinition) {
 			UnitDefinition undef = (UnitDefinition) node;
 			PluginUnitDefinition plugUndef = plugModel.getUnitDefinition(undef
@@ -571,18 +570,12 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseDeleted(plugEvent);
 		} else if (node instanceof RateRule) {
 			RateRule rrule = (RateRule) node;
-			ListOf<Rule> rulelist = rrule.getParent();
-			rulelist.remove(rrule);
-			PluginSBase plugbase = (PluginSBase) rulelist.getParent();
-			plugin.notifySBaseChanged(plugbase);
-			// TODO Not sure if this is working, should be asked somehow.
+			
+			// TODO 
 		} else if (node instanceof AssignmentRule) {
 			AssignmentRule assignRule = (AssignmentRule) node;
-			ListOf<Rule> rulelist = assignRule.getParent();
-			rulelist.remove(assignRule);
-			PluginSBase plugbase = (PluginSBase) rulelist.getParent();
-			plugin.notifySBaseChanged(plugbase);
-			// TODO Not sure if this is working, should be asked somehow.
+			
+			// TODO 
 		} else if (node instanceof KineticLaw) {
 			KineticLaw klaw = (KineticLaw) node;
 			Reaction parentreaction = klaw.getParentSBMLObject();
@@ -593,11 +586,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseDeleted(plugklaw);
 		} else if (node instanceof InitialAssignment) {
 			InitialAssignment iAssign = (InitialAssignment) node;
-			ListOf<InitialAssignment> listinitassignment = iAssign.getParent();
-			listinitassignment.remove(iAssign);
-			PluginSBase plugbase = (PluginSBase) listinitassignment.getParent();
-			plugin.notifySBaseChanged(plugbase);
-			// TODO Not sure if this is working, should be asked somehow.
+			
+			// TODO 
 		} else if (node instanceof EventAssignment) {
 			EventAssignment eAssign = (EventAssignment) node;
 			ListOf<EventAssignment> elist = eAssign.getParent();
@@ -611,78 +601,55 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			logger.log(Level.DEBUG, "No counter class in CellDesigner"
 					+ node.getClass().getSimpleName());
 		} else if (node instanceof Trigger) {
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			Trigger trig = (Trigger) node;
+			PluginEvent plugEvent = plugModel.getEvent(trig.getParent().getId());
+			plugEvent.setTrigger(null); // Why is this function ambiguous ?
+			plugin.notifySBaseDeleted(plugEvent);
 		} else if (node instanceof Rule) {
 			Rule rule = (Rule) node;
-			ListOf<Rule> listofrule = rule.getParent();
-			listofrule.remove(rule);
-			PluginSBase plugbase = (PluginSBase) listofrule.getParent();
-			plugin.notifySBaseChanged(plugbase);
+			// TODO 
 		} else if (node instanceof AlgebraicRule) {
 			AlgebraicRule alrule = (AlgebraicRule) node;
-			ListOf<Rule> listofalgebraicrules = alrule.getParent();
-			listofalgebraicrules.remove(alrule);
-			PluginSBase plugbase = (PluginSBase) listofalgebraicrules
-					.getParent();
-			plugin.notifySBaseChanged(plugbase);
+			// TODO 
 		} else if (node instanceof Constraint) {
 			Constraint ct = (Constraint) node;
-			ListOf<Constraint> listofconstraints = ct.getParent();
-			listofconstraints.remove(ct);
-			// TODO do not delete elements that are already deleted
-			PluginSBase plugbase = (PluginSBase) listofconstraints.getParent();
-			plugin.notifySBaseChanged(plugbase);
+			// TODO 
 		} else if (node instanceof Delay) {
 			Delay dl = (Delay) node;
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			
 		} else if (node instanceof Priority) {
 			Priority prt = (Priority) node;
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			
 		} else if (node instanceof Unit) {
 			Unit ut = (Unit) node;
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			
 		} else if (node instanceof SBMLDocument) {
 			SBMLDocument doc = (SBMLDocument) node;
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			// TODO 
+			
 		} else if (node instanceof ListOf<?>) {
 			ListOf<?> listof = (ListOf<?>) node;
-			// PluginListOf pluglistof = plugModel.getListof???
-			// TODO Parse all lists or what has to be done here?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			// TODO 
+			
 		} else if (node instanceof CVTerm) {
 			CVTerm term = (CVTerm) node;
-			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			
 		} else if (node instanceof History) {
 			History hist = (History) node;
-			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			
 		} else if (node instanceof Annotation) {
-			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			
 		} else if (node instanceof Creator) {
-			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
+			// TODO 
+			
 		}
 	}
 
