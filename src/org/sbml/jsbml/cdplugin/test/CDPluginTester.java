@@ -1,5 +1,11 @@
 package org.sbml.jsbml.cdplugin.test;
 
+import java.beans.PropertyChangeEvent;
+
+import org.sbml.jsbml.Event;
+import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.cdplugin.PluginChangeListener;
+
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
 import jp.sbi.celldesigner.plugin.PluginSBase;
 
@@ -11,18 +17,21 @@ import jp.sbi.celldesigner.plugin.PluginSBase;
  */
 
 public class CDPluginTester extends CellDesignerPlugin {
-
+	SBMLDocument doc = new SBMLDocument();
+	PluginChangeListener plugChangeListener = new PluginChangeListener(doc , this);
 	/*
 	 * Constructors
 	 */
 	
 	public CDPluginTester(){
 		
+		
 	}
 
 	@Override
 	public void SBaseAdded(PluginSBase arg0) {
 		// TODO Auto-generated method stub
+
 		
 	}
 
