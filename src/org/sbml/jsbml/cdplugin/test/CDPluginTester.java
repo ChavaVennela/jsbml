@@ -3,6 +3,13 @@ package org.sbml.jsbml.cdplugin.test;
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
 import jp.sbi.celldesigner.plugin.PluginSBase;
 
+/**
+ * This class is used to test the synchronization between Celldesigner and JSBML.
+ * 
+ * @author Alexander Peltzer
+ *
+ */
+
 public class CDPluginTester extends CellDesignerPlugin {
 
 	/*
