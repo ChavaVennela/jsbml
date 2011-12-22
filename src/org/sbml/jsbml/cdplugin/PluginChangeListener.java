@@ -192,270 +192,307 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginCompartmentType pt = new PluginCompartmentType(ct.getId());
 			if (ct.isSetName() && !pt.getName().equals(ct.getName())) {
 				pt.setName(ct.getName());
-				plugin.notifySBaseAdded(pt); 
+				plugin.notifySBaseAdded(pt);
+			} else {
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
-			logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
 		} else if (node instanceof Species) {
 			Species sp = (Species) node;
-			PluginSpecies plugsp = new PluginSpecies(sp.getSpeciesType(), sp.getName());
+			PluginSpecies plugsp = new PluginSpecies(sp.getSpeciesType(),
+					sp.getName());
 			if (sp.isSetName() && !sp.getName().equals(plugsp.getName())) {
 				plugin.notifySBaseAdded(plugsp);
 			} else {
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
 		} else if (node instanceof Reaction) {
 			Reaction react = (Reaction) node;
 			PluginReaction plugreac = new PluginReaction();
-			if (react.isSetName() && !react.getName().equals(plugreac.getName())){
+			if (react.isSetName()
+					&& !react.getName().equals(plugreac.getName())) {
 				plugreac.setName(react.getName());
 				plugin.notifySBaseAdded(plugreac);
 			} else {
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
 		} else if (node instanceof SpeciesType) {
 			SpeciesType speciestype = (SpeciesType) node;
-			PluginSpeciesType plugspectype = new PluginSpeciesType(speciestype.getId());
-			if (speciestype.isSetName() && !speciestype.getName().equals(plugspectype.getName())){
+			PluginSpeciesType plugspectype = new PluginSpeciesType(
+					speciestype.getId());
+			if (speciestype.isSetName()
+					&& !speciestype.getName().equals(plugspectype.getName())) {
 				plugspectype.setName(speciestype.getName());
 				plugin.notifySBaseAdded(plugspectype);
 			} else {
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
 		} else if (node instanceof org.sbml.jsbml.Parameter) {
 			org.sbml.jsbml.Parameter param = (org.sbml.jsbml.Parameter) node;
-			if (param.getParent() instanceof KineticLaw){
-				PluginParameter plugparam = new PluginParameter((PluginKineticLaw) param.getParent());
-				if (param.isSetName() && !param.getName().equals(plugparam.getName())){
+			if (param.getParent() instanceof KineticLaw) {
+				PluginParameter plugparam = new PluginParameter(
+						(PluginKineticLaw) param.getParent());
+				if (param.isSetName()
+						&& !param.getName().equals(plugparam.getName())) {
 					plugparam.setName(param.getName());
 					plugin.notifySBaseAdded(plugparam);
 				} else {
-					logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+					logger.log(Level.DEBUG, "Cannot add node"
+							+ node.getClass().getSimpleName());
 				}
-			} else if (param.getParent() instanceof Model){
-				PluginParameter plugparam = new PluginParameter((PluginModel) param.getParent());
-				if (param.isSetName() && !param.getName().equals(plugparam.getName())){
+			} else if (param.getParent() instanceof Model) {
+				PluginParameter plugparam = new PluginParameter(
+						(PluginModel) param.getParent());
+				if (param.isSetName()
+						&& !param.getName().equals(plugparam.getName())) {
 					plugparam.setName(param.getName());
 					plugin.notifySBaseAdded(plugparam);
 				} else {
-					logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+					logger.log(Level.DEBUG, "Cannot add node"
+							+ node.getClass().getSimpleName());
 				}
 			}
 		} else if (node instanceof FunctionDefinition) {
 			FunctionDefinition funcdef = (FunctionDefinition) node;
-			PluginFunctionDefinition plugfuncdef = new PluginFunctionDefinition(funcdef.getId());
-			if (funcdef.isSetName() && !plugfuncdef.getName().equals(funcdef.getName())) {
+			PluginFunctionDefinition plugfuncdef = new PluginFunctionDefinition(
+					funcdef.getId());
+			if (funcdef.isSetName()
+					&& !plugfuncdef.getName().equals(funcdef.getName())) {
 				plugfuncdef.setName(funcdef.getName());
 				plugin.notifySBaseAdded(plugfuncdef);
 			} else {
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
 		} else if (node instanceof Compartment) {
 			Compartment comp = (Compartment) node;
-			PluginCompartment plugcomp = new PluginCompartment(comp.getCompartmentType());
+			PluginCompartment plugcomp = new PluginCompartment(
+					comp.getCompartmentType());
 			if (comp.isSetName() && !plugcomp.getName().equals(comp.getName())) {
 				plugcomp.setName(comp.getName());
 				plugin.notifySBaseAdded(plugcomp);
 			} else {
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
 		} else if (node instanceof SpeciesReference) {
 			SpeciesReference specRef = (SpeciesReference) node;
-      String type = SBO.convertSBO2Alias(specRef.getSBOTerm());
-      if (type.length() == 0) {
-        // use "unknown"
-        int sbo = 285;
-        type = SBO.convertSBO2Alias(sbo);
-        logger.log(Level.DEBUG, String.format(
-          "No SBO term defined for %s, using %d", 
-          specRef.getElementName(), sbo));
-      }
-      // TODO: use SBML layout extension (later than JSBML 0.8)
-      if (specRef.isSetSpecies()) {
-        PluginSpeciesAlias alias = new PluginSpeciesAlias(plugModel
-            .getSpecies(specRef.getSpecies()), type);
-        PluginSpeciesReference plugspecRef = new PluginSpeciesReference(
-          (PluginReaction) specRef.getParent(), alias);
-        plugin.notifySBaseAdded(plugspecRef);
-      } else {
-        logger.log(Level.DEBUG, "Cannot create PluginSpeciesReference due to missing species annotation.");
-      }
+			String type = SBO.convertSBO2Alias(specRef.getSBOTerm());
+			if (type.length() == 0) {
+				// use "unknown"
+				int sbo = 285;
+				type = SBO.convertSBO2Alias(sbo);
+				logger.log(Level.DEBUG, String.format(
+						"No SBO term defined for %s, using %d",
+						specRef.getElementName(), sbo));
+			}
+			// TODO: use SBML layout extension (later than JSBML 0.8)
+			if (specRef.isSetSpecies()) {
+				PluginSpeciesAlias alias = new PluginSpeciesAlias(
+						plugModel.getSpecies(specRef.getSpecies()), type);
+				PluginSpeciesReference plugspecRef = new PluginSpeciesReference(
+						(PluginReaction) specRef.getParent(), alias);
+				plugin.notifySBaseAdded(plugspecRef);
+			} else {
+				logger.log(Level.DEBUG,
+						"Cannot create PluginSpeciesReference due to missing species annotation.");
+			}
 		} else if (node instanceof LocalParameter) {
 			LocalParameter locparam = (LocalParameter) node;
 			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
 			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
 			Reaction r = kl.getParentSBMLObject();
-			//TODO LocalParameter not available in CellDesigner?
+			// TODO LocalParameter not available in CellDesigner?
 		} else if (node instanceof SimpleSpeciesReference) {
 			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
-			//PluginSimpleSpeciesReference plugsimspec = new PluginSimpleSpeciesReference(alias);
+			// PluginSimpleSpeciesReference plugsimspec = new
+			// PluginSimpleSpeciesReference(alias);
 			// TODO Where to get the Species Alias ?
 		} else if (node instanceof UnitDefinition) {
 			UnitDefinition undef = (UnitDefinition) node;
-			PluginUnitDefinition plugundef = new PluginUnitDefinition(undef.getId());
-			if (undef.isSetName() && !plugundef.getName().equals(undef.getName())) {
+			PluginUnitDefinition plugundef = new PluginUnitDefinition(
+					undef.getId());
+			if (undef.isSetName()
+					&& !plugundef.getName().equals(undef.getName())) {
 				plugundef.setName(undef.getName());
 				plugin.notifySBaseAdded(plugundef);
 			} else {
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
 		} else if (node instanceof Event) {
 			Event event = (Event) node;
 			PluginEvent plugevent = new PluginEvent(event.getId());
-			if (event.isSetName() && !event.getName().equals(plugevent.getName())){
+			if (event.isSetName()
+					&& !event.getName().equals(plugevent.getName())) {
 				plugevent.setName(event.getName());
 				plugin.notifySBaseAdded(plugevent);
 			} else {
-				logger.log(Level.DEBUG, "Cannot parse node" + node.getClass().getSimpleName());
+				logger.log(Level.DEBUG, "Cannot add node"
+						+ node.getClass().getSimpleName());
 			}
 		} else if (node instanceof RateRule) {
 			RateRule rule = (RateRule) node;
 			PluginRateRule plugraterule = new PluginRateRule(plugModel);
-			plugraterule.setFormula(rule.getFormula());
+			
 			plugraterule.setMath(PluginUtils.convert(rule.getMath()));
 			plugraterule.setVariable(rule.getVariable());
-			//TODO Howto convert XMLNode elements from JSBML to libsbml ?
-			//This isn't as well described in the PluginSBMLWriter class
+			plugraterule.setNotes(rule.getNotes().getName());
 			plugin.notifySBaseAdded(plugraterule);
-			
+
 		} else if (node instanceof AssignmentRule) {
 			AssignmentRule assignRule = (AssignmentRule) node;
-			PluginAssignmentRule plugassignRule = new PluginAssignmentRule(plugModel);
-			plugassignRule.setFormula(assignRule.getFormula());
+			PluginAssignmentRule plugassignRule = new PluginAssignmentRule(
+					plugModel);
+			
 			plugassignRule.setL1TypeCode(assignRule.getLevel());
 			plugassignRule.setMath(PluginUtils.convert(assignRule.getMath()));
 			plugassignRule.setVariable(assignRule.getVariable());
-			//TODO Howto convert XMLNode elements from JSBML to libsbml ?
-			//This isn't as well described in the PluginSBMLWriter class
+			plugassignRule.setNotes(assignRule.getNotesString());
 			plugin.notifySBaseAdded(plugassignRule);
 		} else if (node instanceof KineticLaw) {
 			KineticLaw klaw = (KineticLaw) node;
 			Reaction parentreaction = klaw.getParentSBMLObject();
 			PluginKineticLaw plugklaw = plugModel.getReaction(
 					parentreaction.getId()).getKineticLaw();
-			PluginReaction plugreac = plugModel.getReaction(parentreaction.getId());
+			PluginReaction plugreac = plugModel.getReaction(parentreaction
+					.getId());
 			plugreac.setKineticLaw(plugklaw);
 			plugin.notifySBaseAdded(plugreac);
 		} else if (node instanceof InitialAssignment) {
 			InitialAssignment iAssign = (InitialAssignment) node;
-			PluginInitialAssignment plugiassign = new PluginInitialAssignment(iAssign.getSymbol());
+			PluginInitialAssignment plugiassign = new PluginInitialAssignment(
+					iAssign.getSymbol());
 			plugiassign.setMath(iAssign.getMathMLString());
-			//TODO Howto convert XMLNode elements from JSBML to libsbml ?
-			//This isn't as well described in the PluginSBMLWriter class
+			plugiassign.setNotes(iAssign.getNotesString());
 			plugin.notifySBaseAdded(plugiassign);
 		} else if (node instanceof EventAssignment) {
 			EventAssignment eassign = (EventAssignment) node;
-			//PluginEventAssignment plugeassign = new PluginEventAssignment(eassign.getParent());
-			// TODO: This is a list of <EventAssignments> Are there always only one or more ? 
+			// PluginEventAssignment plugeassign = new
+			// PluginEventAssignment(eassign.getParent());
+			// TODO: This is a list of <EventAssignments> Are there always only
+			// one or more ?
 			// Do we have to parse them all ?
 		} else if (node instanceof StoichiometryMath) {
 			StoichiometryMath stoich = (StoichiometryMath) node;
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-			// TODO no class in CD for that ? What to do with such things ? Log-Message and thats it ?
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
+			// TODO no class in CD for that ? What to do with such things ?
+			// Log-Message and thats it ?
 		} else if (node instanceof Trigger) {
 			Trigger trig = (Trigger) node;
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-			// TODO no class in CD for that ?
+			PluginEvent plugEvent = new PluginEvent(trig.getParent().getId());
+			plugEvent.setTrigger(PluginUtils.convert(trig.getMath()));
+			plugin.notifySBaseAdded(plugEvent);
 		} else if (node instanceof Rule) {
 			Rule rule = (Rule) node;
 			PluginRule plugrule = new PluginRule();
+			plugrule.setMath(PluginUtils.convert(rule.getMath()));
+			plugrule.setNotes(rule.getNotesString());
 			plugin.notifySBaseAdded(plugrule);
 		} else if (node instanceof AlgebraicRule) {
 			AlgebraicRule alrule = (AlgebraicRule) node;
 			PluginAlgebraicRule plugalrule = new PluginAlgebraicRule(plugModel);
-			plugalrule.setFormula(alrule.getFormula());
 			plugalrule.setMath(PluginUtils.convert(alrule.getMath()));
-			//TODO Howto convert XMLNode elements from JSBML to libsbml ?
-			//This isn't as well described in the PluginSBMLWriter class
 			plugin.notifySBaseAdded(plugalrule);
 		} else if (node instanceof Constraint) {
 			Constraint ct = (Constraint) node;
 			PluginConstraint plugct = new PluginConstraint(ct.getMathMLString());
 			plugct.setMessage(ct.getMessageString());
-			//TODO XMLNode parsing as well here
+			plugct.setNotes(ct.getNotesString());
 			plugin.notifySBaseAdded(plugct);
 		} else if (node instanceof Delay) {
 			Delay dl = (Delay) node;
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
+			PluginEvent plugEvent = new PluginEvent(dl.getParent().getId());
+			plugEvent.setDelay(PluginUtils.convert(dl.getMath()));
+			plugin.notifySBaseAdded(plugEvent);
 		} else if (node instanceof Priority) {
 			Priority prt = (Priority) node;
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
 		} else if (node instanceof Unit) {
 			Unit ut = (Unit) node;
-			//TODO Unclear how to continue with that information
-			//PluginUnit plugunit = new PluginUnit(ut.getParent().get)
+			// TODO Unclear how to continue with that information
+			// PluginUnit plugunit = new PluginUnit(ut.getParent().get)
 		} else if (node instanceof SBMLDocument) {
 			SBMLDocument doc = (SBMLDocument) node;
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
 		} else if (node instanceof ListOf<?>) {
 			ListOf<?> listOf = (ListOf<?>) node;
 			switch (listOf.getSBaseListType()) {
-			  case listOfCompartments:
-				  ListOfCompartments ll = new ListOfCompartments();
-				  
-			    break;
-			  case listOfCompartmentTypes:
-			    break;
-			  case listOfConstraints:
-			    break;
-			  case listOfEventAssignments:
-			    break;
-			  case listOfEvents:
-			    break;
-			  case listOfFunctionDefinitions:
-				  break;
-			  case listOfInitialAssignments:
-				  break;
-			  case listOfLocalParameters:
-				  break;
-			  case listOfModifiers:
-				  break;
-			  case listOfParameters:
-				  break;
-			  case listOfProducts:
-				  break;
-			  case listOfReactants:
-				  break;
-			  case listOfReactions:
-				  break;
-			  case listOfRules:
-				  break;
-			  case listOfSpecies:
-				  break;
-			  case listOfSpeciesTypes:
-				  break;
-			  case listOfUnitDefinitions:
-				  break;
-			  case listOfUnits:
-				  break;
-			  case other:
-				  // TODO for JSBML packages (later than 0.8).
-			  default:
-				  // unknown
-				  break;
+			case listOfCompartments:
+				ListOfCompartments ll = new ListOfCompartments();
+
+				break;
+			case listOfCompartmentTypes:
+				break;
+			case listOfConstraints:
+				break;
+			case listOfEventAssignments:
+				break;
+			case listOfEvents:
+				break;
+			case listOfFunctionDefinitions:
+				break;
+			case listOfInitialAssignments:
+				break;
+			case listOfLocalParameters:
+				break;
+			case listOfModifiers:
+				break;
+			case listOfParameters:
+				break;
+			case listOfProducts:
+				break;
+			case listOfReactants:
+				break;
+			case listOfReactions:
+				break;
+			case listOfRules:
+				break;
+			case listOfSpecies:
+				break;
+			case listOfSpeciesTypes:
+				break;
+			case listOfUnitDefinitions:
+				break;
+			case listOfUnits:
+				break;
+			case other:
+				// TODO for JSBML packages (later than 0.8).
+			default:
+				// unknown
+				break;
 			}
 			PluginListOf pluglistof = new PluginListOf();
 			pluglistof.setNotes(listOf.getNotesString());
 			// TODO Parse all lists or what has to be done here?
-		} else if (node instanceof CVTerm){
+		} else if (node instanceof CVTerm) {
 			CVTerm cv = (CVTerm) node;
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-			//TODO This has to be done with the libsbml.CVTerm Class, fix this.
-		} else if (node instanceof History){
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
+			// TODO This has to be done with the libsbml.CVTerm Class, fix this.
+		} else if (node instanceof History) {
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 			// TODO no counter class in CD available
-						// Therefore unnecessary to implement this?
-		} else if (node instanceof Annotation){
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof Annotation) {
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 			// TODO no counter class in CD available
-						// Therefore unnecessary to implement this?
-		} else if (node instanceof Creator){
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			// Therefore unnecessary to implement this?
+		} else if (node instanceof Creator) {
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
 		} else {
@@ -516,7 +553,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
 			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
 			Reaction r = kl.getParentSBMLObject();
-			//TODO how to do this here ?
+			// TODO how to do this here ?
 		} else if (node instanceof SimpleSpeciesReference) {
 			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
 			// What to do with Treenode?
@@ -549,7 +586,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof KineticLaw) {
 			KineticLaw klaw = (KineticLaw) node;
 			Reaction parentreaction = klaw.getParentSBMLObject();
-			PluginReaction plugReac = plugModel.getReaction(parentreaction.getId());
+			PluginReaction plugReac = plugModel.getReaction(parentreaction
+					.getId());
 			PluginKineticLaw plugklaw = plugReac.getKineticLaw();
 			plugReac.setKineticLaw(null);
 			plugin.notifySBaseDeleted(plugklaw);
@@ -570,11 +608,13 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof StoichiometryMath) {
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 		} else if (node instanceof Trigger) {
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 		} else if (node instanceof Rule) {
 			Rule rule = (Rule) node;
 			ListOf<Rule> listofrule = rule.getParent();
@@ -585,7 +625,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			AlgebraicRule alrule = (AlgebraicRule) node;
 			ListOf<Rule> listofalgebraicrules = alrule.getParent();
 			listofalgebraicrules.remove(alrule);
-			PluginSBase plugbase = (PluginSBase) listofalgebraicrules.getParent();
+			PluginSBase plugbase = (PluginSBase) listofalgebraicrules
+					.getParent();
 			plugin.notifySBaseChanged(plugbase);
 		} else if (node instanceof Constraint) {
 			Constraint ct = (Constraint) node;
@@ -598,42 +639,51 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			Delay dl = (Delay) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 		} else if (node instanceof Priority) {
 			Priority prt = (Priority) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 		} else if (node instanceof Unit) {
 			Unit ut = (Unit) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 		} else if (node instanceof SBMLDocument) {
 			SBMLDocument doc = (SBMLDocument) node;
 			// TODO no counter class in CD available
 			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 		} else if (node instanceof ListOf<?>) {
 			ListOf<?> listof = (ListOf<?>) node;
 			// PluginListOf pluglistof = plugModel.getListof???
 			// TODO Parse all lists or what has to be done here?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-		} else if (node instanceof CVTerm){
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
+		} else if (node instanceof CVTerm) {
 			CVTerm term = (CVTerm) node;
 			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-		} else if (node instanceof History){
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
+		} else if (node instanceof History) {
 			History hist = (History) node;
 			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-		} else if (node instanceof Annotation){
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
+		} else if (node instanceof Annotation) {
 			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
-		} else if (node instanceof Creator){
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
+		} else if (node instanceof Creator) {
 			// TODO no counter class in CD available
-			logger.log(Level.DEBUG, "No counter class in CellDesigner" + node.getClass().getSimpleName());
+			logger.log(Level.DEBUG, "No counter class in CellDesigner"
+					+ node.getClass().getSimpleName());
 		}
 	}
-	
+
 }
