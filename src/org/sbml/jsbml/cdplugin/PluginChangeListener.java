@@ -607,7 +607,10 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseDeleted(plugEvent);
 		} else if (node instanceof Rule) {
 			Rule rule = (Rule) node;
-			// TODO 
+			ListOf<Rule> listofRules = rule.getParent();
+			PluginSBase base = (PluginSBase) listofRules.getParent();
+			listofRules.remove(rule);
+			plugin.notifySBaseChanged(base);
 		} else if (node instanceof AlgebraicRule) {
 			AlgebraicRule alrule = (AlgebraicRule) node;
 			// TODO 
