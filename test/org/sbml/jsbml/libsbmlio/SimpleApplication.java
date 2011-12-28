@@ -45,8 +45,10 @@ public class SimpleApplication {
 			// Read SBML file using LibSBML and convert it to JSBML:
 			LibSBMLReader reader = new LibSBMLReader();
 			SBMLDocument doc = reader.convertSBMLDocument(args[0]);
+			//SBMLDocument doc = new SBMLDocument(2,4);
 			
 			org.sbml.libsbml.SBMLDocument libDoc = reader.getOriginalModel().getSBMLDocument();
+			//org.sbml.libsbml.SBMLDocument libDoc = new org.sbml.libsbml.SBMLDocument(2,4);
 			doc.addTreeNodeChangeListener(new LibSBMLChangeListener(doc, libDoc));
 			
 			/*
@@ -61,14 +63,18 @@ public class SimpleApplication {
 			model.createAlgebraicRule();
 			model.createAssignmentRule();
 			model.createConstraint();
-			//model.createDelay();
 			model.createEvent("ev001");
+			model.createDelay();
 			model.createEventAssignment();
 			model.createFunctionDefinition("func001");
 			model.createInitialAssignment();
 			model.createParameter("param001");
+			model.createReaction("newReac001");
 			model.createKineticLaw();
+			model.createModifier();
 			//model.createKineticParameter("param001");
+			
+			model.removeCompartment("c001");
 			
 			// Run some application:
 			new JTreeOfSBML(doc);
