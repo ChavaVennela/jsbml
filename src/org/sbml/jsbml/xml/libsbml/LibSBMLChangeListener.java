@@ -68,6 +68,8 @@ import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.xml.XMLToken;
 import org.sbml.libsbml.SBMLDocument;
+import org.sbml.libsbml.XMLNode;
+import org.sbml.libsbml.libsbmlConstants;
 
 /**
  * @author Meike Aichele
@@ -82,6 +84,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	 * 
 	 */
 	private SBMLDocument libDoc;
+	private org.sbml.jsbml.SBMLDocument doc;
 
 	/**
 	 * 
@@ -91,6 +94,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	public LibSBMLChangeListener(org.sbml.jsbml.SBMLDocument doc,
 			org.sbml.libsbml.SBMLDocument libDoc) {
 		this.libDoc = libDoc;
+		this.doc = doc;
 		// TODO: hash all elements without id. JSBML --> libSBML
 		// all kinds of Rules, initialAssignment, stoichiometryMath (but this is inside of reactions), constraint
 	}
@@ -198,8 +202,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						org.sbml.libsbml.Event libEvent = libDoc.getModel().createEvent();
 						transferNamedSBaseProperties(event, libEvent);
 						if (event.isSetDelay()){
-							//libEvent.setDelay(event.getDelay());
-							//TODO
+							Delay delay = event.getDelay();
+							org.sbml.libsbml.Delay libDelay = libEvent.createDelay();
+							transferMathContainerProperties(delay, libDelay);
+							libEvent.setDelay(libDelay);
 						}
 						if (event.isSetListOfEventAssignments()){
 							for (EventAssignment eventassign : event.getListOfEventAssignments()){
@@ -208,20 +214,21 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 							}
 						}
 						if (event.isSetPriority()){
-							//libEvent.setPriority(event.getPriority());
-							//TODO
+							Priority prio = event.getPriority();
+							org.sbml.libsbml.Priority libPrio = libEvent.createPriority();
+							transferMathContainerProperties(prio, libPrio);
+							libEvent.setPriority(libPrio);
+							
 						}
 						if (event.isSetTimeUnits()){
 							libEvent.setTimeUnits(event.getTimeUnits());
 						}
 						if (event.isSetTrigger()){
-							//libEvent.setTrigger(event.getTrigger());
-							//TODO
+							DefaultMutableTreeNode triggerNode = new DefaultMutableTreeNode(event.getTrigger());
+							nodeAdded(triggerNode);
 						}
-						if (event.isSetUnits()){
-							// are there units in events of libsbml?
-							//TODO
-						}
+						// this case can be dropped, because the units were already set with the case of TimoUnits above
+						// if (event.isSetUnits());
 						if (event.isSetUseValuesFromTriggerTime()){
 							libEvent.setUseValuesFromTriggerTime(event.getUseValuesFromTriggerTime());
 						}
@@ -335,8 +342,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libUnit.setScale(unit.getScale());
 				}
 				if (unit.isSetKind()){
-					//libUnit.setKind(unit.getKind());
-					//TODO
+					transferKindProperties(unit, libUnit);
 				}
 
 			} else if (node instanceof SBMLDocument){
@@ -370,10 +376,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (kinLaw.isSetTimeUnits()){
 						libKinLaw.setTimeUnits(kinLaw.getTimeUnits());
 					}
-					if (kinLaw.isSetUnits()){
-						// are there units in KineticLaw in libsbml?
-						//TODO
-					}					
+					//this case can be dropped, because all units are already set with the two cases above
+					//if (kinLaw.isSetUnits());					
 				}
 				else if (node instanceof InitialAssignment){
 					InitialAssignment initAssign = (InitialAssignment) node;
@@ -383,8 +387,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						libInitAssign.setSymbol(initAssign.getSymbol());
 					}
 					if (initAssign.isSetVariable()){
-						// no corresponding method in libSBML? 
-						//TODO
+						//this case can be dropped, because the Symbol is the same as the Variable in this object
 					}
 				}
 				else if (node instanceof EventAssignment){
@@ -402,7 +405,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				}
 				else if (node instanceof Trigger){
 					Trigger trig = (Trigger) node;
-					org.sbml.libsbml.Trigger LibTrig = libDoc.getModel().createTrigger();
+					org.sbml.libsbml.Trigger LibTrig = libDoc.getModel().getEvent(trig.getParent().getId()).createTrigger();
 					transferMathContainerProperties(trig, LibTrig);
 					if (trig.isSetInitialValue()){
 						LibTrig.setInitialValue(trig.getInitialValue());
@@ -446,13 +449,14 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					org.sbml.libsbml.Constraint libConstr = libDoc.getModel().createConstraint();
 					transferMathContainerProperties(constr, libConstr);
 					if (constr.isSetMessage()){
-						//libConstr.setMessage(constr.getMessage());
-						//TODO
+						libConstr.setMessage(XMLNode.convertStringToXMLNode(constr.getMessage().toXMLString()));
 					}
 				}
 				else if (node instanceof Delay){
 					Delay delay = (Delay) node;
-					org.sbml.libsbml.Delay libDelay = libDoc.getModel().createDelay();
+					// libDoc.getModel().createDelay() would be shorter but can't be used, 
+					// because this would create a new Delay inside the last Event object created in this Model
+					org.sbml.libsbml.Delay libDelay = libDoc.getModel().getEvent(delay.getParent().getId()).createDelay();
 					transferMathContainerProperties(delay, libDelay);
 				}
 				else if (node instanceof Priority){
@@ -499,6 +503,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			//TODO
 		}
 	}
+
+	
+
 
 	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(javax.swing.tree.TreeNode)
@@ -557,8 +564,14 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				// search corresponding UnitDefinition and remove the unit
 				Unit unit = (Unit) node;
 				UnitDefinition udef = (UnitDefinition) unit.getParentSBMLObject().getParentSBMLObject();
-				//TODO: find out number of the unit to remove it
-				libModel.getUnitDefinition(udef.getId()).removeUnit(0);
+				// search the index of this Unit object and remove it
+				for (int k=0; k<udef.getListOfUnits().size();k++){
+					Unit u = udef.getUnit(k);
+					if(u.equals(unit)){
+						libModel.getUnitDefinition(udef.getId()).removeUnit(k);
+						break;
+					}
+				}
 			} else if (node instanceof SBMLDocument){
 				libDoc.delete();
 			} else if (node instanceof ListOf<?>){
@@ -572,18 +585,18 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libModel.removeFunctionDefinition(((FunctionDefinition) node).getId());
 				}
 				else if (node instanceof KineticLaw){
-					//TODO: don't know if it works, when kinlaw is set null
 					Reaction corresreac = ((KineticLaw) node).getParentSBMLObject();
-					libModel.getReaction(corresreac.getId()).setKineticLaw(null);
+					libModel.getReaction(corresreac.getId()).getKineticLaw().delete();
 				}
 				else if (node instanceof InitialAssignment){
-					// can i use the MetaId here?
-					libModel.getInitialAssignment(((InitialAssignment) node).getMetaId()).delete();
+					// get the InitialAssignment object based on the symbol and delete it
+					InitialAssignment initAssign = (InitialAssignment) node;
+					libModel.getInitialAssignment(initAssign.getSymbol()).delete();
 				}
 				else if (node instanceof EventAssignment){
-					// search corresponding event and remove
+					// search corresponding event and remove the EventAssignment indicated by the variable
 					Event event = (Event) ((EventAssignment) node).getParentSBMLObject();
-					libModel.getEvent(event.getId()).removeEventAssignment(((EventAssignment) node).getMetaId());
+					libModel.getEvent(event.getId()).removeEventAssignment(((EventAssignment) node).getVariable());
 				}
 				else if (node instanceof StoichiometryMath){
 					// search corresponding SpeciesReference and delete the StoichiometryMath of it
@@ -591,27 +604,57 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libModel.getSpeciesReference(specRef.getId()).getStoichiometryMath().delete();
 				}
 				else if (node instanceof Trigger){
-					//TODO
+					//get corresponding event and delete it's trigger
+					Event trigEvent = (Event) ((Trigger) node).getParentSBMLObject();
+					libModel.getEvent(trigEvent.getId()).getTrigger().delete();
 				}
 				else if (node instanceof Rule){
-					//is this correct?!?
-					libModel.removeRule(((Rule) node).getMetaId());
+					// find the variable in the Rule object to remove it
+					if (node instanceof AlgebraicRule){
+						AlgebraicRule rule = (AlgebraicRule) node;
+						//Problem: there is no Variable-String in AlgebraicRule objects
+					} else if (node instanceof AssignmentRule){
+						AssignmentRule rule = (AssignmentRule) node;
+						libModel.removeRule(rule.getVariable());
+					} else if (node instanceof RateRule){
+						RateRule rule = (RateRule) node;
+						libModel.removeRule(rule.getVariable());
+					}
 				}
 				else if (node instanceof Constraint){
-					//TODO: removeConstraint() needs a long-argument
-					//libModel.removeConstraint(node);
+					Constraint con = (Constraint) node;
+					// find the index of this Constraint
+					for (int k=0; k<con.getParent().size(); k++){
+						Constraint c = con.getParent().get(k);
+						if (con.equals(c)){
+							libModel.removeConstraint(k);
+							break;
+						}
+					}				
 				}
 				else if (node instanceof Delay){
-					//TODO
+					// find corresponding Event and delete it's Delay
+					Delay delay = (Delay) node;
+					libModel.getEvent(delay.getParent().getId()).getDelay().delete();
 				}
 				else if (node instanceof Priority){
-					//TODO
+					//find the corresponding Event and delete it's Priority
+					Priority prio = (Priority) node;
+					Event prioEvent = prio.getParent();
+					libModel.getEvent(prioEvent.getId()).getPriority().delete();		
 				}
 			}
 		} else if (node instanceof AnnotationElement){
 			if (node instanceof CVTerm){
-				//TODO: search right CVTerm
-				libDoc.getCVTerm(0).delete();
+				//search index of CVTerm object
+				CVTerm cvTerm = (CVTerm) node;
+				for(int k=0; k<doc.getNumCVTerms();k++){
+					CVTerm cv = doc.getCVTerm(k);
+					if(cv.equals(cvTerm)){
+						libDoc.getCVTerm(k).delete();
+						break;
+					}
+				}
 			}
 			else if (node instanceof History){
 				//TODO				
@@ -624,7 +667,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (node instanceof ASTNode){
 			//TODO
-			
 		} else if (node instanceof TreeNodeAdapter){
 			//TODO
 		} else if (node instanceof XMLToken){
@@ -638,12 +680,65 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		Object evtSrc = evt.getSource();
 		String prop = evt.getPropertyName();
-
-		// ...
-		if (prop.equals(TreeNodeChangeEvent.charge)) {
+		
+		if (prop.equals(TreeNodeChangeEvent.about)){			
+		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)){			 
+		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)){
+		} else if (prop.equals(TreeNodeChangeEvent.addExtension)){
+		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)){
+		} else if (prop.equals(TreeNodeChangeEvent.annotation)){
+		} else if (prop.equals(TreeNodeChangeEvent.annotationNameSpaces)){
+		} else if (prop.equals(TreeNodeChangeEvent.areaUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.baseListType)){
+		} else if (prop.equals(TreeNodeChangeEvent.boundaryCondition)){
+		} else if (prop.equals(TreeNodeChangeEvent.charge)) {
 			Species spec = (Species) evtSrc;
 			org.sbml.libsbml.Model libMod = libDoc.getModel();
 			libMod.getSpecies(spec.getId()).setCharge(spec.getCharge());
+		} else if (prop.equals(TreeNodeChangeEvent.childNode)){
+		} else if (prop.equals(TreeNodeChangeEvent.className)){
+		} else if (prop.equals(TreeNodeChangeEvent.compartment)){
+		} else if (prop.equals(TreeNodeChangeEvent.compartmentType)){
+			if (evtSrc instanceof Compartment){
+				Compartment comp = (Compartment) evtSrc;
+				libDoc.getModel().getCompartment(comp.getId()).setCompartmentType(comp.getCompartmentType());
+			}
+		} else if (prop.equals(TreeNodeChangeEvent.constant)){
+		} else if (prop.equals(TreeNodeChangeEvent.conversionFactor)){
+		} else if (prop.equals(TreeNodeChangeEvent.created)){
+		} else if (prop.equals(TreeNodeChangeEvent.creator)){
+		} else if (prop.equals(TreeNodeChangeEvent.currentList)){
+		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)){
+		} else if (prop.equals(TreeNodeChangeEvent.denominator)){
+			ASTNode node = (ASTNode) evtSrc;
+		} else if (prop.equals(TreeNodeChangeEvent.email)){
+		} else if (prop.equals(TreeNodeChangeEvent.encoding)){
+		} else if (prop.equals(TreeNodeChangeEvent.exponent)){
+			ASTNode ast = (ASTNode) evtSrc;
+		} else if (prop.equals(TreeNodeChangeEvent.extentUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.familyName)){
+		} else if (prop.equals(TreeNodeChangeEvent.fast)){
+			Reaction reac = (Reaction) evtSrc;
+			libDoc.getModel().getReaction(reac.getId()).setFast(reac.getFast());
+		} else if (prop.equals(TreeNodeChangeEvent.formula)){
+		} else if (prop.equals(TreeNodeChangeEvent.givenName)){
+		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.history)){
+		} else if (prop.equals(TreeNodeChangeEvent.id)){
+		} else if (prop.equals(TreeNodeChangeEvent.initialAmount)){
+		} else if (prop.equals(TreeNodeChangeEvent.initialValue)){
+		} else if (prop.equals(TreeNodeChangeEvent.isEOF)){
+		} else if (prop.equals(TreeNodeChangeEvent.isExplicitlySetConstant)){
+		} else if (prop.equals(TreeNodeChangeEvent.isSetNumberType)){
+		} else if (prop.equals(TreeNodeChangeEvent.kind)){
+		} else if (prop.equals(TreeNodeChangeEvent.kineticLaw)){
+			Reaction reac = (Reaction) evtSrc;
+			//libDoc.getModel().getReaction(reac.getId()).setKineticLaw(reac.getKineticLaw());
+		} else if (prop.equals(TreeNodeChangeEvent.lengthUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.level)){
+		} else if (prop.equals(TreeNodeChangeEvent.listOfUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.mantissa)){
+			ASTNode node = (ASTNode) evtSrc;
 		} else if (prop.equals(TreeNodeChangeEvent.math)) {
 			MathContainer mathContainer = (MathContainer) evt.getSource();
 			if (mathContainer instanceof KineticLaw) {
@@ -651,12 +746,91 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				org.sbml.libsbml.KineticLaw libKl = libDoc.getModel().getReaction(r.getId()).getKineticLaw();
 				libKl.setFormula(mathContainer.getFormula());
 			} else if (mathContainer instanceof Constraint) {
-
+			} else if (mathContainer instanceof Delay){
+			} else if (mathContainer instanceof FunctionDefinition){
+			} else if (mathContainer instanceof StoichiometryMath){
+			} else if (mathContainer instanceof InitialAssignment){
 			}
+			// ...
+		} else if (prop.equals(TreeNodeChangeEvent.message)){
+		} else if (prop.equals(TreeNodeChangeEvent.messageBuffer)){
+		} else if (prop.equals(TreeNodeChangeEvent.metaId)){
+		} else if (prop.equals(TreeNodeChangeEvent.model)){
+			org.sbml.jsbml.SBMLDocument doc = (org.sbml.jsbml.SBMLDocument) evtSrc;
+			//libDoc.setModel(doc.getModel());
+		} else if (prop.equals(TreeNodeChangeEvent.modified)){
+		} else if (prop.equals(TreeNodeChangeEvent.multiplier)){
+		} else if (prop.equals(TreeNodeChangeEvent.name)){
+		} else if (prop.equals(TreeNodeChangeEvent.namespace)){
+		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)){
+		} else if (prop.equals(TreeNodeChangeEvent.notes)){
+		} else if (prop.equals(TreeNodeChangeEvent.notesBuffer)){
+		} else if (prop.equals(TreeNodeChangeEvent.numerator)){
+			ASTNode node = (ASTNode) evtSrc;
+		} else if (prop.equals(TreeNodeChangeEvent.offset)){
+		} else if (prop.equals(TreeNodeChangeEvent.organisation)){
+		} else if (prop.equals(TreeNodeChangeEvent.outside)){
+			Compartment comp = (Compartment) evtSrc;
+			libDoc.getModel().getCompartment(comp.getId()).setOutside(comp.getOutside());
+		} else if (prop.equals(TreeNodeChangeEvent.parentSBMLObject)){
+		} else if (prop.equals(TreeNodeChangeEvent.persistent)){
+		} else if (prop.equals(TreeNodeChangeEvent.priority)){
+			Event event = (Event) evtSrc;
+			//libDoc.getModel().getEvent(event.getId()).setPriority(event.getPriority());
+		} else if (prop.equals(TreeNodeChangeEvent.qualifier)){
+		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)){
+		} else if (prop.equals(TreeNodeChangeEvent.resource)){
+		} else if (prop.equals(TreeNodeChangeEvent.reversible)){
+			Reaction reac= (Reaction) evtSrc;
+			libDoc.getModel().getReaction(reac.getId()).setReversible(reac.getReversible());
+		} else if (prop.equals(TreeNodeChangeEvent.SBMLDocumentAttributes)){
+		} else if (prop.equals(TreeNodeChangeEvent.sboTerm)){
+		} else if (prop.equals(TreeNodeChangeEvent.scale)){
+		} else if (prop.equals(TreeNodeChangeEvent.setAnnotation)){
+		} else if (prop.equals(TreeNodeChangeEvent.size)){
+			if (evtSrc instanceof Compartment){
+				Compartment comp = (Compartment) evtSrc;
+				libDoc.getModel().getCompartment(comp.getId()).setSize(comp.getSize());
+			}
+		} else if (prop.equals(TreeNodeChangeEvent.spacialDimensions)){
+		} else if (prop.equals(TreeNodeChangeEvent.spatialDimensions)){
+			if (evtSrc instanceof Compartment){
+				Compartment comp = (Compartment) evtSrc;
+				libDoc.getModel().getCompartment(comp.getId()).setSpatialDimensions(comp.getSpatialDimensions());
+			}
+		} else if (prop.equals(TreeNodeChangeEvent.spatialSizeUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.species)){
+		} else if (prop.equals(TreeNodeChangeEvent.speciesType)){
+		} else if (prop.equals(TreeNodeChangeEvent.stoichiometry)){
+			SpeciesReference specRef = (SpeciesReference) evtSrc;
+			Reaction reac = (Reaction) specRef.getParent();
+			//TODO ask if it's a reactant or a product
+		} else if (prop.equals(TreeNodeChangeEvent.style)){
+			ASTNode node = (ASTNode) evtSrc;
+		} else if (prop.equals(TreeNodeChangeEvent.substanceUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.symbol)){
+			if(evtSrc instanceof InitialAssignment){
+				libDoc.getModel().getInitialAssignment(((InitialAssignment) evtSrc).getVariable()).setSymbol(((InitialAssignment) evtSrc).getSymbol());
+			}
+		} else if (prop.equals(TreeNodeChangeEvent.text)){
+		} else if (prop.equals(TreeNodeChangeEvent.timeUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.type)){
+			ASTNode node = (ASTNode) evtSrc;
+		} else if (prop.equals(TreeNodeChangeEvent.units)){
+		} else if (prop.equals(TreeNodeChangeEvent.unsetCVTerms)){
+			libDoc.unsetCVTerms();
+		} else if (prop.equals(TreeNodeChangeEvent.userObject)){
+		} else if (prop.equals(TreeNodeChangeEvent.useValuesFromTriggerTime)){
+		} else if (prop.equals(TreeNodeChangeEvent.value)){
+		} else if (prop.equals(TreeNodeChangeEvent.variable)){
+			if (evtSrc instanceof EventAssignment){
+				EventAssignment evAssign = (EventAssignment) evtSrc;
+			}
+		} else if (prop.equals(TreeNodeChangeEvent.version)){
+		} else if (prop.equals(TreeNodeChangeEvent.volume)){
+		} else if (prop.equals(TreeNodeChangeEvent.volumeUnits)){
+		} else if (prop.equals(TreeNodeChangeEvent.xmlTriple)){
 		}
-
-		// TODO Auto-generated method stub
-
 	}
 	
 	/**
@@ -744,6 +918,124 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		
 	}
 
+	/**
+	 * 
+	 * @param unit
+	 * @param u
+	 */
+	private void transferKindProperties(Unit unit, org.sbml.libsbml.Unit u) {
+		switch (unit.getKind()) {
+		case AMPERE:
+			u.setKind(libsbmlConstants.UNIT_KIND_AMPERE);
+			break;
+		case BECQUEREL:
+			u.setKind(libsbmlConstants.UNIT_KIND_BECQUEREL);
+			break;
+		case CANDELA:
+			u.setKind(libsbmlConstants.UNIT_KIND_CANDELA);
+			break;
+		case CELSIUS:
+			u.setKind(libsbmlConstants.UNIT_KIND_CELSIUS);
+			break;
+		case COULOMB:
+			u.setKind(libsbmlConstants.UNIT_KIND_COULOMB);
+			break;
+		case DIMENSIONLESS:
+			u.setKind(libsbmlConstants.UNIT_KIND_DIMENSIONLESS);
+			break;
+		case FARAD:
+			u.setKind(libsbmlConstants.UNIT_KIND_FARAD);
+			break;
+		case GRAM:
+			u.setKind(libsbmlConstants.UNIT_KIND_GRAM);
+			break;
+		case GRAY:
+			u.setKind(libsbmlConstants.UNIT_KIND_GRAY);
+			break;
+		case HENRY:
+			u.setKind(libsbmlConstants.UNIT_KIND_HENRY);
+			break;
+		case HERTZ:
+			u.setKind(libsbmlConstants.UNIT_KIND_HERTZ);
+			break;
+		case INVALID:
+			u.setKind(libsbmlConstants.UNIT_KIND_INVALID);
+			break;
+		case ITEM:
+			u.setKind(libsbmlConstants.UNIT_KIND_ITEM);
+			break;
+		case JOULE:
+			u.setKind(libsbmlConstants.UNIT_KIND_JOULE);
+			break;
+		case KATAL:
+			u.setKind(libsbmlConstants.UNIT_KIND_KATAL);
+			break;
+		case KELVIN:
+			u.setKind(libsbmlConstants.UNIT_KIND_KELVIN);
+			break;
+		case KILOGRAM:
+			u.setKind(libsbmlConstants.UNIT_KIND_KILOGRAM);
+			break;
+		case LITER:
+			u.setKind(libsbmlConstants.UNIT_KIND_LITER);
+			break;
+		case LITRE:
+			u.setKind(libsbmlConstants.UNIT_KIND_LITRE);
+			break;
+		case LUMEN:
+			u.setKind(libsbmlConstants.UNIT_KIND_LUMEN);
+			break;
+		case LUX:
+			u.setKind(libsbmlConstants.UNIT_KIND_LUX);
+			break;
+		case METER:
+			u.setKind(libsbmlConstants.UNIT_KIND_METER);
+			break;
+		case METRE:
+			u.setKind(libsbmlConstants.UNIT_KIND_METRE);
+			break;
+		case MOLE:
+			u.setKind(libsbmlConstants.UNIT_KIND_MOLE);
+			break;
+		case NEWTON:
+			u.setKind(libsbmlConstants.UNIT_KIND_NEWTON);
+			break;
+		case OHM:
+			u.setKind(libsbmlConstants.UNIT_KIND_OHM);
+			break;
+		case PASCAL:
+			u.setKind(libsbmlConstants.UNIT_KIND_PASCAL);
+			break;
+		case RADIAN:
+			u.setKind(libsbmlConstants.UNIT_KIND_RADIAN);
+			break;
+		case SECOND:
+			u.setKind(libsbmlConstants.UNIT_KIND_SECOND);
+			break;
+		case SIEMENS:
+			u.setKind(libsbmlConstants.UNIT_KIND_SIEMENS);
+			break;
+		case SIEVERT:
+			u.setKind(libsbmlConstants.UNIT_KIND_SIEVERT);
+			break;
+		case STERADIAN:
+			u.setKind(libsbmlConstants.UNIT_KIND_STERADIAN);
+			break;
+		case TESLA:
+			u.setKind(libsbmlConstants.UNIT_KIND_TESLA);
+			break;
+		case VOLT:
+			u.setKind(libsbmlConstants.UNIT_KIND_VOLT);
+			break;
+		case WATT:
+			u.setKind(libsbmlConstants.UNIT_KIND_WATT);
+			break;
+		case WEBER:
+			u.setKind(libsbmlConstants.UNIT_KIND_WEBER);
+			break;
+		}
+	}
+	
 	/**
 	 * 
 	 * @param math
