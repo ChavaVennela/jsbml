@@ -599,10 +599,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugin.notifySBaseDeleted(pspec);
 				} else if (node instanceof SimpleSpeciesReference) {
 					if (node instanceof ModifierSpeciesReference) {
-						// TODO unclear what to do in this case
+						ModifierSpeciesReference modSpecRef = (ModifierSpeciesReference) node;
+						//TODO How to get the plugModel.getSimpleSpeciesReference to remove ?
 					} else if (node instanceof SpeciesReference) {
 						SpeciesReference specRef = (SpeciesReference) node;
-						// TODO
+						// TODO How to get the plugModel.getSpeciesReference to remove ?
 					}
 				} else if (node instanceof AbstractNamedSBaseWithUnit) {
 					if (node instanceof Event) {
@@ -619,7 +620,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 							KineticLaw kl = (KineticLaw) lop
 									.getParentSBMLObject();
 							Reaction r = kl.getParentSBMLObject();
-							// TODO
+							// TODO What has to be done here ?
 						} else if (node instanceof Symbol) {
 							if (node instanceof Compartment) {
 								Compartment comp = (Compartment) node;
@@ -646,10 +647,10 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 			if (node instanceof Unit) {
 				Unit ut = (Unit) node;
-				// TODO
+				// TODO This needs to be hashed somehow.
 			} else if (node instanceof SBMLDocument) {
 				SBMLDocument doc = (SBMLDocument) node;
-				// TODO
+				// TODO This needs to be hashed somehow.
 			} else if (node instanceof ListOf<?>) {
 				ListOf<?> listOf = (ListOf<?>) node;
 				switch (listOf.getSBaseListType()) {
@@ -713,12 +714,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					PluginKineticLaw plugklaw = plugReac.getKineticLaw();
 					plugReac.setKineticLaw(null);
 					plugin.notifySBaseDeleted(plugklaw);
-
 				} else if (node instanceof InitialAssignment) {
 					InitialAssignment iAssign = (InitialAssignment) node;
-
-					// TODO
-
+					PluginInitialAssignment plugiAssign = plugModel.getInitialAssignment(iAssign.getSymbol());
+					plugModel.removeInitialAssignment(plugiAssign);
+					plugin.notifySBaseDeleted(plugiAssign);
 				} else if (node instanceof EventAssignment) {
 					EventAssignment eAssign = (EventAssignment) node;
 					ListOf<EventAssignment> elist = eAssign.getParent();
@@ -727,10 +727,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 							.getEvent(e.getId()).getEventAssignment(
 									eAssign.getIndex(node));
 					plugin.notifySBaseDeleted(plugEventAssignment);
-
 				} else if (node instanceof StoichiometryMath) {
-					// TODO no counter class in CD available
-					// Therefore unnecessary to implement this?
+					//TODO There is no counter class in CellDesigner. Is it therefore unnecessary to implement this function ?
 					logger.log(Level.DEBUG, "No counter class in CellDesigner"
 							+ node.getClass().getSimpleName());
 				} else if (node instanceof Trigger) {
@@ -746,18 +744,19 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugin.notifySBaseChanged(plugEvent);
 				} else if (node instanceof Constraint) {
 					Constraint ct = (Constraint) node;
-					// TODO
+					PluginConstraint plugct = plugModel.getConstraint(ct.getMathMLString());
+					plugModel.removeConstraint(ct.getMathMLString());
+					plugin.notifySBaseDeleted(plugct);
 				} else if (node instanceof Delay) {
 					Delay dl = (Delay) node;
-					// TODO
-
+					//TODO There is no counterclass in CellDesigner
 				} else if (node instanceof Priority) {
 					Priority prt = (Priority) node;
-					// TODO
-
+					// TODO There is no counter class in CellDesigner
 				} else if (node instanceof Rule) {
 					if (node instanceof AlgebraicRule) {
-
+						AlgebraicRule alrule = (AlgebraicRule) node;
+						//TODO
 					} else if (node instanceof ExplicitRule) {
 						if (node instanceof RateRule) {
 							RateRule rrule = (RateRule) node;
@@ -765,11 +764,10 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 							// TODO
 						} else if (node instanceof AssignmentRule) {
 							AssignmentRule assignRule = (AssignmentRule) node;
-
 							// TODO
 						}
 					} else {
-
+						//TODO case when we only have a "Rule" without anything else
 					}
 				}
 			}
@@ -780,13 +778,16 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				}
 				// TODO do something
 			} else if (node instanceof ASTNode) {
-				// TODO something
+				ASTNode astnode = (ASTNode) node;
+				org.sbml.libsbml.ASTNode libastnode = PluginUtils.convert(astnode);
+				//TODO And now ?
 			} else if (node instanceof AnnotationElement) {
 				if (node instanceof CVTerm) {
 					CVTerm term = (CVTerm) node;
 					// TODO
 				} else if (node instanceof History) {
 					History hist = (History) node;
+					
 					// TODO
 				} else if (node instanceof Creator) {
 					Creator creator = (Creator) node;
