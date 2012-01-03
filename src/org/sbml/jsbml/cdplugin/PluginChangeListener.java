@@ -561,12 +561,6 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				}
 			}
 		}
-		
-		
-		
-		
-		
-      
 	}
 
 	/*
@@ -576,157 +570,229 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 	 * org.sbml.jsbml.util.TreeNodeChangeListener#nodeRemoved(javax.swing.tree
 	 * .TreeNode)
 	 */
-	public void nodeRemoved(TreeNode node) {
-		if (node instanceof CompartmentType) {
-			CompartmentType ct = (CompartmentType) node;
-			PluginCompartmentType pt = plugModel.getCompartmentType(ct.getId());
-			plugModel.removeCompartmentType(ct.getId());
-			plugin.notifySBaseDeleted(pt);
-		} else if (node instanceof Species) {
-			Species sp = (Species) node;
-			PluginSpecies ps = plugModel.getSpecies(sp.getId());
-			plugModel.removeSpecies(sp.getId());
-			plugin.notifySBaseDeleted(ps);
-		} else if (node instanceof Reaction) {
-			Reaction react = (Reaction) node;
-			PluginReaction preac = plugModel.getReaction(react.getId());
-			plugModel.removeReaction(react.getId());
-			plugin.notifySBaseDeleted(preac);
-		} else if (node instanceof SpeciesType) {
-			SpeciesType speciestype = (SpeciesType) node;
-			PluginSpeciesType pspec = plugModel.getSpeciesType(speciestype
-					.getId());
-			plugModel.removeSpeciesType(speciestype.getId());
-			plugin.notifySBaseDeleted(pspec);
-		} else if (node instanceof org.sbml.jsbml.Parameter) {
-			org.sbml.jsbml.Parameter param = (org.sbml.jsbml.Parameter) node;
-			PluginParameter plugParam = plugModel.getParameter(param.getId());
-			plugModel.removeParameter(param.getId());
-			plugin.notifySBaseDeleted(plugParam);
-		} else if (node instanceof FunctionDefinition) {
-			FunctionDefinition funcdef = (FunctionDefinition) node;
-			PluginFunctionDefinition plugFuncdef = plugModel
-					.getFunctionDefinition(funcdef.getId());
-			plugModel.removeFunctionDefinition(funcdef.getId());
-			plugin.notifySBaseDeleted(plugFuncdef);
-		} else if (node instanceof Compartment) {
-			Compartment comp = (Compartment) node;
-			PluginCompartment plugComp = plugModel.getCompartment(comp.getId());
-			plugModel.removeCompartment(comp.getId());
-			plugin.notifySBaseDeleted(plugComp);
-		} else if (node instanceof SpeciesReference) {
-			SpeciesReference specRef = (SpeciesReference) node;
-			// TODO 
-		} else if (node instanceof LocalParameter) {
-			LocalParameter locparam = (LocalParameter) node;
-			ListOf<LocalParameter> lop = locparam.getParentSBMLObject();
-			KineticLaw kl = (KineticLaw) lop.getParentSBMLObject();
-			Reaction r = kl.getParentSBMLObject();
-			// TODO 
-		} else if (node instanceof SimpleSpeciesReference) {
-			SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
-			// TODO 
-		} else if (node instanceof UnitDefinition) {
-			UnitDefinition undef = (UnitDefinition) node;
-			PluginUnitDefinition plugUndef = plugModel.getUnitDefinition(undef
-					.getId());
-			plugModel.removeUnitDefinition(undef.getId());
-			plugin.notifySBaseDeleted(plugUndef);
-		} else if (node instanceof Event) {
-			Event event = (Event) node;
-			PluginEvent plugEvent = plugModel.getEvent(event.getId());
-			plugModel.removeEvent(event.getId());
-			plugin.notifySBaseDeleted(plugEvent);
-		} else if (node instanceof RateRule) {
-			RateRule rrule = (RateRule) node;
-			
-			// TODO 
-		} else if (node instanceof AssignmentRule) {
-			AssignmentRule assignRule = (AssignmentRule) node;
-			
-			// TODO 
-		} else if (node instanceof KineticLaw) {
-			KineticLaw klaw = (KineticLaw) node;
-			Reaction parentreaction = klaw.getParentSBMLObject();
-			PluginReaction plugReac = plugModel.getReaction(parentreaction
-					.getId());
-			PluginKineticLaw plugklaw = plugReac.getKineticLaw();
-			plugReac.setKineticLaw(null);
-			plugin.notifySBaseDeleted(plugklaw);
-		} else if (node instanceof InitialAssignment) {
-			InitialAssignment iAssign = (InitialAssignment) node;
-			
-			// TODO 
-		} else if (node instanceof EventAssignment) {
-			EventAssignment eAssign = (EventAssignment) node;
-			ListOf<EventAssignment> elist = eAssign.getParent();
-			Event e = (Event) elist.getParentSBMLObject();
-			PluginEventAssignment plugEventAssignment = plugModel.getEvent(
-					e.getId()).getEventAssignment(eAssign.getIndex(node));
-			plugin.notifySBaseDeleted(plugEventAssignment);
-		} else if (node instanceof StoichiometryMath) {
-			// TODO no counter class in CD available
-			// Therefore unnecessary to implement this?
-			logger.log(Level.DEBUG, "No counter class in CellDesigner"
-					+ node.getClass().getSimpleName());
-		} else if (node instanceof Trigger) {
-			Trigger trig = (Trigger) node;
-			PluginEvent plugEvent = plugModel.getEvent(trig.getParent().getId());
-			logger.log(Level.DEBUG, String.format(
-			  "Trying to remove trigger from event %s, but there is no remove method. Please check the result.",
-			  plugEvent.getId()));
-			plugEvent.setTrigger((org.sbml.libsbml.Trigger) null);
-			plugin.notifySBaseChanged(plugEvent);
-		} else if (node instanceof Rule) {
-			if (node instanceof AlgebraicRule) {
-				AlgebraicRule alrule = (AlgebraicRule) node;
-				alrule.getFormula();
-				// TODO
-			} else if (node instanceof AssignmentRule) {
-				AssignmentRule assRule = (AssignmentRule) node;
-				assRule.getVariable();
-				assRule.getFormula();
-			} else if (node instanceof RateRule) {
-				// TODO
-			}
-		} else if (node instanceof Constraint) {
-			Constraint ct = (Constraint) node;
-			// TODO
-		} else if (node instanceof Delay) {
-			Delay dl = (Delay) node;
-			// TODO
-		} else if (node instanceof Priority) {
-			Priority prt = (Priority) node;
-			// TODO
 
-		} else if (node instanceof Unit) {
-			Unit ut = (Unit) node;
-			// TODO 
-			
-		} else if (node instanceof SBMLDocument) {
-			SBMLDocument doc = (SBMLDocument) node;
-			// TODO 
-			// TODO 
-			
-		} else if (node instanceof ListOf<?>) {
-			ListOf<?> listof = (ListOf<?>) node;
-			// TODO 
-			// TODO 
-			
-		} else if (node instanceof CVTerm) {
-			CVTerm term = (CVTerm) node;
-			// TODO 
-			
-		} else if (node instanceof History) {
-			History hist = (History) node;
-			// TODO 
-			
-		} else if (node instanceof Annotation) {
-			// TODO 
-			
-		} else if (node instanceof Creator) {
-			// TODO 
-			
+	public void nodeRemoved(TreeNode node) {
+		if (node instanceof AbstractSBase) {
+			if (node instanceof AbstractNamedSBase) {
+				if (node instanceof CompartmentType) {
+					CompartmentType ct = (CompartmentType) node;
+					PluginCompartmentType pt = plugModel.getCompartmentType(ct
+							.getId());
+					plugModel.removeCompartmentType(ct.getId());
+					plugin.notifySBaseDeleted(pt);
+				} else if (node instanceof UnitDefinition) {
+					UnitDefinition undef = (UnitDefinition) node;
+					PluginUnitDefinition plugUndef = plugModel
+							.getUnitDefinition(undef.getId());
+					plugModel.removeUnitDefinition(undef.getId());
+					plugin.notifySBaseDeleted(plugUndef);
+				} else if (node instanceof Reaction) {
+					Reaction react = (Reaction) node;
+					PluginReaction preac = plugModel.getReaction(react.getId());
+					plugModel.removeReaction(react.getId());
+					plugin.notifySBaseDeleted(preac);
+				} else if (node instanceof SpeciesType) {
+					SpeciesType speciestype = (SpeciesType) node;
+					PluginSpeciesType pspec = plugModel
+							.getSpeciesType(speciestype.getId());
+					plugModel.removeSpeciesType(speciestype.getId());
+					plugin.notifySBaseDeleted(pspec);
+				} else if (node instanceof SimpleSpeciesReference) {
+					if (node instanceof ModifierSpeciesReference) {
+						// TODO unclear what to do in this case
+					} else if (node instanceof SpeciesReference) {
+						SpeciesReference specRef = (SpeciesReference) node;
+						// TODO
+					}
+				} else if (node instanceof AbstractNamedSBaseWithUnit) {
+					if (node instanceof Event) {
+						Event event = (Event) node;
+						PluginEvent plugEvent = plugModel.getEvent(event
+								.getId());
+						plugModel.removeEvent(event.getId());
+						plugin.notifySBaseDeleted(plugEvent);
+					} else if (node instanceof QuantityWithUnit) {
+						if (node instanceof LocalParameter) {
+							LocalParameter locparam = (LocalParameter) node;
+							ListOf<LocalParameter> lop = locparam
+									.getParentSBMLObject();
+							KineticLaw kl = (KineticLaw) lop
+									.getParentSBMLObject();
+							Reaction r = kl.getParentSBMLObject();
+							// TODO
+						} else if (node instanceof Symbol) {
+							if (node instanceof Compartment) {
+								Compartment comp = (Compartment) node;
+								PluginCompartment plugComp = plugModel
+										.getCompartment(comp.getId());
+								plugModel.removeCompartment(comp.getId());
+								plugin.notifySBaseDeleted(plugComp);
+							} else if (node instanceof Species) {
+								Species sp = (Species) node;
+								PluginSpecies ps = plugModel.getSpecies(sp
+										.getId());
+								plugModel.removeSpecies(sp.getId());
+								plugin.notifySBaseDeleted(ps);
+							} else if (node instanceof org.sbml.jsbml.Parameter) {
+								org.sbml.jsbml.Parameter param = (org.sbml.jsbml.Parameter) node;
+								PluginParameter plugParam = plugModel
+										.getParameter(param.getId());
+								plugModel.removeParameter(param.getId());
+								plugin.notifySBaseDeleted(plugParam);
+							}
+						}
+					}
+				}
+			}
+			if (node instanceof Unit) {
+				Unit ut = (Unit) node;
+				// TODO
+			} else if (node instanceof SBMLDocument) {
+				SBMLDocument doc = (SBMLDocument) node;
+				// TODO
+			} else if (node instanceof ListOf<?>) {
+				ListOf<?> listOf = (ListOf<?>) node;
+				switch (listOf.getSBaseListType()) {
+				case listOfCompartments:
+					ListOfCompartments ll = new ListOfCompartments();
+
+					break;
+				case listOfCompartmentTypes:
+					break;
+				case listOfConstraints:
+					break;
+				case listOfEventAssignments:
+					break;
+				case listOfEvents:
+					break;
+				case listOfFunctionDefinitions:
+					break;
+				case listOfInitialAssignments:
+					break;
+				case listOfLocalParameters:
+					break;
+				case listOfModifiers:
+					break;
+				case listOfParameters:
+					break;
+				case listOfProducts:
+					break;
+				case listOfReactants:
+					break;
+				case listOfReactions:
+					break;
+				case listOfRules:
+					break;
+				case listOfSpecies:
+					break;
+				case listOfSpeciesTypes:
+					break;
+				case listOfUnitDefinitions:
+					break;
+				case listOfUnits:
+					break;
+				case other:
+					// TODO for JSBML packages (later than 0.8).
+				default:
+					// unknown
+					break;
+				}
+
+			} else if (node instanceof AbstractMathContainer) {
+				if (node instanceof FunctionDefinition) {
+					FunctionDefinition funcdef = (FunctionDefinition) node;
+					PluginFunctionDefinition plugFuncdef = plugModel
+							.getFunctionDefinition(funcdef.getId());
+					plugModel.removeFunctionDefinition(funcdef.getId());
+					plugin.notifySBaseDeleted(plugFuncdef);
+				} else if (node instanceof KineticLaw) {
+					KineticLaw klaw = (KineticLaw) node;
+					Reaction parentreaction = klaw.getParentSBMLObject();
+					PluginReaction plugReac = plugModel
+							.getReaction(parentreaction.getId());
+					PluginKineticLaw plugklaw = plugReac.getKineticLaw();
+					plugReac.setKineticLaw(null);
+					plugin.notifySBaseDeleted(plugklaw);
+
+				} else if (node instanceof InitialAssignment) {
+					InitialAssignment iAssign = (InitialAssignment) node;
+
+					// TODO
+
+				} else if (node instanceof EventAssignment) {
+					EventAssignment eAssign = (EventAssignment) node;
+					ListOf<EventAssignment> elist = eAssign.getParent();
+					Event e = (Event) elist.getParentSBMLObject();
+					PluginEventAssignment plugEventAssignment = plugModel
+							.getEvent(e.getId()).getEventAssignment(
+									eAssign.getIndex(node));
+					plugin.notifySBaseDeleted(plugEventAssignment);
+
+				} else if (node instanceof StoichiometryMath) {
+					// TODO no counter class in CD available
+					// Therefore unnecessary to implement this?
+					logger.log(Level.DEBUG, "No counter class in CellDesigner"
+							+ node.getClass().getSimpleName());
+				} else if (node instanceof Trigger) {
+					Trigger trig = (Trigger) node;
+					PluginEvent plugEvent = plugModel.getEvent(trig.getParent()
+							.getId());
+					logger.log(
+							Level.DEBUG,
+							String.format(
+									"Trying to remove trigger from event %s, but there is no remove method. Please check the result.",
+									plugEvent.getId()));
+					plugEvent.setTrigger((org.sbml.libsbml.Trigger) null);
+					plugin.notifySBaseChanged(plugEvent);
+				} else if (node instanceof Constraint) {
+					Constraint ct = (Constraint) node;
+					// TODO
+				} else if (node instanceof Delay) {
+					Delay dl = (Delay) node;
+					// TODO
+
+				} else if (node instanceof Priority) {
+					Priority prt = (Priority) node;
+					// TODO
+
+				} else if (node instanceof Rule) {
+					if (node instanceof AlgebraicRule) {
+
+					} else if (node instanceof ExplicitRule) {
+						if (node instanceof RateRule) {
+							RateRule rrule = (RateRule) node;
+
+							// TODO
+						} else if (node instanceof AssignmentRule) {
+							AssignmentRule assignRule = (AssignmentRule) node;
+
+							// TODO
+						}
+					} else {
+
+					}
+				}
+			}
+		} else if (node instanceof AbstractTreeNode) {
+			if (node instanceof XMLToken) {
+				if (node instanceof XMLNode) {
+					// TODO do something with the XMLNode
+				}
+				// TODO do something
+			} else if (node instanceof ASTNode) {
+				// TODO something
+			} else if (node instanceof AnnotationElement) {
+				if (node instanceof CVTerm) {
+					CVTerm term = (CVTerm) node;
+					// TODO
+				} else if (node instanceof History) {
+					History hist = (History) node;
+					// TODO
+				} else if (node instanceof Creator) {
+					Creator creator = (Creator) node;
+					// TODO
+				}
+			}
 		}
 	}
 
