@@ -48,6 +48,7 @@ import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.Priority;
 import org.sbml.jsbml.QuantityWithUnit;
@@ -348,6 +349,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			} else if (node instanceof SBMLDocument){
 				//TODO use method from LibSBMLReader
 			} else if (node instanceof ListOf<?>){
+				// I don't have to ask what type of list the node is, 
+				// because of the recursion you get always the right case for every element in the list
 				for (SBase sb : (ListOf<?>) node){
 					DefaultMutableTreeNode sbasenode = new DefaultMutableTreeNode(sb);
 					nodeAdded(sbasenode);
@@ -386,9 +389,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (initAssign.isSetSymbol()){
 						libInitAssign.setSymbol(initAssign.getSymbol());
 					}
-					if (initAssign.isSetVariable()){
-						//this case can be dropped, because the Symbol is the same as the Variable in this object
-					}
+					//this case can be dropped, because the Symbol is the same as the Variable in this object
+					// if (initAssign.isSetVariable());
 				}
 				else if (node instanceof EventAssignment){
 					EventAssignment eventAssign = (EventAssignment) node;
@@ -682,7 +684,18 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		String prop = evt.getPropertyName();
 		
 		if (prop.equals(TreeNodeChangeEvent.about)){			
-		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)){			 
+		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)){	
+			//then the evtSrc is a SBase
+			int index = 0;
+			if (evtSrc instanceof org.sbml.jsbml.AbstractNamedSBase){
+				for (int i=0; i< ((org.sbml.jsbml.AbstractNamedSBase) evtSrc).getCVTerms().size(); i++){
+					if (((org.sbml.jsbml.AbstractNamedSBase)evtSrc).getCVTerm(i).equals(evt.getNewValue())){
+						index = i;
+						break;
+					}
+				}
+				//TODO convert the CVTerm and add it to the element by searching it with the id and add the CVTerm at the index
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)){
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)){
 		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)){
@@ -691,6 +704,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.areaUnits)){
 		} else if (prop.equals(TreeNodeChangeEvent.baseListType)){
 		} else if (prop.equals(TreeNodeChangeEvent.boundaryCondition)){
+			Species spec = (Species) evtSrc;
+			libDoc.getModel().getSpecies(spec.getId()).setBoundaryCondition(spec.getBoundaryCondition());
 		} else if (prop.equals(TreeNodeChangeEvent.charge)) {
 			Species spec = (Species) evtSrc;
 			org.sbml.libsbml.Model libMod = libDoc.getModel();
@@ -698,13 +713,31 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.childNode)){
 		} else if (prop.equals(TreeNodeChangeEvent.className)){
 		} else if (prop.equals(TreeNodeChangeEvent.compartment)){
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setCompartment(spec.getCompartment());
+			} else if (evtSrc instanceof Reaction){
+				Reaction reac = (Reaction) evtSrc;
+				libDoc.getModel().getReaction(reac.getId()).setCompartment(reac.getCompartment());
+			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.compartmentType)){
 			if (evtSrc instanceof Compartment){
 				Compartment comp = (Compartment) evtSrc;
 				libDoc.getModel().getCompartment(comp.getId()).setCompartmentType(comp.getCompartmentType());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.constant)){
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setConstant(spec.getConstant());
+			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.conversionFactor)){
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setConversionFactor(spec.getConversionFactor());
+			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.created)){
 		} else if (prop.equals(TreeNodeChangeEvent.creator)){
 		} else if (prop.equals(TreeNodeChangeEvent.currentList)){
@@ -723,9 +756,19 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.formula)){
 		} else if (prop.equals(TreeNodeChangeEvent.givenName)){
 		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)){
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setHasOnlySubstanceUnits(spec.getHasOnlySubstanceUnits());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.history)){
 		} else if (prop.equals(TreeNodeChangeEvent.id)){
+			if (evtSrc instanceof Rule){
+				
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.initialAmount)){
+			//evtSrc is a Species
+			Species spec = (Species) evtSrc;
+			libDoc.getModel().getSpecies(spec.getId()).setInitialAmount(spec.getInitialAmount());
 		} else if (prop.equals(TreeNodeChangeEvent.initialValue)){
 		} else if (prop.equals(TreeNodeChangeEvent.isEOF)){
 		} else if (prop.equals(TreeNodeChangeEvent.isExplicitlySetConstant)){
@@ -761,6 +804,11 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.modified)){
 		} else if (prop.equals(TreeNodeChangeEvent.multiplier)){
 		} else if (prop.equals(TreeNodeChangeEvent.name)){
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setName(spec.getName());
+			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)){
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)){
 		} else if (prop.equals(TreeNodeChangeEvent.notes)){
@@ -798,9 +846,17 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				Compartment comp = (Compartment) evtSrc;
 				libDoc.getModel().getCompartment(comp.getId()).setSpatialDimensions(comp.getSpatialDimensions());
 			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.spatialSizeUnits)){
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setSpatialSizeUnits(spec.getSpatialSizeUnits());
+			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.species)){
 		} else if (prop.equals(TreeNodeChangeEvent.speciesType)){
+			Species spec = (Species) evtSrc;
+			libDoc.getModel().getSpecies(spec.getId()).setSpeciesType(spec.getSpeciesType());
 		} else if (prop.equals(TreeNodeChangeEvent.stoichiometry)){
 			SpeciesReference specRef = (SpeciesReference) evtSrc;
 			Reaction reac = (Reaction) specRef.getParent();
@@ -808,6 +864,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.style)){
 			ASTNode node = (ASTNode) evtSrc;
 		} else if (prop.equals(TreeNodeChangeEvent.substanceUnits)){
+			Species spec = (Species) evtSrc;
+			libDoc.getModel().getSpecies(spec.getId()).setSubstanceUnits(spec.getSubstanceUnits());
 		} else if (prop.equals(TreeNodeChangeEvent.symbol)){
 			if(evtSrc instanceof InitialAssignment){
 				libDoc.getModel().getInitialAssignment(((InitialAssignment) evtSrc).getVariable()).setSymbol(((InitialAssignment) evtSrc).getSymbol());
@@ -817,6 +875,11 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.type)){
 			ASTNode node = (ASTNode) evtSrc;
 		} else if (prop.equals(TreeNodeChangeEvent.units)){
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setUnits(spec.getUnits());
+			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.unsetCVTerms)){
 			libDoc.unsetCVTerms();
 		} else if (prop.equals(TreeNodeChangeEvent.userObject)){
