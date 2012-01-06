@@ -130,7 +130,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					Model model = (Model) node;
 					LibSBMLWriter writer = new LibSBMLWriter();
 					libDoc.setModel((org.sbml.libsbml.Model) writer.writeModel(model));
-		
+
 				} else if (node instanceof Reaction){
 					Reaction reac = (Reaction) node;
 					org.sbml.libsbml.Reaction libReac = libDoc.getModel().createReaction();
@@ -219,7 +219,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 							org.sbml.libsbml.Priority libPrio = libEvent.createPriority();
 							transferMathContainerProperties(prio, libPrio);
 							libEvent.setPriority(libPrio);
-							
+
 						}
 						if (event.isSetTimeUnits()){
 							libEvent.setTimeUnits(event.getTimeUnits());
@@ -355,7 +355,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					DefaultMutableTreeNode sbasenode = new DefaultMutableTreeNode(sb);
 					nodeAdded(sbasenode);
 				}	
-			
+
 			} else if (node instanceof AbstractMathContainer){
 				if (node instanceof FunctionDefinition){
 					FunctionDefinition funcDef = (FunctionDefinition) node;
@@ -506,7 +506,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		}
 	}
 
-	
+
 
 
 	/* (non-Javadoc)
@@ -682,7 +682,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		Object evtSrc = evt.getSource();
 		String prop = evt.getPropertyName();
-		
+
 		if (prop.equals(TreeNodeChangeEvent.about)){			
 		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)){	
 			//then the evtSrc is a SBase
@@ -694,14 +694,21 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						break;
 					}
 				}
-				//TODO convert the CVTerm and add it to the element by searching it with the id and add the CVTerm at the index
+				//TODO convert the CVTerm and add it to the element by searching it with the id
 			}
+			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)){
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)){
 		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)){
 		} else if (prop.equals(TreeNodeChangeEvent.annotation)){
+			if (evtSrc instanceof Model){
+				libDoc.getModel().setAnnotation(((Model) evtSrc).getAnnotationString());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.annotationNameSpaces)){
 		} else if (prop.equals(TreeNodeChangeEvent.areaUnits)){
+			if (evtSrc instanceof Model){
+				libDoc.getModel().setAreaUnits(((Model) evtSrc).getAreaUnits());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.baseListType)){
 		} else if (prop.equals(TreeNodeChangeEvent.boundaryCondition)){
 			Species spec = (Species) evtSrc;
@@ -719,8 +726,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			} else if (evtSrc instanceof Reaction){
 				Reaction reac = (Reaction) evtSrc;
 				libDoc.getModel().getReaction(reac.getId()).setCompartment(reac.getCompartment());
-			}
-			// ...
+			} 
 		} else if (prop.equals(TreeNodeChangeEvent.compartmentType)){
 			if (evtSrc instanceof Compartment){
 				Compartment comp = (Compartment) evtSrc;
@@ -730,30 +736,53 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			if (evtSrc instanceof Species){
 				Species spec = (Species) evtSrc;
 				libDoc.getModel().getSpecies(spec.getId()).setConstant(spec.getConstant());
+			} else if (evtSrc instanceof Parameter){
+				Parameter param = (Parameter) evtSrc;
+				libDoc.getModel().getParameter(param.getId()).setConstant(param.getConstant());
+			} else if (evtSrc instanceof SpeciesReference){
+				SpeciesReference specRef = (SpeciesReference) evtSrc;
+				libDoc.getModel().getSpeciesReference(specRef.getId()).setConstant(specRef.getConstant());
 			}
 			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.conversionFactor)){
 			if (evtSrc instanceof Species){
 				Species spec = (Species) evtSrc;
 				libDoc.getModel().getSpecies(spec.getId()).setConversionFactor(spec.getConversionFactor());
+			} else if (evtSrc instanceof Model){
+				libDoc.getModel().setConversionFactor(((Model) evtSrc).getConversionFactor());
 			}
-			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.created)){
 		} else if (prop.equals(TreeNodeChangeEvent.creator)){
 		} else if (prop.equals(TreeNodeChangeEvent.currentList)){
 		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)){
 		} else if (prop.equals(TreeNodeChangeEvent.denominator)){
-			ASTNode node = (ASTNode) evtSrc;
+			if (evtSrc instanceof ASTNode){
+				ASTNode node = (ASTNode) evtSrc;
+				//TODO: find ASTNode in libDoc
+			} else if (evtSrc instanceof SpeciesReference){
+				SpeciesReference specRef = (SpeciesReference) evtSrc;
+				libDoc.getModel().getSpeciesReference(specRef.getId()).setDenominator(specRef.getDenominator());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.email)){
 		} else if (prop.equals(TreeNodeChangeEvent.encoding)){
 		} else if (prop.equals(TreeNodeChangeEvent.exponent)){
 			ASTNode ast = (ASTNode) evtSrc;
 		} else if (prop.equals(TreeNodeChangeEvent.extentUnits)){
+			if (evtSrc instanceof Model){
+				libDoc.getModel().setExtentUnits(((Model) evtSrc).getExtentUnits());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.familyName)){
 		} else if (prop.equals(TreeNodeChangeEvent.fast)){
-			Reaction reac = (Reaction) evtSrc;
-			libDoc.getModel().getReaction(reac.getId()).setFast(reac.getFast());
+			if (evtSrc instanceof Reaction){
+				Reaction reac = (Reaction) evtSrc;
+				libDoc.getModel().getReaction(reac.getId()).setFast(reac.getFast());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.formula)){
+			if (evtSrc instanceof KineticLaw){
+				KineticLaw kinLaw = (KineticLaw) evtSrc;
+				Reaction parentKinLaw = kinLaw.getParent();
+				libDoc.getModel().getReaction(parentKinLaw.getId()).getKineticLaw().setFormula(kinLaw.getFormula());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.givenName)){
 		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)){
 			if (evtSrc instanceof Species){
@@ -762,23 +791,47 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.history)){
 		} else if (prop.equals(TreeNodeChangeEvent.id)){
-			if (evtSrc instanceof Rule){
-				
+			// search the element in libDoc with the old id and set the new one
+			// you don't have to ask here of which instance the evtSrc is 
+			if (evt.getOldValue() != null){
+				libDoc.getElementBySId((String)evt.getOldValue()).setId((String) evt.getNewValue());
+			} else {
+				// then the id was not set, but how to find then the element in libDoc?
+				// TODO: find the element in libDoc
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.initialAmount)){
 			//evtSrc is a Species
 			Species spec = (Species) evtSrc;
 			libDoc.getModel().getSpecies(spec.getId()).setInitialAmount(spec.getInitialAmount());
 		} else if (prop.equals(TreeNodeChangeEvent.initialValue)){
+			if (evtSrc instanceof Trigger){
+				Trigger trig = (Trigger) evtSrc;
+				Event parentTrig = (Event) trig.getParent();
+				libDoc.getModel().getEvent(parentTrig.getId()).getTrigger().setInitialValue(trig.getInitialValue());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.isEOF)){
+			if (evtSrc instanceof XMLToken){
+				XMLToken token = (XMLToken) evtSrc;
+				// TODO: find the corresponding XMLToken in libDoc
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.isExplicitlySetConstant)){
 		} else if (prop.equals(TreeNodeChangeEvent.isSetNumberType)){
 		} else if (prop.equals(TreeNodeChangeEvent.kind)){
+			if (evtSrc instanceof Unit){
+				Unit u = (Unit) evtSrc;
+				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
+				transferKindProperties(u, libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(u.indexOf(u.getParent(), u)));
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.kineticLaw)){
 			Reaction reac = (Reaction) evtSrc;
+			// TODO
 			//libDoc.getModel().getReaction(reac.getId()).setKineticLaw(reac.getKineticLaw());
 		} else if (prop.equals(TreeNodeChangeEvent.lengthUnits)){
+			if (evtSrc instanceof Model){
+				libDoc.getModel().setLengthUnits(((Model) evtSrc).getLengthUnits());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.level)){
+			libDoc.setLevelAndVersion(((AbstractSBase) evtSrc).getLevel(), ((AbstractSBase) evtSrc).getVersion());
 		} else if (prop.equals(TreeNodeChangeEvent.listOfUnits)){
 		} else if (prop.equals(TreeNodeChangeEvent.mantissa)){
 			ASTNode node = (ASTNode) evtSrc;
@@ -789,51 +842,96 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				org.sbml.libsbml.KineticLaw libKl = libDoc.getModel().getReaction(r.getId()).getKineticLaw();
 				libKl.setFormula(mathContainer.getFormula());
 			} else if (mathContainer instanceof Constraint) {
+				Constraint con = (Constraint) mathContainer;
+				//TODO: solve the Problem, that a constraint can only with the index can be found
 			} else if (mathContainer instanceof Delay){
 			} else if (mathContainer instanceof FunctionDefinition){
 			} else if (mathContainer instanceof StoichiometryMath){
 			} else if (mathContainer instanceof InitialAssignment){
+			} else if (mathContainer instanceof Priority){
+			} else if (mathContainer instanceof Trigger){
 			}
-			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.message)){
+			if (evtSrc instanceof Constraint){
+				Constraint con = (Constraint) evtSrc;
+				//TODO: solve the Problem, that a constraint can only with the index can be found
+				// and set the message
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.messageBuffer)){
 		} else if (prop.equals(TreeNodeChangeEvent.metaId)){
+			//TODO: same case like the "unsetCVTerms"-case
 		} else if (prop.equals(TreeNodeChangeEvent.model)){
 			org.sbml.jsbml.SBMLDocument doc = (org.sbml.jsbml.SBMLDocument) evtSrc;
 			//libDoc.setModel(doc.getModel());
 		} else if (prop.equals(TreeNodeChangeEvent.modified)){
 		} else if (prop.equals(TreeNodeChangeEvent.multiplier)){
-		} else if (prop.equals(TreeNodeChangeEvent.name)){
-			if (evtSrc instanceof Species){
-				Species spec = (Species) evtSrc;
-				libDoc.getModel().getSpecies(spec.getId()).setName(spec.getName());
+			if (evtSrc instanceof Unit){
+				Unit u = (Unit) evtSrc;
+				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
+				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(udef.indexOf(u.getParent(), u)).setMultiplier(u.getMultiplier());
 			}
-			// ...
+		} else if (prop.equals(TreeNodeChangeEvent.name)){
+			// evtSrc must be a type of namedSBase
+			NamedSBase nsb = (NamedSBase) evtSrc;
+			libDoc.getElementBySId(nsb.getId()).setName(nsb.getName());
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)){
+			//TODO: same case like the "unsetCVTerms"-case
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)){
 		} else if (prop.equals(TreeNodeChangeEvent.notes)){
+			//TODO: same case like the "unsetCVTerms"-case
 		} else if (prop.equals(TreeNodeChangeEvent.notesBuffer)){
 		} else if (prop.equals(TreeNodeChangeEvent.numerator)){
 			ASTNode node = (ASTNode) evtSrc;
 		} else if (prop.equals(TreeNodeChangeEvent.offset)){
+			if (evtSrc instanceof Unit){
+				Unit u = (Unit) evtSrc;
+				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
+				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(udef.indexOf(u.getParent(), u)).setOffset(u.getOffset());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.organisation)){
 		} else if (prop.equals(TreeNodeChangeEvent.outside)){
-			Compartment comp = (Compartment) evtSrc;
-			libDoc.getModel().getCompartment(comp.getId()).setOutside(comp.getOutside());
+			if (evtSrc instanceof Compartment){
+				Compartment comp = (Compartment) evtSrc;
+				libDoc.getModel().getCompartment(comp.getId()).setOutside(comp.getOutside());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.parentSBMLObject)){
 		} else if (prop.equals(TreeNodeChangeEvent.persistent)){
+			if (evtSrc instanceof Trigger){
+				Trigger trig = (Trigger) evtSrc;
+				Event parentTrig = (Event) trig.getParent();
+				libDoc.getModel().getEvent(parentTrig.getId()).getTrigger().setPersistent(trig.getPersistent());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.priority)){
-			Event event = (Event) evtSrc;
-			//libDoc.getModel().getEvent(event.getId()).setPriority(event.getPriority());
+			if (evtSrc instanceof Event){
+				Event event = (Event) evtSrc;
+				//libDoc.getModel().getEvent(event.getId()).setPriority(event.getPriority());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.qualifier)){
 		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)){
 		} else if (prop.equals(TreeNodeChangeEvent.resource)){
+			if (evtSrc instanceof CVTerm){
+				// there are only two cases:
+				// 1. the resource was removed
+				// 2. a resource was added
+				CVTerm term = (CVTerm) evtSrc;
+				if (evt.getNewValue() != null){
+					libDoc.getCVTerm(term.indexOf(term.getParent(), term)).addResource((String) evt.getNewValue());
+				} else {
+					libDoc.getCVTerm(term.indexOf(term.getParent(), term)).removeResource((String) evt.getOldValue());
+				}
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.reversible)){
 			Reaction reac= (Reaction) evtSrc;
 			libDoc.getModel().getReaction(reac.getId()).setReversible(reac.getReversible());
 		} else if (prop.equals(TreeNodeChangeEvent.SBMLDocumentAttributes)){
 		} else if (prop.equals(TreeNodeChangeEvent.sboTerm)){
+			//TODO: same case like the "unsetCVTerms"-case
 		} else if (prop.equals(TreeNodeChangeEvent.scale)){
+			if (evtSrc instanceof Unit){
+				Unit u = (Unit) evtSrc;
+				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
+				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(udef.indexOf(u.getParent(), u)).setScale(u.getScale());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.setAnnotation)){
 		} else if (prop.equals(TreeNodeChangeEvent.size)){
 			if (evtSrc instanceof Compartment){
@@ -846,56 +944,125 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				Compartment comp = (Compartment) evtSrc;
 				libDoc.getModel().getCompartment(comp.getId()).setSpatialDimensions(comp.getSpatialDimensions());
 			}
-			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.spatialSizeUnits)){
 			if (evtSrc instanceof Species){
 				Species spec = (Species) evtSrc;
 				libDoc.getModel().getSpecies(spec.getId()).setSpatialSizeUnits(spec.getSpatialSizeUnits());
 			}
-			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.species)){
+			if (evtSrc instanceof SimpleSpeciesReference){
+				SimpleSpeciesReference ref = (SimpleSpeciesReference) evtSrc;
+				libDoc.getModel().getSpeciesReference(ref.getId()).setSpecies(ref.getSpecies());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.speciesType)){
-			Species spec = (Species) evtSrc;
-			libDoc.getModel().getSpecies(spec.getId()).setSpeciesType(spec.getSpeciesType());
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setSpeciesType(spec.getSpeciesType());
+			} else if (evtSrc instanceof Model){
+				//TODO: is this case possible?
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.stoichiometry)){
 			SpeciesReference specRef = (SpeciesReference) evtSrc;
-			Reaction reac = (Reaction) specRef.getParent();
-			//TODO ask if it's a reactant or a product
+			libDoc.getModel().getSpeciesReference(specRef.getId()).setStoichiometry(specRef.getStoichiometry());
 		} else if (prop.equals(TreeNodeChangeEvent.style)){
 			ASTNode node = (ASTNode) evtSrc;
 		} else if (prop.equals(TreeNodeChangeEvent.substanceUnits)){
-			Species spec = (Species) evtSrc;
-			libDoc.getModel().getSpecies(spec.getId()).setSubstanceUnits(spec.getSubstanceUnits());
+			if (evtSrc instanceof Species){
+				Species spec = (Species) evtSrc;
+				libDoc.getModel().getSpecies(spec.getId()).setSubstanceUnits(spec.getSubstanceUnits());
+			} else if (evtSrc instanceof KineticLaw){
+				KineticLaw kinLaw = (KineticLaw) evtSrc;
+				Reaction parentKinLaw = (Reaction) kinLaw.getParent();
+				libDoc.getModel().getReaction(parentKinLaw.getId()).getKineticLaw().setSubstanceUnits(kinLaw.getSubstanceUnits());
+			} else if (evtSrc instanceof Model){
+				libDoc.getModel().setSubstanceUnits(((Model) evtSrc).getSubstanceUnits());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.symbol)){
 			if(evtSrc instanceof InitialAssignment){
 				libDoc.getModel().getInitialAssignment(((InitialAssignment) evtSrc).getVariable()).setSymbol(((InitialAssignment) evtSrc).getSymbol());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.text)){
 		} else if (prop.equals(TreeNodeChangeEvent.timeUnits)){
+			if (evtSrc instanceof Event){
+				Event event = (Event) evtSrc;
+				libDoc.getModel().getEvent(event.getId()).setTimeUnits(event.getTimeUnits());
+			} else if (evtSrc instanceof KineticLaw){
+				KineticLaw kinLaw = (KineticLaw) evtSrc;
+				Reaction parentKinLaw = (Reaction) kinLaw.getParent();
+				libDoc.getModel().getReaction(parentKinLaw.getId()).getKineticLaw().setTimeUnits(kinLaw.getTimeUnits());
+			} else if (evtSrc instanceof Model){
+				libDoc.getModel().setTimeUnits(((Model) evtSrc).getTimeUnits());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.type)){
 			ASTNode node = (ASTNode) evtSrc;
 		} else if (prop.equals(TreeNodeChangeEvent.units)){
 			if (evtSrc instanceof Species){
 				Species spec = (Species) evtSrc;
 				libDoc.getModel().getSpecies(spec.getId()).setUnits(spec.getUnits());
+			} else if (evtSrc instanceof Compartment){
+				Compartment comp = (Compartment) evtSrc;
+				libDoc.getModel().getCompartment(comp.getId()).setUnits(comp.getUnits());
+			} else if (evtSrc instanceof Parameter){
+				Parameter param = (Parameter) evtSrc;
+				libDoc.getModel().getParameter(param.getId()).setUnits(param.getUnits());
+			} else if (evtSrc instanceof Rule){
+				Rule rule = (Rule) evtSrc;
+				if (rule instanceof RateRule){
+					RateRule rrule = (RateRule) rule;
+					libDoc.getModel().getRule(rrule.getVariable()).setUnits(rrule.getUnits());
+				} else if (rule instanceof AlgebraicRule){
+					AlgebraicRule algRule = (AlgebraicRule) rule;
+					//TODO
+				} else if (rule instanceof AssignmentRule){
+					AssignmentRule assRule = (AssignmentRule) rule;
+					libDoc.getModel().getRule(assRule.getVariable()).setUnits(assRule.getUnits());
+				}
 			}
-			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.unsetCVTerms)){
-			libDoc.unsetCVTerms();
+			SBase sb = (SBase) evtSrc;
+			//TODO: all SBases can unset the CVTerms...
 		} else if (prop.equals(TreeNodeChangeEvent.userObject)){
 		} else if (prop.equals(TreeNodeChangeEvent.useValuesFromTriggerTime)){
 		} else if (prop.equals(TreeNodeChangeEvent.value)){
+			if (evtSrc instanceof Parameter){
+				Parameter param = (Parameter) evtSrc;
+				libDoc.getModel().getParameter(param.getId()).setValue(param.getValue());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.variable)){
 			if (evtSrc instanceof EventAssignment){
 				EventAssignment evAssign = (EventAssignment) evtSrc;
+				Event parentEvAssign = (Event) evAssign.getParent().getParent();
+				libDoc.getModel().getEvent(parentEvAssign.getId()).getEventAssignment((String)evt.getOldValue()).setVariable(evAssign.getVariable());
+			} else if (evtSrc instanceof Rule){
+				Rule rule = (Rule) evtSrc;
+				if (rule instanceof RateRule){
+					RateRule rrule = (RateRule) rule;
+					libDoc.getModel().getRule((String)evt.getOldValue()).setVariable(rrule.getVariable());
+				} else if (rule instanceof AlgebraicRule){
+					AlgebraicRule algRule = (AlgebraicRule) rule;
+					//TODO
+				} else if (rule instanceof AssignmentRule){
+					AssignmentRule assRule = (AssignmentRule) rule;
+					libDoc.getModel().getRule((String)evt.getOldValue()).setVariable(assRule.getVariable());
+				}
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.version)){
+			libDoc.setLevelAndVersion(((AbstractSBase) evtSrc).getLevel(), ((AbstractSBase) evtSrc).getVersion());
 		} else if (prop.equals(TreeNodeChangeEvent.volume)){
+			if (evtSrc instanceof Compartment){
+				Compartment comp = (Compartment) evtSrc;
+				libDoc.getModel().getCompartment(comp.getId()).setVolume(comp.getVolume());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.volumeUnits)){
+			if (evtSrc instanceof Model){
+				libDoc.getModel().setVolumeUnits(((Model) evtSrc).getVolumeUnits());
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.xmlTriple)){
+			XMLToken token = (XMLToken) evtSrc;
+			//TODO: find XMLToken element in libDoc
 		}
 	}
-	
+
 	/**
 	 * sets MetaId, SBOTerm, Notes and Annotation in the libSBML object, 
 	 * if it's set in the JSBML object.
@@ -917,7 +1084,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			libSBase.setAnnotation(sbase.getAnnotationString());
 		}
 	}
-	
+
 	/**
 	 * sets the name and the id in the libSBML object, when it's set in the JSBML object
 	 * and calls the method transferSBaseProperties(SBase, libSBase).
@@ -946,7 +1113,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		}
 		transferNamedSBaseProperties(sbase, libSBase);
 	}
-	
+
 	/**
 	 * sets the math ASTNode in the libSBML object if it's set in the JSBML object
 	 * and calls the convert-method for the ASTNodes.
@@ -978,7 +1145,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				((org.sbml.libsbml.Priority) libMathCont).setMath(convertASTNode(mathCont.getMath()));
 			}
 		}
-		
+
 	}
 
 	/**
@@ -986,7 +1153,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	 * @param unit
 	 * @param u
 	 */
-	private void transferKindProperties(Unit unit, org.sbml.libsbml.Unit u) {
+	private int transferKindProperties(Unit unit, org.sbml.libsbml.Unit u) {
 		switch (unit.getKind()) {
 		case AMPERE:
 			u.setKind(libsbmlConstants.UNIT_KIND_AMPERE);
@@ -1097,8 +1264,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			u.setKind(libsbmlConstants.UNIT_KIND_WEBER);
 			break;
 		}
+		return u.getKind();
 	}
-	
+
 	/**
 	 * 
 	 * @param math
