@@ -20,15 +20,12 @@ import java.beans.PropertyChangeEvent;
 
 import javax.swing.tree.TreeNode;
 
-import jp.sbi.celldesigner.SpeciesAlias;
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
 import jp.sbi.celldesigner.plugin.PluginAlgebraicRule;
-import jp.sbi.celldesigner.plugin.PluginAntiSenseRNA;
 import jp.sbi.celldesigner.plugin.PluginAssignmentRule;
 import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
 import jp.sbi.celldesigner.plugin.PluginConstraint;
-import jp.sbi.celldesigner.plugin.PluginDoSthAbstractAction;
 import jp.sbi.celldesigner.plugin.PluginEvent;
 import jp.sbi.celldesigner.plugin.PluginEventAssignment;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
@@ -38,17 +35,13 @@ import jp.sbi.celldesigner.plugin.PluginListOf;
 import jp.sbi.celldesigner.plugin.PluginModel;
 import jp.sbi.celldesigner.plugin.PluginModifierSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginParameter;
-import jp.sbi.celldesigner.plugin.PluginProtein;
 import jp.sbi.celldesigner.plugin.PluginRateRule;
 import jp.sbi.celldesigner.plugin.PluginReaction;
 import jp.sbi.celldesigner.plugin.PluginRule;
-import jp.sbi.celldesigner.plugin.PluginSBase;
-import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
 import jp.sbi.celldesigner.plugin.PluginSpeciesAlias;
 import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
-import jp.sbi.celldesigner.plugin.PluginUnit;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
 import org.apache.log4j.Level;
@@ -60,7 +53,6 @@ import org.sbml.jsbml.AbstractNamedSBaseWithUnit;
 import org.sbml.jsbml.AbstractSBase;
 import org.sbml.jsbml.AbstractTreeNode;
 import org.sbml.jsbml.AlgebraicRule;
-import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.AnnotationElement;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.CVTerm;
@@ -101,9 +93,7 @@ import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.xml.XMLToken;
 import org.sbml.libsbml.ListOfCompartments;
-import org.sbml.libsbml.SBase;
 import org.sbml.libsbml.XMLNode;
-import org.sbml.libsbml.libsbmlConstants;
 
 /**
  * @author Alexander Peltzer
@@ -252,7 +242,26 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
 					String type = SBO.convertSBO2Alias(simspec.getSBOTerm());
 					if (node instanceof ModifierSpeciesReference) {
-						// TODO unclear what to do in this case
+						if (type.length() == 0) {
+							// use "unknown"
+							int sbo = 285;
+							type = SBO.convertSBO2Alias(sbo);
+							logger.log(Level.DEBUG, String.format(
+									"No SBO term defined for %s, using %d",
+									simspec.getElementName(), sbo));
+						}
+						if (simspec.isSetSpecies()) {
+							PluginSpeciesAlias alias = new PluginSpeciesAlias(
+									plugModel.getSpecies(simspec.getSpecies()),
+									type);
+							PluginModifierSpeciesReference plugModRef = new PluginModifierSpeciesReference(
+									(PluginReaction) simspec.getParent(), alias);
+							plugin.notifySBaseAdded(plugModRef);
+						} else {
+							logger.log(Level.DEBUG,
+									"Cannot create PluginSpeciesReference due to missing species annotation.");
+						}
+
 					} else if (node instanceof SpeciesReference) {
 						if (type.length() == 0) {
 							// use "unknown"
@@ -295,9 +304,20 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 									.getParentSBMLObject();
 							KineticLaw kl = (KineticLaw) lop
 									.getParentSBMLObject();
-							Reaction r = kl.getParentSBMLObject();
-							// TODO There is no counter class available in
-							// CellDesigner for that.
+							/*
+							 * TODO Crosscheck if this is okay.
+							 */
+							for (LocalParameter p: kl.getListOfLocalParameters()){
+								if (p.isSetUnits()
+										&& !Unit.isUnitKind(p.getUnits(), p.getLevel(), p.getVersion()) 
+										&& plugModel.getUnitDefinition(p.getUnits())==null){
+									PluginUnitDefinition plugUnitDefinition = new PluginUnitDefinition(p.getUnitsInstance().getId());
+									plugModel.addUnitDefinition(plugUnitDefinition);
+									plugin.notifySBaseAdded(plugUnitDefinition);
+									
+								}
+							}
+							
 						} else if (node instanceof Symbol) {
 							if (node instanceof Compartment) {
 								Compartment comp = (Compartment) node;
@@ -600,10 +620,12 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				} else if (node instanceof SimpleSpeciesReference) {
 					if (node instanceof ModifierSpeciesReference) {
 						ModifierSpeciesReference modSpecRef = (ModifierSpeciesReference) node;
-						//TODO How to get the plugModel.getSimpleSpeciesReference to remove ?
+						// TODO How to get the
+						// plugModel.getSimpleSpeciesReference to remove ?
 					} else if (node instanceof SpeciesReference) {
 						SpeciesReference specRef = (SpeciesReference) node;
-						// TODO How to get the plugModel.getSpeciesReference to remove ?
+						// TODO How to get the plugModel.getSpeciesReference to
+						// remove ?
 					}
 				} else if (node instanceof AbstractNamedSBaseWithUnit) {
 					if (node instanceof Event) {
@@ -716,7 +738,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugin.notifySBaseDeleted(plugklaw);
 				} else if (node instanceof InitialAssignment) {
 					InitialAssignment iAssign = (InitialAssignment) node;
-					PluginInitialAssignment plugiAssign = plugModel.getInitialAssignment(iAssign.getSymbol());
+					PluginInitialAssignment plugiAssign = plugModel
+							.getInitialAssignment(iAssign.getSymbol());
 					plugModel.removeInitialAssignment(plugiAssign);
 					plugin.notifySBaseDeleted(plugiAssign);
 				} else if (node instanceof EventAssignment) {
@@ -728,7 +751,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 									eAssign.getIndex(node));
 					plugin.notifySBaseDeleted(plugEventAssignment);
 				} else if (node instanceof StoichiometryMath) {
-					//TODO There is no counter class in CellDesigner. Is it therefore unnecessary to implement this function ?
+					// TODO There is no counter class in CellDesigner. Is it
+					// therefore unnecessary to implement this function ?
 					logger.log(Level.DEBUG, "No counter class in CellDesigner"
 							+ node.getClass().getSimpleName());
 				} else if (node instanceof Trigger) {
@@ -744,19 +768,20 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugin.notifySBaseChanged(plugEvent);
 				} else if (node instanceof Constraint) {
 					Constraint ct = (Constraint) node;
-					PluginConstraint plugct = plugModel.getConstraint(ct.getMathMLString());
+					PluginConstraint plugct = plugModel.getConstraint(ct
+							.getMathMLString());
 					plugModel.removeConstraint(ct.getMathMLString());
 					plugin.notifySBaseDeleted(plugct);
 				} else if (node instanceof Delay) {
 					Delay dl = (Delay) node;
-					//TODO There is no counterclass in CellDesigner
+					// TODO There is no counterclass in CellDesigner
 				} else if (node instanceof Priority) {
 					Priority prt = (Priority) node;
 					// TODO There is no counter class in CellDesigner
 				} else if (node instanceof Rule) {
 					if (node instanceof AlgebraicRule) {
 						AlgebraicRule alrule = (AlgebraicRule) node;
-						//TODO
+						// TODO
 					} else if (node instanceof ExplicitRule) {
 						if (node instanceof RateRule) {
 							RateRule rrule = (RateRule) node;
@@ -767,7 +792,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 							// TODO
 						}
 					} else {
-						//TODO case when we only have a "Rule" without anything else
+						// TODO case when we only have a "Rule" without anything
+						// else
 					}
 				}
 			}
@@ -779,15 +805,16 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				// TODO do something
 			} else if (node instanceof ASTNode) {
 				ASTNode astnode = (ASTNode) node;
-				org.sbml.libsbml.ASTNode libastnode = PluginUtils.convert(astnode);
-				//TODO And now ?
+				org.sbml.libsbml.ASTNode libastnode = PluginUtils
+						.convert(astnode);
+				// TODO And now ?
 			} else if (node instanceof AnnotationElement) {
 				if (node instanceof CVTerm) {
 					CVTerm term = (CVTerm) node;
 					// TODO
 				} else if (node instanceof History) {
 					History hist = (History) node;
-					
+
 					// TODO
 				} else if (node instanceof Creator) {
 					Creator creator = (Creator) node;
