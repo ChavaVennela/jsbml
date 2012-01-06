@@ -522,7 +522,6 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				switch (listOf.getSBaseListType()) {
 				case listOfCompartments:
 					ListOfCompartments ll = new ListOfCompartments();
-					
 					break;
 				case listOfCompartmentTypes:
 					break;
@@ -575,7 +574,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 						plugfuncdef.setName(funcdef.getName());
 						plugin.notifySBaseAdded(plugfuncdef);
 					} else {
-						logger.log(Level.DEBUG, "Cannot add node"
+						logger.log(Level.DEBUG, "Cannot add node "
 								+ node.getClass().getSimpleName());
 					}
 				} else if (node instanceof KineticLaw) {
@@ -599,11 +598,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					// TODO PluginEventAssignemnt requires a new PluginEvent -
 					// we do not know this event. What shall we do here ?
 				} else if (node instanceof StoichiometryMath) {
-					StoichiometryMath stoich = (StoichiometryMath) node;
-					logger.log(Level.DEBUG, "No counter class in CellDesigner"
-							+ node.getClass().getSimpleName());
-					// TODO There is no counter class in CellDesigner.
-					// Logmessage and thats all ?
+					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
+							node.getClass().getSimpleName()));
 				} else if (node instanceof Trigger) {
 					Trigger trig = (Trigger) node;
 					PluginEvent plugEvent = new PluginEvent(trig.getParent()
@@ -624,11 +620,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugEvent.setDelay(PluginUtils.convert(dl.getMath()));
 					plugin.notifySBaseAdded(plugEvent);
 				} else if (node instanceof Priority) {
-					Priority prt = (Priority) node;
-					logger.log(Level.DEBUG, "No counter class in CellDesigner"
-							+ node.getClass().getSimpleName());
-					// TODO no counter class in CD available
-					// Therefore unnecessary to implement this?
+					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
+								node.getClass().getSimpleName()));
 				} else if (node instanceof Rule) {
 					if (node instanceof AlgebraicRule) {
 						AlgebraicRule alrule = (AlgebraicRule) node;
@@ -732,17 +725,23 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					SpeciesType speciestype = (SpeciesType) node;
 					PluginSpeciesType pspec = plugModel
 							.getSpeciesType(speciestype.getId());
-					plugModel.removeSpeciesType(speciestype.getId());
+					plugModel.removeSpeciesType(pspec);
 					plugin.notifySBaseDeleted(pspec);
 				} else if (node instanceof SimpleSpeciesReference) {
+					SimpleSpeciesReference simspec = (SimpleSpeciesReference) node;
+					String type = SBO.convertSBO2Alias(simspec.getSBOTerm());
 					if (node instanceof ModifierSpeciesReference) {
 						ModifierSpeciesReference modSpecRef = (ModifierSpeciesReference) node;
-						// TODO How to get the
-						// plugModel.getSimpleSpeciesReference to remove ?
+						PluginSpeciesAlias alias = plugModel.getSpecies(modSpecRef.getId()).getSpeciesAlias(type);
+						PluginModifierSpeciesReference ref = new PluginModifierSpeciesReference(plugModel.getReaction(simspec.getId()), alias);
+						plugModel.getReaction(simspec.getId()).removeModifier(ref);
+						plugin.notifySBaseDeleted(ref);
 					} else if (node instanceof SpeciesReference) {
-						SpeciesReference specRef = (SpeciesReference) node;
-						// TODO How to get the plugModel.getSpeciesReference to
-						// remove ?
+						SpeciesReference specref = (SpeciesReference) node;
+						PluginSpeciesAlias alias = plugModel.getSpecies(specref.getId()).getSpeciesAlias(type);
+						PluginSpeciesReference ref = new PluginSpeciesReference(plugModel.getReaction(simspec.getId()), alias);
+						plugModel.getReaction(simspec.getId()).removeProduct(ref);
+						plugin.notifySBaseDeleted(ref);
 					}
 				} else if (node instanceof AbstractNamedSBaseWithUnit) {
 					if (node instanceof Event) {
