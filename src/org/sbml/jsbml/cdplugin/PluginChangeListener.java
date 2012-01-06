@@ -42,6 +42,7 @@ import jp.sbi.celldesigner.plugin.PluginSpecies;
 import jp.sbi.celldesigner.plugin.PluginSpeciesAlias;
 import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
+import jp.sbi.celldesigner.plugin.PluginUnit;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
 import org.apache.log4j.Level;
@@ -94,6 +95,7 @@ import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.xml.XMLToken;
 import org.sbml.libsbml.ListOfCompartments;
 import org.sbml.libsbml.XMLNode;
+import org.sbml.libsbml.libsbmlConstants;
 
 /**
  * @author Alexander Peltzer
@@ -384,9 +386,128 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				}
 			}
 			if (node instanceof Unit) {
+				/*
+				 * TODO This needs to be crosschecked if thats the way it should work.
+				 */
 				Unit ut = (Unit) node;
-				// TODO Unclear how to continue with that information
-				// PluginUnit plugunit = new PluginUnit(ut.getParent().get)
+				PluginUnitDefinition plugUnitDef = new PluginUnitDefinition(((UnitDefinition) ut.getParentSBMLObject()).getId()); 
+				PluginUnit plugut = new PluginUnit(plugUnitDef);
+				switch (ut.getKind()) {
+				case AMPERE:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_AMPERE);
+					break;
+				case BECQUEREL:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_BECQUEREL);
+					break;
+				case CANDELA:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_CANDELA);
+					break;
+				case CELSIUS:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_CELSIUS);
+					break;
+				case COULOMB:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_COULOMB);
+					break;
+				case DIMENSIONLESS:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_DIMENSIONLESS);
+					break;
+				case FARAD:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_FARAD);
+					break;
+				case GRAM:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_GRAM);
+					break;
+				case GRAY:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_GRAY);
+					break;
+				case HENRY:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_HENRY);
+					break;
+				case HERTZ:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_HERTZ);
+					break;
+				case INVALID:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_INVALID);
+					break;
+				case ITEM:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_ITEM);
+					break;
+				case JOULE:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_JOULE);
+					break;
+				case KATAL:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_KATAL);
+					break;
+				case KELVIN:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_KELVIN);
+					break;
+				case KILOGRAM:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_KILOGRAM);
+					break;
+				case LITER:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_LITER);
+					break;
+				case LITRE:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_LITRE);
+					break;
+				case LUMEN:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_LUMEN);
+					break;
+				case LUX:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_LUX);
+					break;
+				case METER:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_METER);
+					break;
+				case METRE:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_METRE);
+					break;
+				case MOLE:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_MOLE);
+					break;
+				case NEWTON:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_NEWTON);
+					break;
+				case OHM:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_OHM);
+					break;
+				case PASCAL:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_PASCAL);
+					break;
+				case RADIAN:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_RADIAN);
+					break;
+				case SECOND:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_SECOND);
+					break;
+				case SIEMENS:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_SIEMENS);
+					break;
+				case SIEVERT:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_SIEVERT);
+					break;
+				case STERADIAN:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_STERADIAN);
+					break;
+				case TESLA:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_TESLA);
+					break;
+				case VOLT:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_VOLT);
+					break;
+				case WATT:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_WATT);
+					break;
+				case WEBER:
+					plugut.setKind(libsbmlConstants.UNIT_KIND_WEBER);
+					break;
+				}
+				plugut.setExponent((int) Math.round(ut.getExponent()));
+				plugut.setMultiplier(ut.getMultiplier());
+				plugut.setOffset(ut.getOffset());
+				plugut.setScale(ut.getScale());
+				plugin.notifySBaseAdded(plugut);
+				
 			} else if (node instanceof SBMLDocument) {
 				SBMLDocument doc = (SBMLDocument) node;
 				logger.log(Level.DEBUG, "No counter class in CellDesigner"
