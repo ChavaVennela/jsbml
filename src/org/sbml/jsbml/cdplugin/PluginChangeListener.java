@@ -752,13 +752,10 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 						plugin.notifySBaseDeleted(plugEvent);
 					} else if (node instanceof QuantityWithUnit) {
 						if (node instanceof LocalParameter) {
-							LocalParameter locparam = (LocalParameter) node;
-							ListOf<LocalParameter> lop = locparam
-									.getParentSBMLObject();
-							KineticLaw kl = (KineticLaw) lop
-									.getParentSBMLObject();
-							Reaction r = kl.getParentSBMLObject();
-							// TODO What has to be done here ?
+							/*
+							 * TODO: What to do with Localparameters? There are no LocalParameters in CD available.
+							 * 
+							 */
 						} else if (node instanceof Symbol) {
 							if (node instanceof Compartment) {
 								Compartment comp = (Compartment) node;
@@ -785,7 +782,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 			if (node instanceof Unit) {
 				Unit ut = (Unit) node;
-				// TODO This needs to be hashed somehow.
+				//TODO
 			} else if (node instanceof SBMLDocument) {
 				SBMLDocument doc = (SBMLDocument) node;
 				// TODO This needs to be hashed somehow.
@@ -867,10 +864,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 									eAssign.getIndex(node));
 					plugin.notifySBaseDeleted(plugEventAssignment);
 				} else if (node instanceof StoichiometryMath) {
-					// TODO There is no counter class in CellDesigner. Is it
-					// therefore unnecessary to implement this function ?
-					logger.log(Level.DEBUG, "No counter class in CellDesigner"
-							+ node.getClass().getSimpleName());
+					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
+							node.getClass().getSimpleName()));
 				} else if (node instanceof Trigger) {
 					Trigger trig = (Trigger) node;
 					PluginEvent plugEvent = plugModel.getEvent(trig.getParent()
@@ -890,22 +885,24 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugin.notifySBaseDeleted(plugct);
 				} else if (node instanceof Delay) {
 					Delay dl = (Delay) node;
-					// TODO There is no counterclass in CellDesigner
+					PluginEvent plugEvent = plugModel.getEvent(dl.getParent().getId());
+					Delay dlnew = new Delay();
+					plugEvent.setDelay(PluginUtils.convert(dlnew.getMath()));
+					plugin.notifySBaseChanged(plugEvent);
 				} else if (node instanceof Priority) {
-					Priority prt = (Priority) node;
-					// TODO There is no counter class in CellDesigner
+					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
+							node.getClass().getSimpleName()));
 				} else if (node instanceof Rule) {
 					if (node instanceof AlgebraicRule) {
 						AlgebraicRule alrule = (AlgebraicRule) node;
-						// TODO
+						//TODO how to get the right algebraic rule ?
 					} else if (node instanceof ExplicitRule) {
 						if (node instanceof RateRule) {
 							RateRule rrule = (RateRule) node;
-
-							// TODO
+							// TODO howto get the right Rate Rule ?
 						} else if (node instanceof AssignmentRule) {
 							AssignmentRule assignRule = (AssignmentRule) node;
-							// TODO
+							// TODO howto get the right AssignmentRule? 
 						}
 					} else {
 						// TODO case when we only have a "Rule" without anything
@@ -916,25 +913,22 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof AbstractTreeNode) {
 			if (node instanceof XMLToken) {
 				if (node instanceof XMLNode) {
-					// TODO do something with the XMLNode
+					logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
+							node.getClass().getSimpleName()));
 				}
-				// TODO do something
 			} else if (node instanceof ASTNode) {
-				ASTNode astnode = (ASTNode) node;
-				org.sbml.libsbml.ASTNode libastnode = PluginUtils
-						.convert(astnode);
-				// TODO And now ?
+				logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
+						node.getClass().getSimpleName()));
 			} else if (node instanceof AnnotationElement) {
 				if (node instanceof CVTerm) {
 					CVTerm term = (CVTerm) node;
-					// TODO
+					// TODO Here I dont know how to get the right CVTerm 
 				} else if (node instanceof History) {
-					History hist = (History) node;
-
-					// TODO
+					logger.log(Level.DEBUG, "No counter class in CellDesigner"
+							+ node.getClass().getSimpleName());
 				} else if (node instanceof Creator) {
-					Creator creator = (Creator) node;
-					// TODO
+					logger.log(Level.DEBUG, "No counter class in CellDesigner"
+							+ node.getClass().getSimpleName());
 				}
 			}
 		}
