@@ -81,6 +81,7 @@ import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -512,14 +513,16 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				SBMLDocument doc = (SBMLDocument) node;
 				logger.log(Level.DEBUG, "No counter class in CellDesigner"
 						+ node.getClass().getSimpleName());
-				// TODO no counter class in CD available
-				// Therefore unnecessary to implement this?
+				// TODO 
 			} else if (node instanceof ListOf<?>) {
 				ListOf<?> listOf = (ListOf<?>) node;
+				PluginListOf pluli = new PluginListOf();
+				PluginReaction ro = (PluginReaction) listOf.getParentSBMLObject();
+				
 				switch (listOf.getSBaseListType()) {
 				case listOfCompartments:
 					ListOfCompartments ll = new ListOfCompartments();
-
+					
 					break;
 				case listOfCompartmentTypes:
 					break;
@@ -561,9 +564,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					// unknown
 					break;
 				}
-				PluginListOf pluglistof = new PluginListOf();
-				pluglistof.setNotes(listOf.getNotesString());
-				// TODO Parse all lists or what has to be done here?
+				
 			} else if (node instanceof AbstractMathContainer) {
 				if (node instanceof FunctionDefinition) {
 					FunctionDefinition funcdef = (FunctionDefinition) node;
@@ -674,28 +675,23 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof AbstractTreeNode) {
 			if (node instanceof XMLToken) {
 				if (node instanceof XMLNode) {
-					// TODO do something with the XMLNode
+					logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
+							node.getClass().getSimpleName()));
 				}
-				// TODO do something
 			} else if (node instanceof ASTNode) {
-				// TODO something
+				logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
+						node.getClass().getSimpleName()));
 			} else if (node instanceof AnnotationElement) {
 				if (node instanceof CVTerm) {
-					CVTerm cv = (CVTerm) node;
-					logger.log(Level.DEBUG, "No counter class in CellDesigner"
-							+ node.getClass().getSimpleName());
+					
 					// TODO This has to be done with the libsbml.CVTerm Class,
 					// fix this.
 				} else if (node instanceof History) {
 					logger.log(Level.DEBUG, "No counter class in CellDesigner"
 							+ node.getClass().getSimpleName());
-					// TODO no counter class in CD available
-					// Therefore unnecessary to implement this?
 				} else if (node instanceof Creator) {
 					logger.log(Level.DEBUG, "No counter class in CellDesigner"
 							+ node.getClass().getSimpleName());
-					// TODO no counter class in CD available
-					// Therefore unnecessary to implement this?
 				} else {
 					logger.warn(String.format("Could not process %s.",
 							node.toString()));
