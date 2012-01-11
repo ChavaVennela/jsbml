@@ -477,11 +477,12 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libCvt.setBiologicalQualifierType(cvt.getBiologicalQualifierType().getElementNameEquivalent());
 				}
 				if (cvt.isSetQualifierType()){
-					//libCvt.setQualifierType(cvt.getQualifierType());
+					// libCvt.setQualifierType(cvt.getQualifierType());
 				}
 				if (cvt.isSetType()){
 					//TODO
 				}
+				libDoc.addCVTerm(libCvt);
 			}
 			else if (node instanceof History){
 				History his = (History) node;
@@ -495,7 +496,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 				}
 				if (his.isSetListOfModification()){
-					//TODO
+					//go throw the list and add all ModifiedDates
+					for(int i=0; i<his.getListOfModifiedDates().size() ;i++){
+						modHis.addModifiedDate(convertDate(his.getModifiedDate(i)));
+					}
 				}
 				if (his.isSetModifiedDate()){
 					modHis.setModifiedDate(convertDate(his.getModifiedDate()));
@@ -503,10 +507,44 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 			else if (node instanceof Annotation){
 				Annotation annot = (Annotation) node;
-				//TODO				
+				//TODO: where to save this in libDoc?
+				if (annot.isSetAbout()){
+					
+				}
+				if (annot.isSetAnnotation()){
+					
+				}
+				if (annot.isSetHistory()){
+					
+				}
+				if (annot.isSetListOfCVTerms()){
+					
+				}
+				if (annot.isSetNonRDFannotation()){
+					
+				}
+				if (annot.isSetRDFannotation()){
+					
+				}
+				if (annot.isSetOtherAnnotationThanRDF()){
+					
+				}
 			}
 			else if (node instanceof Creator){
-				//TODO
+				Creator creator = (Creator) node;
+				org.sbml.libsbml.ModelCreator libCreator = new ModelCreator();
+				if (creator.isSetEmail()){
+					libCreator.setEmail(creator.getEmail());
+				}
+				if (creator.isSetFamilyName()){
+					libCreator.setFamilyName(creator.getFamilyName());
+				}
+				if (creator.isSetGivenName()){
+					libCreator.setGivenName(creator.getGivenName());
+				}
+				if (creator.isSetOrganisation()){
+					libCreator.setOrganisation(creator.getOrganisation());
+				}
 			}
 		} else if (node instanceof ASTNode){
 			ASTNode astnode = (ASTNode) node;
@@ -515,6 +553,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof TreeNodeAdapter){
 			TreeNodeAdapter treeNodeAd = (TreeNodeAdapter) node;
 			//TODO
+			if (treeNodeAd.isSetUserObject()){
+				
+			}
 		} else if (node instanceof XMLToken){
 			XMLToken token = (XMLToken) node;
 			org.sbml.libsbml.XMLToken libToken;
@@ -623,6 +664,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					// find the variable in the Rule object to remove it
 					if (node instanceof AlgebraicRule){
 						AlgebraicRule rule = (AlgebraicRule) node;
+						//TODO
 						//Problem: there is no Variable-String in AlgebraicRule objects
 					} else if (node instanceof AssignmentRule){
 						AssignmentRule rule = (AssignmentRule) node;
@@ -668,13 +710,13 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				}
 			}
 			else if (node instanceof History){
-				//TODO				
+				libDoc.getModelHistory().delete();			
 			}
 			else if (node instanceof Annotation){
 				//TODO				
 			}
 			else if (node instanceof Creator){
-				//TODO
+				libDoc.getModelHistory().getCreator(getCreatorIndex((Creator) node)).delete();
 			}
 		} else if (node instanceof ASTNode){
 			//TODO
@@ -694,6 +736,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		String prop = evt.getPropertyName();
 
 		if (prop.equals(TreeNodeChangeEvent.about)){	
+			//evtSrc is an Annotation
 			//TODO
 		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)){	
 			//then the evtSrc is a SBase
@@ -774,7 +817,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.created)){
 			//TODO
 		} else if (prop.equals(TreeNodeChangeEvent.creator)){
-			//TODO
+			// evtSrc is a Historyelement
+			libDoc.getModelHistory().addCreator(convertToModelCreator((Creator)evt.getNewValue()));
 		} else if (prop.equals(TreeNodeChangeEvent.currentList)){
 			//TODO
 		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)){
@@ -788,7 +832,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				libDoc.getModel().getSpeciesReference(specRef.getId()).setDenominator(specRef.getDenominator());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.email)){
-			//TODO
+			// evtSrc is a Creator
+			Creator cr = (Creator) evtSrc;
+			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setEmail(cr.getEmail());
 		} else if (prop.equals(TreeNodeChangeEvent.encoding)){
 			//TODO
 		} else if (prop.equals(TreeNodeChangeEvent.exponent)){
@@ -799,7 +845,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				libDoc.getModel().setExtentUnits(((Model) evtSrc).getExtentUnits());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.familyName)){
-			//TODO
+			Creator cr = (Creator) evtSrc;
+			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setFamilyName(cr.getFamilyName());		
 		} else if (prop.equals(TreeNodeChangeEvent.fast)){
 			if (evtSrc instanceof Reaction){
 				Reaction reac = (Reaction) evtSrc;
@@ -812,14 +859,15 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				libDoc.getModel().getReaction(parentKinLaw.getId()).getKineticLaw().setFormula(kinLaw.getFormula());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.givenName)){
-			//TODO
+			Creator cr = (Creator) evtSrc;
+			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setGivenName(cr.getGivenName());
 		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)){
 			if (evtSrc instanceof Species){
 				Species spec = (Species) evtSrc;
 				libDoc.getModel().getSpecies(spec.getId()).setHasOnlySubstanceUnits(spec.getHasOnlySubstanceUnits());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.history)){
-			//TODO
+			// evtSrc is an Annotation-element
 		} else if (prop.equals(TreeNodeChangeEvent.id)){
 			// search the element in libDoc with the old id and set the new one
 			// you don't have to ask here of which instance the evtSrc is 
@@ -931,6 +979,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)){
 			//TODO: same case like the "unsetCVTerms"-case
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)){
+			//evtSrc is an Annotation-element
 			//TODO
 		} else if (prop.equals(TreeNodeChangeEvent.notes)){
 			//TODO: same case like the "unsetCVTerms"-case
@@ -946,7 +995,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(getUnitIndex(u, udef)).setOffset(u.getOffset());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.organisation)){
-			//TODO
+			Creator cr = (Creator) evtSrc;
+			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setOrganisation(cr.getOrganisation());
 		} else if (prop.equals(TreeNodeChangeEvent.outside)){
 			if (evtSrc instanceof Compartment){
 				Compartment comp = (Compartment) evtSrc;
@@ -971,6 +1021,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.qualifier)){
 			//TODO
 		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)){
+			// evtSrc is an Annotation-element
 			//TODO
 		} else if (prop.equals(TreeNodeChangeEvent.resource)){
 			if (evtSrc instanceof CVTerm){
@@ -1135,12 +1186,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			//TODO: find XMLToken element in libDoc
 		}
 	}
-
-	private org.sbml.libsbml.CVTerm convertCVTerm(CVTerm newValue) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	/**
 	 * sets MetaId, SBOTerm, Notes and Annotation in the libSBML object, 
@@ -1428,4 +1473,32 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/**
+	 * 
+	 * @param creator
+	 * @return
+	 */
+	private long getCreatorIndex(Creator creator) {
+		int index = 0;
+		for (int k=0; k<doc.getHistory().getNumCreators(); k++){
+			Creator c = doc.getHistory().getCreator(k);
+			if(c.equals(creator)){
+				index = k;
+				break;
+			}
+		}
+		return index;
+	}
+
+	/**
+	 * 
+	 * @param newValue
+	 * @return
+	 */
+	private org.sbml.libsbml.CVTerm convertCVTerm(CVTerm newValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
