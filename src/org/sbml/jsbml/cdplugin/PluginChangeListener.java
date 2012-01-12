@@ -26,6 +26,7 @@ import jp.sbi.celldesigner.plugin.PluginAssignmentRule;
 import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
 import jp.sbi.celldesigner.plugin.PluginConstraint;
+import jp.sbi.celldesigner.plugin.PluginDoSthAbstractAction;
 import jp.sbi.celldesigner.plugin.PluginEvent;
 import jp.sbi.celldesigner.plugin.PluginEventAssignment;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
@@ -42,6 +43,7 @@ import jp.sbi.celldesigner.plugin.PluginSpecies;
 import jp.sbi.celldesigner.plugin.PluginSpeciesAlias;
 import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
+import jp.sbi.celldesigner.plugin.PluginStructuralState;
 import jp.sbi.celldesigner.plugin.PluginUnit;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
@@ -96,6 +98,7 @@ import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.xml.XMLToken;
 import org.sbml.libsbml.ListOfCompartments;
 import org.sbml.libsbml.XMLNode;
+import org.sbml.libsbml.libsbml;
 import org.sbml.libsbml.libsbmlConstants;
 
 /**
@@ -163,25 +166,104 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.math)) {
 			MathContainer mathContainer = (MathContainer) event.getSource();
-			// TODO check which corresponding element can be found in
-			// CellDesigner
-			if (mathContainer instanceof Constraint) {
-				// TODO
-				Constraint c = (Constraint) mathContainer;
-
-			}
-			// ...
-			else if (mathContainer instanceof KineticLaw) {
-				Reaction r = ((KineticLaw) mathContainer).getParent();
-				PluginReaction plugReac = plugModel.getReaction(r.getId());
-				if (plugReac != null) {
-					PluginKineticLaw plugKl = plugReac.getKineticLaw();
-					// plugKl.setMath(); // see PluginSBMLWriter
-
-				}
-			}
+			saveMathContainerProperties(mathContainer);
 		}
 		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * This method saves the properties of a MathContainer input Object.
+	 * 
+	 * @param mathcontainer
+	 */
+
+	private void saveMathContainerProperties(MathContainer mathcontainer){
+		if (mathcontainer instanceof FunctionDefinition){
+			FunctionDefinition funcDef = (FunctionDefinition) mathcontainer;
+			PluginFunctionDefinition plugFuncDef = plugModel.getFunctionDefinition(funcDef.getId());
+			boolean equals = (plugFuncDef.getMath() != null) && funcDef.isSetMath() && PluginUtils.equal(funcDef.getMath(), plugFuncDef.getMath());
+			if (funcDef.isSetMath() && !equals) {
+				plugFuncDef.setMath(PluginUtils.convert(funcDef.getMath()));
+			} else {
+				logger.log(Level.DEBUG, String.format("Couldn't save math properties of %s", funcDef.getClass().getSimpleName()));
+			}
+		} else if (mathcontainer instanceof KineticLaw) {
+			Reaction r = ((KineticLaw) mathcontainer).getParent();
+			PluginReaction plugReac = plugModel.getReaction(r.getId());
+			if (plugReac != null) {
+				PluginKineticLaw plugKl = plugReac.getKineticLaw();
+				plugKl.setMath(PluginUtils.convert(r.getKineticLaw().getMath()));
+				plugin.notifySBaseChanged(plugKl);
+			} else {
+				logger.log(Level.DEBUG, String.format("Couldn't save math properties of %s", r.getClass().getSimpleName()));
+			}
+		} else if (mathcontainer instanceof InitialAssignment){
+			InitialAssignment initAss = (InitialAssignment) mathcontainer;
+			PluginInitialAssignment pluginit = plugModel.getInitialAssignment(initAss.getSymbol());
+			boolean equals = (initAss.getMath() != null) && initAss.isSetMath() && PluginUtils.equal(initAss.getMath(), libsbml.parseFormula(pluginit.getMath()));
+			if (initAss.isSetMath() && !equals){
+				pluginit.setMath(libsbml.formulaToString(PluginUtils.convert(initAss.getMath())));
+				plugin.notifySBaseChanged(pluginit);
+			} else {
+				logger.log(Level.DEBUG, String.format("Couldn't save math properties of %s", initAss.getClass().getSimpleName()));
+			}
+		} else if (mathcontainer instanceof EventAssignment){
+			EventAssignment eventAss = (EventAssignment) mathcontainer;
+			//TODO Unclear how to get the EventAssignment
+		} else if (mathcontainer instanceof StoichiometryMath){
+			//TODO Does not exist in Celldesigner or ?
+		} else if (mathcontainer instanceof Trigger){
+			Trigger trig = (Trigger) mathcontainer;
+			PluginEvent plugEvent = plugModel.getEvent(trig.getParent().getId());
+			boolean equals = plugEvent.getTrigger().isSetMath() && trig.isSetMath() && PluginUtils.equal(trig.getMath(), plugEvent.getTrigger().getMath());
+			if (trig.isSetMath() && !equals){
+				plugEvent.getTrigger().setMath(PluginUtils.convert(trig.getMath()));
+				plugin.notifySBaseChanged(plugEvent);
+			} else {
+				logger.log(Level.DEBUG, String.format("Couldn't save math properties of %s", trig.getClass().getSimpleName()));
+			}
+		} else if (mathcontainer instanceof Rule){
+			Rule r = (Rule) mathcontainer;
+			if (mathcontainer instanceof AlgebraicRule){
+				//TODO how to get the proper Algebraic Rule ?
+				
+			} else if (mathcontainer instanceof ExplicitRule){
+				if (mathcontainer instanceof RateRule){
+					//TODO how to get the Right Rate Rule
+				}else if (mathcontainer instanceof AssignmentRule){
+					//TODO
+				}
+			}
+		} else if (mathcontainer instanceof Constraint) {
+			Constraint c = (Constraint) mathcontainer;
+			PluginConstraint plugC  = plugModel.getConstraint(c.getMathMLString());
+			boolean equals = (plugC.getMath() != null) && c.isSetMath() && PluginUtils.equal(c.getMath(), libsbml.parseFormula(plugC.getMath()));
+			if (c.isSetMath() && !equals){
+				logger.log(Level.DEBUG, String.format("Couldn't save math properties of %s", c.getClass().getSimpleName()));
+			}
+		} else if (mathcontainer instanceof Delay){
+			Delay d = (Delay) mathcontainer;
+			PluginEvent plugEvent = plugModel.getEvent(d.getParent().getId());
+			org.sbml.libsbml.Delay plugDelay = plugEvent.getDelay();
+			boolean equals = (plugDelay.getMath() != null && d.isSetMath() && PluginUtils.equal(d.getMath(), plugDelay.getMath()));
+			if (d.isSetMath() && !equals){
+				plugDelay.setMath(PluginUtils.convert(d.getMath()));
+				plugin.notifySBaseChanged(plugEvent);
+			} else {
+				logger.log(Level.DEBUG, String.format("Couldn't save math properties of %s", d.getClass().getSimpleName()));
+			}
+		} else if (mathcontainer instanceof Priority){
+			Priority p = (Priority) mathcontainer;
+			PluginEvent plugEvent = plugModel.getEvent(p.getParent().getId());
+			org.sbml.libsbml.Delay plugPriority = plugEvent.getDelay();
+			boolean equals = (plugPriority.getMath() != null && p.isSetMath() && PluginUtils.equal(p.getMath(), plugPriority.getMath()));
+			if (p.isSetMath() && !equals){
+				plugPriority.setMath(PluginUtils.convert(p.getMath()));
+				plugin.notifySBaseChanged(plugEvent);
+			} else {
+				logger.log(Level.DEBUG, String.format("Couldn't save math properties of %s", p.getClass().getSimpleName()));
+			}
+		}
 	}
 
 	/*
@@ -310,17 +392,22 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 							/*
 							 * TODO Crosscheck if this is okay.
 							 */
-							for (LocalParameter p: kl.getListOfLocalParameters()){
+							for (LocalParameter p : kl
+									.getListOfLocalParameters()) {
 								if (p.isSetUnits()
-										&& !Unit.isUnitKind(p.getUnits(), p.getLevel(), p.getVersion()) 
-										&& plugModel.getUnitDefinition(p.getUnits())==null){
-									PluginUnitDefinition plugUnitDefinition = new PluginUnitDefinition(p.getUnitsInstance().getId());
-									plugModel.addUnitDefinition(plugUnitDefinition);
+										&& !Unit.isUnitKind(p.getUnits(),
+												p.getLevel(), p.getVersion())
+										&& plugModel.getUnitDefinition(p
+												.getUnits()) == null) {
+									PluginUnitDefinition plugUnitDefinition = new PluginUnitDefinition(
+											p.getUnitsInstance().getId());
+									plugModel
+											.addUnitDefinition(plugUnitDefinition);
 									plugin.notifySBaseAdded(plugUnitDefinition);
-									
+
 								}
 							}
-							
+
 						} else if (node instanceof Symbol) {
 							if (node instanceof Compartment) {
 								Compartment comp = (Compartment) node;
@@ -388,10 +475,12 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 			if (node instanceof Unit) {
 				/*
-				 * TODO This needs to be crosschecked if thats the way it should work.
+				 * TODO This needs to be crosschecked if thats the way it should
+				 * work.
 				 */
 				Unit ut = (Unit) node;
-				PluginUnitDefinition plugUnitDef = new PluginUnitDefinition(((UnitDefinition) ut.getParentSBMLObject()).getId()); 
+				PluginUnitDefinition plugUnitDef = new PluginUnitDefinition(
+						((UnitDefinition) ut.getParentSBMLObject()).getId());
 				PluginUnit plugut = new PluginUnit(plugUnitDef);
 				switch (ut.getKind()) {
 				case AMPERE:
@@ -508,17 +597,18 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				plugut.setOffset(ut.getOffset());
 				plugut.setScale(ut.getScale());
 				plugin.notifySBaseAdded(plugut);
-				
+
 			} else if (node instanceof SBMLDocument) {
 				SBMLDocument doc = (SBMLDocument) node;
 				logger.log(Level.DEBUG, "No counter class in CellDesigner"
 						+ node.getClass().getSimpleName());
-				// TODO 
+				// TODO
 			} else if (node instanceof ListOf<?>) {
 				ListOf<?> listOf = (ListOf<?>) node;
 				PluginListOf pluli = new PluginListOf();
-				PluginReaction ro = (PluginReaction) listOf.getParentSBMLObject();
-				
+				PluginReaction ro = (PluginReaction) listOf
+						.getParentSBMLObject();
+
 				switch (listOf.getSBaseListType()) {
 				case listOfCompartments:
 					ListOfCompartments ll = new ListOfCompartments();
@@ -563,7 +653,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					// unknown
 					break;
 				}
-				
+
 			} else if (node instanceof AbstractMathContainer) {
 				if (node instanceof FunctionDefinition) {
 					FunctionDefinition funcdef = (FunctionDefinition) node;
@@ -598,8 +688,9 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					// TODO PluginEventAssignemnt requires a new PluginEvent -
 					// we do not know this event. What shall we do here ?
 				} else if (node instanceof StoichiometryMath) {
-					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
-							node.getClass().getSimpleName()));
+					logger.log(Level.DEBUG, String.format(
+							"No counter class for %s in CellDesigner.", node
+									.getClass().getSimpleName()));
 				} else if (node instanceof Trigger) {
 					Trigger trig = (Trigger) node;
 					PluginEvent plugEvent = new PluginEvent(trig.getParent()
@@ -620,8 +711,9 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugEvent.setDelay(PluginUtils.convert(dl.getMath()));
 					plugin.notifySBaseAdded(plugEvent);
 				} else if (node instanceof Priority) {
-					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
-								node.getClass().getSimpleName()));
+					logger.log(Level.DEBUG, String.format(
+							"No counter class for %s in CellDesigner.", node
+									.getClass().getSimpleName()));
 				} else if (node instanceof Rule) {
 					if (node instanceof AlgebraicRule) {
 						AlgebraicRule alrule = (AlgebraicRule) node;
@@ -668,15 +760,17 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof AbstractTreeNode) {
 			if (node instanceof XMLToken) {
 				if (node instanceof XMLNode) {
-					logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
-							node.getClass().getSimpleName()));
+					logger.log(Level.DEBUG, String.format(
+							"Parsing of node %s not successful.", node
+									.getClass().getSimpleName()));
 				}
 			} else if (node instanceof ASTNode) {
-				logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
-						node.getClass().getSimpleName()));
+				logger.log(Level.DEBUG, String.format(
+						"Parsing of node %s not successful.", node.getClass()
+								.getSimpleName()));
 			} else if (node instanceof AnnotationElement) {
 				if (node instanceof CVTerm) {
-					
+
 					// TODO This has to be done with the libsbml.CVTerm Class,
 					// fix this.
 				} else if (node instanceof History) {
@@ -732,15 +826,21 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					String type = SBO.convertSBO2Alias(simspec.getSBOTerm());
 					if (node instanceof ModifierSpeciesReference) {
 						ModifierSpeciesReference modSpecRef = (ModifierSpeciesReference) node;
-						PluginSpeciesAlias alias = plugModel.getSpecies(modSpecRef.getId()).getSpeciesAlias(type);
-						PluginModifierSpeciesReference ref = new PluginModifierSpeciesReference(plugModel.getReaction(simspec.getId()), alias);
-						plugModel.getReaction(simspec.getId()).removeModifier(ref);
+						PluginSpeciesAlias alias = plugModel.getSpecies(
+								modSpecRef.getId()).getSpeciesAlias(type);
+						PluginModifierSpeciesReference ref = new PluginModifierSpeciesReference(
+								plugModel.getReaction(simspec.getId()), alias);
+						plugModel.getReaction(simspec.getId()).removeModifier(
+								ref);
 						plugin.notifySBaseDeleted(ref);
 					} else if (node instanceof SpeciesReference) {
 						SpeciesReference specref = (SpeciesReference) node;
-						PluginSpeciesAlias alias = plugModel.getSpecies(specref.getId()).getSpeciesAlias(type);
-						PluginSpeciesReference ref = new PluginSpeciesReference(plugModel.getReaction(simspec.getId()), alias);
-						plugModel.getReaction(simspec.getId()).removeProduct(ref);
+						PluginSpeciesAlias alias = plugModel.getSpecies(
+								specref.getId()).getSpeciesAlias(type);
+						PluginSpeciesReference ref = new PluginSpeciesReference(
+								plugModel.getReaction(simspec.getId()), alias);
+						plugModel.getReaction(simspec.getId()).removeProduct(
+								ref);
 						plugin.notifySBaseDeleted(ref);
 					}
 				} else if (node instanceof AbstractNamedSBaseWithUnit) {
@@ -753,8 +853,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					} else if (node instanceof QuantityWithUnit) {
 						if (node instanceof LocalParameter) {
 							/*
-							 * TODO: What to do with Localparameters? There are no LocalParameters in CD available.
-							 * 
+							 * TODO: What to do with Localparameters? There are
+							 * no LocalParameters in CD available.
 							 */
 						} else if (node instanceof Symbol) {
 							if (node instanceof Compartment) {
@@ -782,7 +882,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 			if (node instanceof Unit) {
 				Unit ut = (Unit) node;
-				//TODO
+				// TODO
 			} else if (node instanceof SBMLDocument) {
 				SBMLDocument doc = (SBMLDocument) node;
 				// TODO This needs to be hashed somehow.
@@ -864,8 +964,9 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 									eAssign.getIndex(node));
 					plugin.notifySBaseDeleted(plugEventAssignment);
 				} else if (node instanceof StoichiometryMath) {
-					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
-							node.getClass().getSimpleName()));
+					logger.log(Level.DEBUG, String.format(
+							"No counter class for %s in CellDesigner.", node
+									.getClass().getSimpleName()));
 				} else if (node instanceof Trigger) {
 					Trigger trig = (Trigger) node;
 					PluginEvent plugEvent = plugModel.getEvent(trig.getParent()
@@ -885,24 +986,26 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 					plugin.notifySBaseDeleted(plugct);
 				} else if (node instanceof Delay) {
 					Delay dl = (Delay) node;
-					PluginEvent plugEvent = plugModel.getEvent(dl.getParent().getId());
+					PluginEvent plugEvent = plugModel.getEvent(dl.getParent()
+							.getId());
 					Delay dlnew = new Delay();
 					plugEvent.setDelay(PluginUtils.convert(dlnew.getMath()));
 					plugin.notifySBaseChanged(plugEvent);
 				} else if (node instanceof Priority) {
-					logger.log(Level.DEBUG, String.format("No counter class for %s in CellDesigner.",
-							node.getClass().getSimpleName()));
+					logger.log(Level.DEBUG, String.format(
+							"No counter class for %s in CellDesigner.", node
+									.getClass().getSimpleName()));
 				} else if (node instanceof Rule) {
 					if (node instanceof AlgebraicRule) {
 						AlgebraicRule alrule = (AlgebraicRule) node;
-						//TODO how to get the right algebraic rule ?
+						// TODO how to get the right algebraic rule ?
 					} else if (node instanceof ExplicitRule) {
 						if (node instanceof RateRule) {
 							RateRule rrule = (RateRule) node;
 							// TODO howto get the right Rate Rule ?
 						} else if (node instanceof AssignmentRule) {
 							AssignmentRule assignRule = (AssignmentRule) node;
-							// TODO howto get the right AssignmentRule? 
+							// TODO howto get the right AssignmentRule?
 						}
 					} else {
 						// TODO case when we only have a "Rule" without anything
@@ -913,16 +1016,18 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof AbstractTreeNode) {
 			if (node instanceof XMLToken) {
 				if (node instanceof XMLNode) {
-					logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
-							node.getClass().getSimpleName()));
+					logger.log(Level.DEBUG, String.format(
+							"Parsing of node %s not successful.", node
+									.getClass().getSimpleName()));
 				}
 			} else if (node instanceof ASTNode) {
-				logger.log(Level.DEBUG, String.format("Parsing of node %s not successful.",
-						node.getClass().getSimpleName()));
+				logger.log(Level.DEBUG, String.format(
+						"Parsing of node %s not successful.", node.getClass()
+								.getSimpleName()));
 			} else if (node instanceof AnnotationElement) {
 				if (node instanceof CVTerm) {
 					CVTerm term = (CVTerm) node;
-					// TODO Here I dont know how to get the right CVTerm 
+					// TODO Here I dont know how to get the right CVTerm
 				} else if (node instanceof History) {
 					logger.log(Level.DEBUG, "No counter class in CellDesigner"
 							+ node.getClass().getSimpleName());
