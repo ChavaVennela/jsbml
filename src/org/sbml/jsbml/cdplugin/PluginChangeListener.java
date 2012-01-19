@@ -22,6 +22,7 @@ import javax.swing.tree.TreeNode;
 
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
 import jp.sbi.celldesigner.plugin.PluginAlgebraicRule;
+import jp.sbi.celldesigner.plugin.PluginAntiSenseRNA;
 import jp.sbi.celldesigner.plugin.PluginAssignmentRule;
 import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
@@ -56,6 +57,7 @@ import org.sbml.jsbml.AbstractNamedSBaseWithUnit;
 import org.sbml.jsbml.AbstractSBase;
 import org.sbml.jsbml.AbstractTreeNode;
 import org.sbml.jsbml.AlgebraicRule;
+import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.AnnotationElement;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.CVTerm;
@@ -152,17 +154,25 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		String prop = event.getPropertyName();
 		//TODO Each of these values have to be crosschecked whether they are used or not
 		//     If they are used, we have to parse them properly, else we can ignore them safely.
-		if (prop.equals(TreeNodeChangeEvent.about)) {
-
-		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)) {
-
-		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)) {
-
+		/**
+		 * Some of these TreeNodeChangeEvents are either not applicable for propertyChange or
+		 * not used since other methods are doing the work, therefore they're only listed here for 
+		 * documentation purposes:
+		 * - about
+		 * - addDeclaredNameSpace
+		 * 
+		 */
+		
+		if (prop.equals(TreeNodeChangeEvent.addCVTerm)) {
+			CVTerm cv = (CVTerm) event.getSource();
+			
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)) {
 			
 		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)) {
 			
 		} else if (prop.equals(TreeNodeChangeEvent.annotation)) {
+			Annotation ann = (Annotation) event.getSource();
+			
 			
 		} else if (prop.equals(TreeNodeChangeEvent.annotationNameSpaces)) {
 			
