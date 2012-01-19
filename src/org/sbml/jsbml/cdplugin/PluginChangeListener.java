@@ -149,26 +149,202 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
 		Object eventsource = event.getSource();
-
 		String prop = event.getPropertyName();
+		//TODO Each of these values have to be crosschecked whether they are used or not
+		//     If they are used, we have to parse them properly, else we can ignore them safely.
 		if (prop.equals(TreeNodeChangeEvent.about)) {
 
 		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)) {
 
 		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)) {
 
-		}
-		// TODO Auto-generated method stub
-		else if (prop.equals(TreeNodeChangeEvent.charge)) {
+		} else if (prop.equals(TreeNodeChangeEvent.addExtension)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.annotation)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.annotationNameSpaces)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.areaUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.baseListType)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.boundaryCondition)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.charge)) {
 			Species species = (Species) event.getSource();
 			PluginSpecies plugSpec = plugModel.getSpecies(species.getId());
 			plugSpec.setCharge(species.getCharge());
 			plugin.notifySBaseChanged(plugSpec);
+		} else if (prop.equals(TreeNodeChangeEvent.childNode)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.className)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.compartment)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.compartmentType)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.constant)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.conversionFactor)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.created)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.creator)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.currentList)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.denominator)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.email)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.encoding)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.exponent)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.extentUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.familyName)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.fast)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.formula)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.givenName)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.history)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.id)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.initialAmount)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.initialValue)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.isEOF)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.isExplicitlySetConstant)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.isSetNumberType)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.kind)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.kineticLaw)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.lengthUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.level)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.listOfUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.mantissa)) {
+			
 		} else if (prop.equals(TreeNodeChangeEvent.math)) {
 			MathContainer mathContainer = (MathContainer) event.getSource();
 			saveMathContainerProperties(mathContainer);
-		}
-		// TODO Auto-generated method stub
+		} else if (prop.equals(TreeNodeChangeEvent.message)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.messageBuffer)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.metaId)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.model)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.modified)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.multiplier)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.name)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.namespace)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.notes)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.notesBuffer)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.numerator)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.offset)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.organisation)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.outside)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.parentSBMLObject)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.persistent)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.priority)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.qualifier)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.resource)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.reversible)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.sboTerm)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.scale)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.setAnnotation)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.size)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.spacialDimensions)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.spatialDimensions)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.spatialSizeUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.species)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.speciesType)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.stoichiometry)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.style)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.substanceUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.symbol)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.SBMLDocumentAttributes)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.text)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.timeUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.type)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.units)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.unsetCVTerms)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.userObject)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.useValuesFromTriggerTime)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.value)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.variable)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.version)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.volume)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.volumeUnits)) {
+			
+		} else if (prop.equals(TreeNodeChangeEvent.xmlTriple)) {
+			
+		}  
 	}
 
 	/**
