@@ -8,13 +8,20 @@ import jp.sbi.celldesigner.plugin.PluginAction;
 
 public class SimpleCellDesignerPluginAction extends PluginAction{
 
-	private CDPluginTester plugin;
+	/**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = 2080508810969190318L;
+  
+  private CDPluginTester plugin;
 	
 	public SimpleCellDesignerPluginAction(CDPluginTester plugTest) {
 		this.plugin = plugTest;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see jp.sbi.celldesigner.plugin.PluginActionListener#myActionPerformed(java.awt.event.ActionEvent)
+	 */
 	public void myActionPerformed(ActionEvent ae) {
 		if (ae.getSource() instanceof JMenuItem){
 			String itemText = ((JMenuItem) ae.getSource()).getText();
