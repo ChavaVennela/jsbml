@@ -122,14 +122,14 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				if (node instanceof CompartmentType) {
 					CompartmentType ct = (CompartmentType) node;
 					org.sbml.libsbml.CompartmentType libCt = libDoc.getModel().createCompartmentType();
-					transferNamedSBaseProperties(ct, libCt);
+					LibSBMLUtils.transferNamedSBaseProperties(ct, libCt);
 					if (ct.isSetNotes()){
 						libCt.setNotes(ct.getNotesString());
 					}
 				} else if (node instanceof UnitDefinition){
 					UnitDefinition udef = (UnitDefinition) node;
 					org.sbml.libsbml.UnitDefinition libUdef = libDoc.getModel().createUnitDefinition();
-					transferNamedSBaseProperties(udef, libUdef);
+					LibSBMLUtils.transferNamedSBaseProperties(udef, libUdef);
 					if (udef.isSetListOfUnits()){
 						for (org.sbml.jsbml.Unit u : udef.getListOfUnits()){
 							//makes a recursion for every unit u in the list of units
@@ -145,7 +145,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				} else if (node instanceof Reaction){
 					Reaction reac = (Reaction) node;
 					org.sbml.libsbml.Reaction libReac = libDoc.getModel().createReaction();
-					transferNamedSBaseProperties(reac, libReac);
+					LibSBMLUtils.transferNamedSBaseProperties(reac, libReac);
 					if (reac.isSetCompartment()){
 						libReac.setCompartment(reac.getCompartment());
 					}
@@ -184,7 +184,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					SimpleSpeciesReference siSpecRef = (SimpleSpeciesReference) node;
 					if (node instanceof ModifierSpeciesReference){
 						org.sbml.libsbml.ModifierSpeciesReference libModifier = libDoc.getModel().createModifier();
-						transferSimpleSpeciesReferenceProperties(siSpecRef, libModifier);
+						LibSBMLUtils.transferSimpleSpeciesReferenceProperties(siSpecRef, libModifier);
 					}
 					if (node instanceof SpeciesReference){
 						SpeciesReference specRef = (SpeciesReference) node;
@@ -196,7 +196,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 							if (specRef.isSetStoichiometry()){
 								libProduct.setStoichiometry(specRef.getStoichiometry());
 							}
-							transferSimpleSpeciesReferenceProperties(specRef, libProduct);
+							LibSBMLUtils.transferSimpleSpeciesReferenceProperties(specRef, libProduct);
 						} else if (specRef.getParentSBMLObject().equals(Type.listOfReactants)){
 							org.sbml.libsbml.SpeciesReference libReactant = libDoc.getModel().createReactant();
 							if (specRef.isSetConstant()){
@@ -205,18 +205,18 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 							if (specRef.isSetStoichiometry()){
 								libReactant.setStoichiometry(specRef.getStoichiometry());
 							}
-							transferSimpleSpeciesReferenceProperties(specRef, libReactant);
+							LibSBMLUtils.transferSimpleSpeciesReferenceProperties(specRef, libReactant);
 						}
 					}
 				} else if (node instanceof AbstractNamedSBaseWithUnit){
 					if (node instanceof Event){
 						Event event = (Event) node;
 						org.sbml.libsbml.Event libEvent = libDoc.getModel().createEvent();
-						transferNamedSBaseProperties(event, libEvent);
+						LibSBMLUtils.transferNamedSBaseProperties(event, libEvent);
 						if (event.isSetDelay()){
 							Delay delay = event.getDelay();
 							org.sbml.libsbml.Delay libDelay = libEvent.createDelay();
-							transferMathContainerProperties(delay, libDelay);
+							LibSBMLUtils.transferMathContainerProperties(delay, libDelay);
 							libEvent.setDelay(libDelay);
 						}
 						if (event.isSetListOfEventAssignments()){
@@ -228,7 +228,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						if (event.isSetPriority()){
 							Priority prio = event.getPriority();
 							org.sbml.libsbml.Priority libPrio = libEvent.createPriority();
-							transferMathContainerProperties(prio, libPrio);
+							LibSBMLUtils.transferMathContainerProperties(prio, libPrio);
 							libEvent.setPriority(libPrio);
 
 						}
@@ -249,7 +249,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						if (node instanceof LocalParameter){
 							LocalParameter locParam = (LocalParameter) node;
 							org.sbml.libsbml.LocalParameter libLocParam = libDoc.getModel().createKineticLawLocalParameter();
-							transferNamedSBaseProperties(locParam, libLocParam);
+							LibSBMLUtils.transferNamedSBaseProperties(locParam, libLocParam);
 							if (locParam.isSetValue()){
 								libLocParam.setValue(locParam.getValue());
 							}
@@ -258,7 +258,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 							if (node instanceof Compartment){
 								Compartment c = (Compartment) node;
 								org.sbml.libsbml.Compartment libC = libDoc.getModel().createCompartment();
-								transferNamedSBaseProperties(c, libC);
+								LibSBMLUtils.transferNamedSBaseProperties(c, libC);
 								if (c.isSetCompartmentType()){
 									libC.setCompartmentType(c.getCompartmentType());
 								}
@@ -283,7 +283,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 							} else if (node instanceof Species){
 								Species spec = (Species) node;
 								org.sbml.libsbml.Species libS = libDoc.getModel().createSpecies();
-								transferNamedSBaseProperties(spec, libS);
+								LibSBMLUtils.transferNamedSBaseProperties(spec, libS);
 								if (spec.isSetBoundaryCondition()){
 									libS.setBoundaryCondition(spec.getBoundaryCondition());
 								}
@@ -323,7 +323,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 							} else if (node instanceof Parameter){
 								Parameter param = (Parameter) node;
 								org.sbml.libsbml.Parameter libParam = libDoc.getModel().createParameter();
-								transferNamedSBaseProperties(param, libParam);
+								LibSBMLUtils.transferNamedSBaseProperties(param, libParam);
 								if (param.isSetConstant()){
 									libParam.setConstant(param.getConstant());
 								}
@@ -340,7 +340,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			} else if (node instanceof Unit){
 				Unit unit = (Unit) node;
 				org.sbml.libsbml.Unit libUnit = libDoc.getModel().createUnit();
-				transferSBaseProperties(unit, libUnit);
+				LibSBMLUtils.transferSBaseProperties(unit, libUnit);
 				if (unit.isSetExponent()){
 					libUnit.setExponent(unit.getExponent());
 				}
@@ -354,7 +354,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libUnit.setScale(unit.getScale());
 				}
 				if (unit.isSetKind()){
-					transferKindProperties(unit, libUnit);
+					LibSBMLUtils.transferKindProperties(unit, libUnit);
 				}
 
 			} else if (node instanceof SBMLDocument){
@@ -371,12 +371,12 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				if (node instanceof FunctionDefinition){
 					FunctionDefinition funcDef = (FunctionDefinition) node;
 					org.sbml.libsbml.FunctionDefinition libFuncDef = libDoc.getModel().createFunctionDefinition();
-					transferMathContainerProperties(funcDef, libFuncDef);
+					LibSBMLUtils.transferMathContainerProperties(funcDef, libFuncDef);
 				}
 				else if (node instanceof KineticLaw){
 					KineticLaw kinLaw = (KineticLaw) node;
 					org.sbml.libsbml.KineticLaw libKinLaw = libDoc.getModel().createKineticLaw();
-					transferMathContainerProperties(kinLaw, libKinLaw);
+					LibSBMLUtils.transferMathContainerProperties(kinLaw, libKinLaw);
 					if (kinLaw.isSetListOfLocalParameters()){
 						//makes a recursion 
 						for (LocalParameter locParam : kinLaw.getListOfLocalParameters()){
@@ -396,7 +396,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				else if (node instanceof InitialAssignment){
 					InitialAssignment initAssign = (InitialAssignment) node;
 					org.sbml.libsbml.InitialAssignment libInitAssign = libDoc.getModel().createInitialAssignment();
-					transferMathContainerProperties(initAssign, libInitAssign);
+					LibSBMLUtils.transferMathContainerProperties(initAssign, libInitAssign);
 					if (initAssign.isSetSymbol()){
 						libInitAssign.setSymbol(initAssign.getSymbol());
 					}
@@ -406,7 +406,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				else if (node instanceof EventAssignment){
 					EventAssignment eventAssign = (EventAssignment) node;
 					org.sbml.libsbml.EventAssignment libEventAssign = libDoc.getModel().createEventAssignment();
-					transferMathContainerProperties(eventAssign, libEventAssign);
+					LibSBMLUtils.transferMathContainerProperties(eventAssign, libEventAssign);
 					if (eventAssign.isSetVariable()){
 						libEventAssign.setVariable(eventAssign.getVariable());
 					}
@@ -414,12 +414,12 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				else if (node instanceof StoichiometryMath){
 					StoichiometryMath sMath = (StoichiometryMath) node;
 					org.sbml.libsbml.StoichiometryMath libSMath = libDoc.getModel().getSpeciesReference(sMath.getParent().getId()).createStoichiometryMath();
-					transferMathContainerProperties(sMath, libSMath);
+					LibSBMLUtils.transferMathContainerProperties(sMath, libSMath);
 				}
 				else if (node instanceof Trigger){
 					Trigger trig = (Trigger) node;
 					org.sbml.libsbml.Trigger LibTrig = libDoc.getModel().getEvent(trig.getParent().getId()).createTrigger();
-					transferMathContainerProperties(trig, LibTrig);
+					LibSBMLUtils.transferMathContainerProperties(trig, LibTrig);
 					if (trig.isSetInitialValue()){
 						LibTrig.setInitialValue(trig.getInitialValue());
 					}
@@ -431,13 +431,13 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					Rule rule = (Rule) node;
 					if (node instanceof AlgebraicRule){
 						org.sbml.libsbml.AlgebraicRule libAlgRule = libDoc.getModel().createAlgebraicRule();
-						transferMathContainerProperties(rule, libAlgRule);
+						LibSBMLUtils.transferMathContainerProperties(rule, libAlgRule);
 					}
 					else{
 						ExplicitRule expRule = (ExplicitRule) rule;
 						if (node instanceof RateRule){
 							org.sbml.libsbml.RateRule libRateRule = libDoc.getModel().createRateRule();
-							transferMathContainerProperties(expRule, libRateRule);
+							LibSBMLUtils.transferMathContainerProperties(expRule, libRateRule);
 							if (expRule.isSetVariable()){
 								libRateRule.setVariable(expRule.getVariable());
 							}
@@ -447,7 +447,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 						}
 						else if (node instanceof AssignmentRule){
 							org.sbml.libsbml.AssignmentRule libAssignRule = libDoc.getModel().createAssignmentRule();
-							transferMathContainerProperties(expRule, libAssignRule);
+							LibSBMLUtils.transferMathContainerProperties(expRule, libAssignRule);
 							if (expRule.isSetVariable()){
 								libAssignRule.setVariable(expRule.getVariable());
 							}
@@ -460,7 +460,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				else if (node instanceof Constraint){
 					Constraint constr = (Constraint) node;
 					org.sbml.libsbml.Constraint libConstr = libDoc.getModel().createConstraint();
-					transferMathContainerProperties(constr, libConstr);
+					LibSBMLUtils.transferMathContainerProperties(constr, libConstr);
 					if (constr.isSetMessage()){
 						libConstr.setMessage(XMLNode.convertStringToXMLNode(constr.getMessage().toXMLString()));
 					}
@@ -470,12 +470,12 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					// libDoc.getModel().createDelay() would be shorter but can't be used, 
 					// because this would create a new Delay inside the last Event object created in this Model
 					org.sbml.libsbml.Delay libDelay = libDoc.getModel().getEvent(delay.getParent().getId()).createDelay();
-					transferMathContainerProperties(delay, libDelay);
+					LibSBMLUtils.transferMathContainerProperties(delay, libDelay);
 				}
 				else if (node instanceof Priority){
 					Priority prio = (Priority) node;
 					org.sbml.libsbml.Priority libPrio = libDoc.getModel().getEvent(prio.getParent().getId()).createPriority();
-					transferMathContainerProperties(prio, libPrio);
+					LibSBMLUtils.transferMathContainerProperties(prio, libPrio);
 				}
 			}
 		} else if (node instanceof AnnotationElement){
@@ -498,21 +498,21 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				History his = (History) node;
 				org.sbml.libsbml.ModelHistory modHis = new org.sbml.libsbml.ModelHistory();
 				if (his.isSetCreatedDate()){
-					modHis.setCreatedDate(convertDate(his.getCreatedDate()));
+					modHis.setCreatedDate(LibSBMLUtils.convertDate(his.getCreatedDate()));
 				}
 				if (his.isSetListOfCreators()){
 					for (Creator c : his.getListOfCreators()){
-						modHis.addCreator(convertToModelCreator(c));
+						modHis.addCreator(LibSBMLUtils.convertToModelCreator(c));
 					}
 				}
 				if (his.isSetListOfModification()){
 					//go throw the list and add all ModifiedDates
 					for(int i=0; i<his.getListOfModifiedDates().size() ;i++){
-						modHis.addModifiedDate(convertDate(his.getModifiedDate(i)));
+						modHis.addModifiedDate(LibSBMLUtils.convertDate(his.getModifiedDate(i)));
 					}
 				}
 				if (his.isSetModifiedDate()){
-					modHis.setModifiedDate(convertDate(his.getModifiedDate()));
+					modHis.setModifiedDate(LibSBMLUtils.convertDate(his.getModifiedDate()));
 				}
 				libDoc.setModelHistory(modHis);
 			}
@@ -633,7 +633,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				Unit unit = (Unit) node;
 				UnitDefinition udef = (UnitDefinition) unit.getParentSBMLObject().getParentSBMLObject();
 				// search the index of this Unit object and remove it
-				int index = getUnitIndex(unit, udef);
+				int index = LibSBMLUtils.getUnitIndex(unit, udef);
 				libModel.getUnitDefinition(udef.getId()).removeUnit(index);
 			} else if (node instanceof SBMLDocument){
 				libDoc.delete();
@@ -729,7 +729,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				logger.log(Level.DEBUG, String.format("Cannot remove this %s in the libSBML-Document", node.getClass().getSimpleName()));
 			}
 			else if (node instanceof Creator){
-				libDoc.getModelHistory().getCreator(getCreatorIndex((Creator) node)).delete();
+				libDoc.getModelHistory().getCreator(LibSBMLUtils.getCreatorIndex((Creator) node, doc)).delete();
 			}
 		} else if (node instanceof ASTNode){
 			logger.log(Level.DEBUG, String.format("Cannot remove this %s in the libSBML-Document", node.getClass().getSimpleName()));
@@ -754,7 +754,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.addCVTerm)){	
 			//then the evtSrc is a SBase
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
-			correspondingElement.addCVTerm(convertCVTerm((CVTerm) evt.getNewValue()));
+			correspondingElement.addCVTerm(LibSBMLUtils.convertCVTerm((CVTerm) evt.getNewValue()));
 		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)){
 			//TODO: this case can concern every SBase	
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
@@ -826,10 +826,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.created)){
 			// evtSrc is a History-element
-			libDoc.getModelHistory().setCreatedDate(convertDate(((History) evtSrc).getCreatedDate()));
+			libDoc.getModelHistory().setCreatedDate(LibSBMLUtils.convertDate(((History) evtSrc).getCreatedDate()));
 		} else if (prop.equals(TreeNodeChangeEvent.creator)){
 			// evtSrc is a History-element
-			libDoc.getModelHistory().addCreator(convertToModelCreator((Creator)evt.getNewValue()));
+			libDoc.getModelHistory().addCreator(LibSBMLUtils.convertToModelCreator((Creator)evt.getNewValue()));
 		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)){
 			ASTNode node = (ASTNode) evtSrc;
 			logger.log(Level.DEBUG, String.format("Couldn't find the %s in the libSBML-Document", node.getClass().getSimpleName()));
@@ -844,7 +844,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.email)){
 			// evtSrc is a Creator
 			Creator cr = (Creator) evtSrc;
-			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setEmail(cr.getEmail());
+			libDoc.getModelHistory().getCreator(LibSBMLUtils.getCreatorIndex(cr,doc)).setEmail(cr.getEmail());
 		} else if (prop.equals(TreeNodeChangeEvent.encoding)){
 			ASTNode node = (ASTNode) evtSrc;
 			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document", node.getClass().getSimpleName()));
@@ -857,7 +857,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.familyName)){
 			Creator cr = (Creator) evtSrc;
-			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setFamilyName(cr.getFamilyName());		
+			libDoc.getModelHistory().getCreator(LibSBMLUtils.getCreatorIndex(cr,doc)).setFamilyName(cr.getFamilyName());		
 		} else if (prop.equals(TreeNodeChangeEvent.fast)){
 			if (evtSrc instanceof Reaction){
 				Reaction reac = (Reaction) evtSrc;
@@ -871,7 +871,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.givenName)){
 			Creator cr = (Creator) evtSrc;
-			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setGivenName(cr.getGivenName());
+			libDoc.getModelHistory().getCreator(LibSBMLUtils.getCreatorIndex(cr,doc)).setGivenName(cr.getGivenName());
 		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)){
 			if (evtSrc instanceof Species){
 				Species spec = (Species) evtSrc;
@@ -918,7 +918,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			if (evtSrc instanceof Unit){
 				Unit u = (Unit) evtSrc;
 				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
-				transferKindProperties(u, libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(getUnitIndex(u, udef)));
+				LibSBMLUtils.transferKindProperties(u, libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(LibSBMLUtils.getUnitIndex(u, udef)));
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.lengthUnits)){
 			if (evtSrc instanceof Model){
@@ -937,31 +937,31 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				libKl.setFormula(mathContainer.getFormula());
 			} else if (mathContainer instanceof Constraint) {
 				Constraint con = (Constraint) mathContainer;
-				int index = getContraintIndex(con);
-				libDoc.getModel().getConstraint(index).setMath(convertASTNode(mathContainer.getMath()));
+				int index = LibSBMLUtils.getContraintIndex(con,doc);
+				libDoc.getModel().getConstraint(index).setMath(LibSBMLUtils.convertASTNode(mathContainer.getMath()));
 			} else if (mathContainer instanceof Delay){
 				Delay delay = (Delay) mathContainer;
-				libDoc.getModel().getEvent(delay.getParent().getId()).getDelay().setMath(convertASTNode(mathContainer.getMath()));
+				libDoc.getModel().getEvent(delay.getParent().getId()).getDelay().setMath(LibSBMLUtils.convertASTNode(mathContainer.getMath()));
 			} else if (mathContainer instanceof FunctionDefinition){
 				FunctionDefinition funcDef = (FunctionDefinition) mathContainer;
-				libDoc.getModel().getFunctionDefinition(funcDef.getId()).setMath(convertASTNode(mathContainer.getMath()));
+				libDoc.getModel().getFunctionDefinition(funcDef.getId()).setMath(LibSBMLUtils.convertASTNode(mathContainer.getMath()));
 			} else if (mathContainer instanceof StoichiometryMath){
 				StoichiometryMath sto = (StoichiometryMath) mathContainer;
-				libDoc.getModel().getSpeciesReference(sto.getParent().getId()).getStoichiometryMath().setMath(convertASTNode(mathContainer.getMath()));
+				libDoc.getModel().getSpeciesReference(sto.getParent().getId()).getStoichiometryMath().setMath(LibSBMLUtils.convertASTNode(mathContainer.getMath()));
 			} else if (mathContainer instanceof InitialAssignment){
 				InitialAssignment initAssign = (InitialAssignment) mathContainer;
-				libDoc.getModel().getInitialAssignment(initAssign.getVariable()).setMath(convertASTNode(mathContainer.getMath()));
+				libDoc.getModel().getInitialAssignment(initAssign.getVariable()).setMath(LibSBMLUtils.convertASTNode(mathContainer.getMath()));
 			} else if (mathContainer instanceof Priority){
 				Priority prio = (Priority) mathContainer;
-				libDoc.getModel().getEvent(prio.getParent().getId()).getPriority().setMath(convertASTNode(mathContainer.getMath()));
+				libDoc.getModel().getEvent(prio.getParent().getId()).getPriority().setMath(LibSBMLUtils.convertASTNode(mathContainer.getMath()));
 			} else if (mathContainer instanceof Trigger){
 				Trigger trig = (Trigger) mathContainer;
-				libDoc.getModel().getEvent(trig.getParent().getId()).getTrigger().setMath(convertASTNode(mathContainer.getMath()));
+				libDoc.getModel().getEvent(trig.getParent().getId()).getTrigger().setMath(LibSBMLUtils.convertASTNode(mathContainer.getMath()));
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.message)){
 			if (evtSrc instanceof Constraint){
 				Constraint con = (Constraint) evtSrc;
-				int index = getContraintIndex(con);
+				int index = LibSBMLUtils.getContraintIndex(con,doc);
 				org.sbml.libsbml.XMLNode xml = new XMLNode(con.getMessageString());
 				libDoc.getModel().getConstraint(index).setMessage(xml);
 			}
@@ -973,12 +973,12 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			LibSBMLWriter write = new LibSBMLWriter();
 			libDoc.setModel((org.sbml.libsbml.Model) write.writeModel(doc.getModel()));
 		} else if (prop.equals(TreeNodeChangeEvent.modified)){
-			libDoc.getModelHistory().setModifiedDate(convertDate(((History)evtSrc).getModifiedDate()));
+			libDoc.getModelHistory().setModifiedDate(LibSBMLUtils.convertDate(((History)evtSrc).getModifiedDate()));
 		} else if (prop.equals(TreeNodeChangeEvent.multiplier)){
 			if (evtSrc instanceof Unit){
 				Unit u = (Unit) evtSrc;
 				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
-				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(getUnitIndex(u, udef)).setMultiplier(u.getMultiplier());
+				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(LibSBMLUtils.getUnitIndex(u, udef)).setMultiplier(u.getMultiplier());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.name)){
 			// evtSrc must be a type of namedSBase
@@ -1007,11 +1007,11 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			if (evtSrc instanceof Unit){
 				Unit u = (Unit) evtSrc;
 				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
-				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(getUnitIndex(u, udef)).setOffset(u.getOffset());
+				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(LibSBMLUtils.getUnitIndex(u, udef)).setOffset(u.getOffset());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.organisation)){
 			Creator cr = (Creator) evtSrc;
-			libDoc.getModelHistory().getCreator(getCreatorIndex(cr)).setOrganisation(cr.getOrganisation());
+			libDoc.getModelHistory().getCreator(LibSBMLUtils.getCreatorIndex(cr,doc)).setOrganisation(cr.getOrganisation());
 		} else if (prop.equals(TreeNodeChangeEvent.outside)){
 			if (evtSrc instanceof Compartment){
 				Compartment comp = (Compartment) evtSrc;
@@ -1032,7 +1032,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			if (evtSrc instanceof Event){
 				Event event = (Event) evtSrc;
 				org.sbml.libsbml.Priority prio = new org.sbml.libsbml.Priority(event.getPriority().getLevel(), event.getPriority().getVersion());
-				transferMathContainerProperties(event.getPriority(), prio);
+				LibSBMLUtils.transferMathContainerProperties(event.getPriority(), prio);
 				libDoc.getModel().getEvent(event.getId()).setPriority(prio);
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.qualifier)){
@@ -1050,6 +1050,13 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			libDoc.getModel().getReaction(reac.getId()).setReversible(reac.getReversible());
 		} else if (prop.equals(TreeNodeChangeEvent.SBMLDocumentAttributes)){
 			//TODO: SBMLDocument, make recursion with the content of the doc-Attributes
+			org.sbml.jsbml.SBMLDocument sbmlDoc = (org.sbml.jsbml.SBMLDocument) evtSrc;
+			if (!sbmlDoc.getSBMLDocumentAttributes().containsValue(libDoc.getLevel())){
+				propertyChange(new TreeNodeChangeEvent(sbmlDoc, TreeNodeChangeEvent.level, libDoc.getLevel() , sbmlDoc.getLevel()));
+			}
+			if (!sbmlDoc.getSBMLDocumentAttributes().containsValue(libDoc.getVersion())){
+				propertyChange(new TreeNodeChangeEvent(sbmlDoc, TreeNodeChangeEvent.version, libDoc.getVersion() , sbmlDoc.getVersion()));
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.sboTerm)){
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
 			correspondingElement.setSBOTerm((Integer) evt.getNewValue());
@@ -1057,7 +1064,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			if (evtSrc instanceof Unit){
 				Unit u = (Unit) evtSrc;
 				UnitDefinition udef = (UnitDefinition) u.getParent().getParent();
-				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(getUnitIndex(u, udef)).setScale(u.getScale());
+				libDoc.getModel().getUnitDefinition(udef.getId()).getUnit(LibSBMLUtils.getUnitIndex(u, udef)).setScale(u.getScale());
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.setAnnotation)){
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
@@ -1252,11 +1259,61 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				}
 			} else if (evtSrc instanceof Unit){
 				Unit unit = (Unit) evtSrc;
-				return libDoc.getModel().getUnitDefinition(((UnitDefinition) unit.getParentSBMLObject()).getId()).getUnit(getUnitIndex(unit, (UnitDefinition) unit.getParentSBMLObject()));
+				return libDoc.getModel().getUnitDefinition(((UnitDefinition) unit.getParentSBMLObject()).getId()).getUnit(LibSBMLUtils.getUnitIndex(unit, (UnitDefinition) unit.getParentSBMLObject()));
 			} else if (evtSrc instanceof SBMLDocument){
 				return libDoc;
 			} else if (evtSrc instanceof ListOf<?>){
-
+				Type listType = ((ListOf<?>) evtSrc).getSBaseListType();
+				if (listType.equals(Type.listOfCompartments)){
+					return libDoc.getModel().getListOfCompartments();
+				} else if (listType.equals(Type.listOfCompartmentTypes)){
+					return libDoc.getModel().getListOfCompartmentTypes();
+				} else if (listType.equals(Type.listOfConstraints)){
+					return libDoc.getModel().getListOfConstraints();
+				} else if (listType.equals(Type.listOfEvents)){
+					return libDoc.getModel().getListOfEvents();
+				} else if (listType.equals(Type.listOfFunctionDefinitions)){
+					return libDoc.getModel().getListOfFunctionDefinitions();
+				} else if (listType.equals(Type.listOfInitialAssignments)){
+					return libDoc.getModel().getListOfInitialAssignments();
+				} else if (listType.equals(Type.listOfLocalParameters)){
+					if(((ListOf<?>) evtSrc).getParentSBMLObject() != null){
+						KineticLaw kinLaw = (KineticLaw) ((ListOf<?>) evtSrc).getParentSBMLObject();
+						return libDoc.getModel().getReaction(kinLaw.getParentSBMLObject().getId()).getKineticLaw().getListOfLocalParameters();
+					}
+				} else if (listType.equals(Type.listOfModifiers)){
+					if(((ListOf<?>) evtSrc).getParentSBMLObject() != null){
+						Reaction reac = (Reaction) ((ListOf<?>) evtSrc).getParentSBMLObject();
+						return libDoc.getModel().getReaction(reac.getId()).getListOfModifiers();
+					}
+				} else if (listType.equals(Type.listOfParameters)){
+					return libDoc.getModel().getListOfParameters();
+				} else if (listType.equals(Type.listOfProducts)){
+					if(((ListOf<?>) evtSrc).getParentSBMLObject() != null){
+						Reaction reac = (Reaction) ((ListOf<?>) evtSrc).getParentSBMLObject();
+						return libDoc.getModel().getReaction(reac.getId()).getListOfProducts();
+					}
+				} else if (listType.equals(Type.listOfReactants)){
+					if(((ListOf<?>) evtSrc).getParentSBMLObject() != null){
+						Reaction reac = (Reaction) ((ListOf<?>) evtSrc).getParentSBMLObject();
+						return libDoc.getModel().getReaction(reac.getId()).getListOfReactants();
+					}
+				} else if (listType.equals(Type.listOfReactions)){
+					return libDoc.getModel().getListOfReactions();
+				} else if (listType.equals(Type.listOfRules)){
+					return libDoc.getModel().getListOfRules();
+				} else if (listType.equals(Type.listOfSpecies)){
+					return libDoc.getModel().getListOfSpecies();
+				} else if (listType.equals(Type.listOfSpeciesTypes)){
+					return libDoc.getModel().getListOfSpeciesTypes();
+				} else if (listType.equals(Type.listOfUnitDefinitions)){
+					return libDoc.getModel().getListOfUnitDefinitions();
+				} else if (listType.equals(Type.listOfUnits)){
+					if(((ListOf<?>) evtSrc).getParentSBMLObject() != null){
+						UnitDefinition udef = (UnitDefinition) ((ListOf<?>) evtSrc).getParentSBMLObject();
+						return libDoc.getModel().getUnitDefinition(udef.getId()).getListOfUnits();
+					}
+				}
 			} else if (evtSrc instanceof AbstractMathContainer){
 				if (evtSrc instanceof FunctionDefinition){
 					FunctionDefinition funcDef = (FunctionDefinition) evtSrc;
@@ -1290,19 +1347,20 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 					else{
 						if (evtSrc instanceof RateRule){
-							libDoc.getModel().getRule(((RateRule) evtSrc).getVariable());
+							return libDoc.getModel().getRule(((RateRule) evtSrc).getVariable());
 						}
 						else if (evtSrc instanceof Constraint){
 							Constraint constr = (Constraint) evtSrc;
-							return libDoc.getModel().getConstraint(getContraintIndex(constr));
+							return libDoc.getModel().getConstraint(LibSBMLUtils.getContraintIndex(constr,doc));
 						}
 						else if (evtSrc instanceof Delay){
 							Delay delay = (Delay) evtSrc;
-							//TODO
+							return libDoc.getModel().getEvent(delay.getParent().getId()).getDelay();
 						}
 						else if (evtSrc instanceof Priority){
 							Priority prio = (Priority) evtSrc;
-							//TODO
+							Event prioEvent = prio.getParent();
+							return libDoc.getModel().getEvent(prioEvent.getId()).getPriority();
 						}
 					}
 				} 
@@ -1319,305 +1377,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				 */		
 			}
 		}
-		return null;
-	}
-
-
-
-	/**
-	 * sets MetaId, SBOTerm, Notes and Annotation in the libSBML object, 
-	 * if it's set in the JSBML object.
-	 * @param sbase
-	 * @param libSBase
-	 */
-	private void transferSBaseProperties(SBase sbase,
-			org.sbml.libsbml.SBase libSBase) {
-		if (sbase.isSetMetaId()) {
-			libSBase.setMetaId(libSBase.getMetaId());
-		}
-		if (sbase.isSetSBOTerm()) {
-			libSBase.setSBOTerm(libSBase.getSBOTerm());
-		}
-		if (sbase.isSetNotes()) {
-			libSBase.setNotes(libSBase.getNotesString());
-		}
-		if (sbase.isSetAnnotation()){
-			libSBase.setAnnotation(sbase.getAnnotationString());
-		}
-	}
-
-	/**
-	 * sets the name and the id in the libSBML object, when it's set in the JSBML object
-	 * and calls the method transferSBaseProperties(SBase, libSBase).
-	 * @param sbase
-	 * @param libSBase
-	 */
-	private void transferNamedSBaseProperties(SBase sbase, org.sbml.libsbml.SBase libSBase){
-		if (((org.sbml.jsbml.NamedSBase) sbase).isSetName()){
-			libSBase.setName(((org.sbml.jsbml.NamedSBase) sbase).getName());
-		}
-		if (((org.sbml.jsbml.NamedSBase) sbase).isSetId()){
-			libSBase.setId(((org.sbml.jsbml.NamedSBase) sbase).getId());
-		}
-		transferSBaseProperties(sbase, libSBase);
-	}
-
-	/**
-	 * sets the species in libSBML object if the species is set in the JSBML object
-	 * and calls the method transferNamedSBaseProperties(SBase, libSBase).
-	 * @param sbase
-	 * @param libSBase
-	 */
-	private void transferSimpleSpeciesReferenceProperties(SBase sbase, org.sbml.libsbml.SBase libSBase){
-		if (((SimpleSpeciesReference) sbase).isSetSpecies()){
-			((org.sbml.libsbml.SimpleSpeciesReference) libSBase).setSpecies(((SimpleSpeciesReference) sbase).getSpecies());
-		}
-		transferNamedSBaseProperties(sbase, libSBase);
-	}
-
-	/**
-	 * sets the math ASTNode in the libSBML object if it's set in the JSBML object
-	 * and calls the convert-method for the ASTNodes.
-	 * @param mathCont
-	 * @param libMathCont
-	 */
-	private void transferMathContainerProperties(MathContainer mathCont, org.sbml.libsbml.SBase libMathCont){
-		transferSBaseProperties(mathCont, libMathCont);
-		if (mathCont.isSetMath()){
-			if (libMathCont instanceof org.sbml.libsbml.FunctionDefinition){
-				((org.sbml.libsbml.FunctionDefinition) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.KineticLaw){
-				((org.sbml.libsbml.KineticLaw) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.Rule){
-				((org.sbml.libsbml.Rule) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.StoichiometryMath){
-				((org.sbml.libsbml.StoichiometryMath) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.Trigger){
-				((org.sbml.libsbml.Trigger) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.EventAssignment){
-				((org.sbml.libsbml.EventAssignment) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.InitialAssignment){
-				((org.sbml.libsbml.InitialAssignment) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.Constraint){
-				((org.sbml.libsbml.Constraint) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.Delay){
-				((org.sbml.libsbml.Delay) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}else if (libMathCont instanceof org.sbml.libsbml.Priority){
-				((org.sbml.libsbml.Priority) libMathCont).setMath(convertASTNode(mathCont.getMath()));
-			}
-		}
-
-	}
-
-	/**
-	 * 
-	 * @param unit
-	 * @param u
-	 */
-	private int transferKindProperties(Unit unit, org.sbml.libsbml.Unit u) {
-		switch (unit.getKind()) {
-		case AMPERE:
-			u.setKind(libsbmlConstants.UNIT_KIND_AMPERE);
-			break;
-		case BECQUEREL:
-			u.setKind(libsbmlConstants.UNIT_KIND_BECQUEREL);
-			break;
-		case CANDELA:
-			u.setKind(libsbmlConstants.UNIT_KIND_CANDELA);
-			break;
-		case CELSIUS:
-			u.setKind(libsbmlConstants.UNIT_KIND_CELSIUS);
-			break;
-		case COULOMB:
-			u.setKind(libsbmlConstants.UNIT_KIND_COULOMB);
-			break;
-		case DIMENSIONLESS:
-			u.setKind(libsbmlConstants.UNIT_KIND_DIMENSIONLESS);
-			break;
-		case FARAD:
-			u.setKind(libsbmlConstants.UNIT_KIND_FARAD);
-			break;
-		case GRAM:
-			u.setKind(libsbmlConstants.UNIT_KIND_GRAM);
-			break;
-		case GRAY:
-			u.setKind(libsbmlConstants.UNIT_KIND_GRAY);
-			break;
-		case HENRY:
-			u.setKind(libsbmlConstants.UNIT_KIND_HENRY);
-			break;
-		case HERTZ:
-			u.setKind(libsbmlConstants.UNIT_KIND_HERTZ);
-			break;
-		case INVALID:
-			u.setKind(libsbmlConstants.UNIT_KIND_INVALID);
-			break;
-		case ITEM:
-			u.setKind(libsbmlConstants.UNIT_KIND_ITEM);
-			break;
-		case JOULE:
-			u.setKind(libsbmlConstants.UNIT_KIND_JOULE);
-			break;
-		case KATAL:
-			u.setKind(libsbmlConstants.UNIT_KIND_KATAL);
-			break;
-		case KELVIN:
-			u.setKind(libsbmlConstants.UNIT_KIND_KELVIN);
-			break;
-		case KILOGRAM:
-			u.setKind(libsbmlConstants.UNIT_KIND_KILOGRAM);
-			break;
-		case LITER:
-			u.setKind(libsbmlConstants.UNIT_KIND_LITER);
-			break;
-		case LITRE:
-			u.setKind(libsbmlConstants.UNIT_KIND_LITRE);
-			break;
-		case LUMEN:
-			u.setKind(libsbmlConstants.UNIT_KIND_LUMEN);
-			break;
-		case LUX:
-			u.setKind(libsbmlConstants.UNIT_KIND_LUX);
-			break;
-		case METER:
-			u.setKind(libsbmlConstants.UNIT_KIND_METER);
-			break;
-		case METRE:
-			u.setKind(libsbmlConstants.UNIT_KIND_METRE);
-			break;
-		case MOLE:
-			u.setKind(libsbmlConstants.UNIT_KIND_MOLE);
-			break;
-		case NEWTON:
-			u.setKind(libsbmlConstants.UNIT_KIND_NEWTON);
-			break;
-		case OHM:
-			u.setKind(libsbmlConstants.UNIT_KIND_OHM);
-			break;
-		case PASCAL:
-			u.setKind(libsbmlConstants.UNIT_KIND_PASCAL);
-			break;
-		case RADIAN:
-			u.setKind(libsbmlConstants.UNIT_KIND_RADIAN);
-			break;
-		case SECOND:
-			u.setKind(libsbmlConstants.UNIT_KIND_SECOND);
-			break;
-		case SIEMENS:
-			u.setKind(libsbmlConstants.UNIT_KIND_SIEMENS);
-			break;
-		case SIEVERT:
-			u.setKind(libsbmlConstants.UNIT_KIND_SIEVERT);
-			break;
-		case STERADIAN:
-			u.setKind(libsbmlConstants.UNIT_KIND_STERADIAN);
-			break;
-		case TESLA:
-			u.setKind(libsbmlConstants.UNIT_KIND_TESLA);
-			break;
-		case VOLT:
-			u.setKind(libsbmlConstants.UNIT_KIND_VOLT);
-			break;
-		case WATT:
-			u.setKind(libsbmlConstants.UNIT_KIND_WATT);
-			break;
-		case WEBER:
-			u.setKind(libsbmlConstants.UNIT_KIND_WEBER);
-			break;
-		}
-		return u.getKind();
-	}
-
-	/**
-	 * 
-	 * @param math
-	 * @return
-	 */
-	private org.sbml.libsbml.ASTNode convertASTNode(ASTNode math) {
-		org.sbml.libsbml.ASTNode libASTNode = new org.sbml.libsbml.ASTNode();
-		//TODO: fill libASTNode with Properties of ASTNode math
-		return libASTNode;
-	}
-
-	/**
-	 * searches the index of the incoming unit in the ListOfUnits of the UnitDefinition
-	 * @param unit
-	 * @param udef
-	 * @return
-	 */
-	private int getUnitIndex(Unit unit, UnitDefinition udef) {
-		int index = 0;
-		for (int k=0; k<udef.getListOfUnits().size();k++){
-			Unit u = udef.getUnit(k);
-			if(u.equals(unit)){
-				index = k;
-				break;
-			}
-		}
-		return index;
-	}
-
-	/**
-	 * 
-	 * @param con
-	 * @return
-	 */
-	private int getContraintIndex(Constraint con) {
-		int index = 0;
-		for (int k=0; k<doc.getModel().getListOfConstraints().size(); k++){
-			Constraint c = doc.getModel().getConstraint(k);
-			if(c.equals(con)){
-				index = k;
-				break;
-			}
-		}
-		return index;
-	}
-
-	/**
-	 * 
-	 * @param c
-	 * @return
-	 */
-	private ModelCreator convertToModelCreator(Creator c) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param createdDate
-	 * @return
-	 */
-	private org.sbml.libsbml.Date convertDate(Date createdDate) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param creator
-	 * @return
-	 */
-	private long getCreatorIndex(Creator creator) {
-		int index = 0;
-		for (int k=0; k<doc.getHistory().getNumCreators(); k++){
-			Creator c = doc.getHistory().getCreator(k);
-			if(c.equals(creator)){
-				index = k;
-				break;
-			}
-		}
-		return index;
-	}
-
-	/**
-	 * 
-	 * @param newValue
-	 * @return
-	 */
-	private org.sbml.libsbml.CVTerm convertCVTerm(CVTerm newValue) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
