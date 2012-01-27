@@ -9,11 +9,11 @@ import jp.sbi.celldesigner.plugin.PluginAction;
 public class SimpleCellDesignerPluginAction extends PluginAction{
 
 	/**
-   * Generated serial version identifier.
-   */
-  private static final long serialVersionUID = 2080508810969190318L;
-  
-  private CDPluginTester plugin;
+	 * Generated serial version identifier.
+	 */
+	private static final long serialVersionUID = 2080508810969190318L;
+	
+	private CDPluginTester plugin;
 	
 	public SimpleCellDesignerPluginAction(CDPluginTester plugTest) {
 		this.plugin = plugTest;
