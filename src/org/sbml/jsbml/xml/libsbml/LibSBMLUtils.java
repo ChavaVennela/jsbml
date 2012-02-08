@@ -23,15 +23,18 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.AlgebraicRule;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Constraint;
 import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.MathContainer;
+import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.libsbml.ModelCreator;
+import org.sbml.libsbml.SBMLDocument;
 import org.sbml.libsbml.libsbmlConstants;
 
 /**
@@ -40,21 +43,37 @@ import org.sbml.libsbml.libsbmlConstants;
  * @since 1.0
  */
 public class LibSBMLUtils {
-	
+
 	/**
-	 * 
+	 * this method creates a new {@link ModelCreator} 
+	 * and fills it with the attributes of the given jsbml-{@link Creator}
 	 * @param c
 	 * @return
 	 */
 	public static ModelCreator convertToModelCreator(Creator c) {
-		// TODO Auto-generated method stub
-		return null;
+		org.sbml.libsbml.ModelCreator mc = new org.sbml.libsbml.ModelCreator();
+		if (c.isSetEmail()){
+			mc.setEmail(c.getEmail());
+		}
+		if (c.isSetFamilyName()){
+			mc.setFamilyName(c.getFamilyName());
+		}
+		if (c.isSetGivenName()){
+			mc.setGivenName(c.getGivenName());
+		}
+		if (c.isSetOrganisation()){
+			mc.setOrganisation(c.getOrganisation());
+		}
+		if (c.isSetOrganization()){
+			mc.setOrganization(c.getOrganization());
+		}
+		return mc;
 	}
 
 	/**
 	 * 
 	 * @param createdDate
-	 * @return
+	 * @return a libSBML Date-Object with the same attributes as the incoming parameter createdDate
 	 */
 	public static org.sbml.libsbml.Date convertDate(Date createdDate) {
 		Calendar c = Calendar.getInstance();
@@ -63,14 +82,15 @@ public class LibSBMLUtils {
 				.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH), c
 				.get(Calendar.HOUR), c.get(Calendar.MINUTE), c
 				.get(Calendar.SECOND), (int) Math.signum(c.getTimeZone()
-				.getRawOffset()), c.getTimeZone().getRawOffset() / 3600000, c
-				.getTimeZone().getRawOffset() / 60000);
+						.getRawOffset()), c.getTimeZone().getRawOffset() / 3600000, c
+						.getTimeZone().getRawOffset() / 60000);
 	}
 
 	/**
 	 * 
 	 * @param creator
-	 * @return
+	 * @param doc
+	 * @return integer index
 	 */
 	public static long getCreatorIndex(Creator creator, org.sbml.jsbml.SBMLDocument doc) {
 		int index = 0;
@@ -86,15 +106,87 @@ public class LibSBMLUtils {
 
 	/**
 	 * 
-	 * @param newValue
-	 * @return
+	 * @param t
+	 * @return a new libSBMl-CVTerm with the attributes of the incoming JSBML-CVTerm t
 	 */
-	public static org.sbml.libsbml.CVTerm convertCVTerm(CVTerm newValue) {
-		// TODO Auto-generated method stub
-		return null;
+	public static org.sbml.libsbml.CVTerm convertCVTerm(CVTerm t) {
+		org.sbml.libsbml.CVTerm libCVt = new org.sbml.libsbml.CVTerm();
+		switch (t.getQualifierType()) {
+		case MODEL_QUALIFIER:
+			libCVt.setQualifierType(libsbmlConstants.MODEL_QUALIFIER);
+			switch (t.getModelQualifierType()) {
+			case BQM_IS:
+				libCVt.setModelQualifierType(libsbmlConstants.BQM_IS);
+				break;
+			case BQM_IS_DESCRIBED_BY:
+				libCVt
+				.setModelQualifierType(libsbmlConstants.BQM_IS_DESCRIBED_BY);
+				break;
+			case BQM_UNKNOWN:
+				libCVt.setModelQualifierType(libsbmlConstants.BQM_UNKNOWN);
+				break;
+			default:
+				break;
+			}
+			break;
+		case BIOLOGICAL_QUALIFIER:
+			libCVt.setQualifierType(libsbmlConstants.BIOLOGICAL_QUALIFIER);
+			switch (t.getBiologicalQualifierType()) {
+			case BQB_ENCODES:
+				libCVt.setBiologicalQualifierType(libsbmlConstants.BQB_ENCODES);
+				break;
+			case BQB_HAS_PART:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_HAS_PART);
+				break;
+			case BQB_HAS_VERSION:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_HAS_VERSION);
+				break;
+			case BQB_IS:
+				libCVt.setBiologicalQualifierType(libsbmlConstants.BQB_IS);
+				break;
+			case BQB_IS_DESCRIBED_BY:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_IS_DESCRIBED_BY);
+				break;
+			case BQB_IS_ENCODED_BY:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_IS_ENCODED_BY);
+				break;
+			case BQB_IS_HOMOLOG_TO:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_IS_HOMOLOG_TO);
+				break;
+			case BQB_IS_PART_OF:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_IS_PART_OF);
+				break;
+			case BQB_IS_VERSION_OF:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_IS_VERSION_OF);
+				break;
+			case BQB_OCCURS_IN:
+				libCVt
+				.setBiologicalQualifierType(libsbmlConstants.BQB_OCCURS_IN);
+				break;
+			case BQB_UNKNOWN:
+				libCVt.setBiologicalQualifierType(libsbmlConstants.BQB_UNKNOWN);
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+		for (int j = 0; j < t.getNumResources(); j++) {
+			libCVt.addResource(t.getResourceURI(j));
+		}
+		return libCVt;
 	}
 
-	
+
 	/**
 	 * 
 	 * @param astnode
@@ -364,7 +456,7 @@ public class LibSBMLUtils {
 	}
 
 	/**
-	 * searches the index of the incoming unit in the ListOfUnits of the UnitDefinition
+	 * searches the index of the incoming {@link Unit} in the ListOfUnits of the {@link UnitDefinition}
 	 * @param unit
 	 * @param udef
 	 * @return
@@ -384,6 +476,7 @@ public class LibSBMLUtils {
 	/**
 	 * 
 	 * @param con
+	 * @param doc
 	 * @return
 	 */
 	public static int getContraintIndex(Constraint con, org.sbml.jsbml.SBMLDocument doc) {
@@ -397,7 +490,7 @@ public class LibSBMLUtils {
 		}
 		return index;
 	}
-	
+
 	/**
 	 * sets the name and the id in the libSBML object, when it's set in the JSBML object
 	 * and calls the method transferSBaseProperties(SBase, libSBase).
@@ -461,7 +554,7 @@ public class LibSBMLUtils {
 
 	}
 
-	
+
 	/**
 	 * sets MetaId, SBOTerm, Notes and Annotation in the libSBML object, 
 	 * if it's set in the JSBML object.
@@ -483,7 +576,7 @@ public class LibSBMLUtils {
 			libSBase.setAnnotation(sbase.getAnnotationString());
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param unit
@@ -601,5 +694,27 @@ public class LibSBMLUtils {
 			break;
 		}
 		return u.getKind();
+	}
+
+	/**
+	 * this method compares the strings of the formulas of the incoming {@link AlgebraicRule} and the AlgebraicRules in the libSBMlDocument
+	 * @param libDoc
+	 * @param algRule
+	 * @return null if the rule was not found in the libSBMLDocument, else the corresponding rule
+	 */
+	public static org.sbml.libsbml.AlgebraicRule getCorrespondingAlgRule(
+			SBMLDocument libDoc, AlgebraicRule algRule) {
+		if (libDoc.getModel().getListOfRules() != null){
+			for (int i=0; i<libDoc.getModel().getListOfRules().size(); i++){
+				org.sbml.libsbml.Rule r = libDoc.getModel().getListOfRules().get(i);
+				if (r.isAlgebraic()){
+					org.sbml.libsbml.AlgebraicRule ar = (org.sbml.libsbml.AlgebraicRule) r;
+					if (ar.getFormula().equals(algRule.getFormula())){
+						return ar;
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

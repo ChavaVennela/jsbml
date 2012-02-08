@@ -675,8 +675,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					// find the variable in the Rule object to remove it
 					if (node instanceof AlgebraicRule){
 						AlgebraicRule rule = (AlgebraicRule) node;
-						//TODO
-						//Problem: there is no Variable-String in AlgebraicRule objects
+						if (LibSBMLUtils.getCorrespondingAlgRule(libDoc, rule) != null){
+							LibSBMLUtils.getCorrespondingAlgRule(libDoc, rule).delete();
+						}
 					} else if (node instanceof AssignmentRule){
 						AssignmentRule rule = (AssignmentRule) node;
 						libModel.removeRule(rule.getVariable());
@@ -756,8 +757,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
 			correspondingElement.addCVTerm(LibSBMLUtils.convertCVTerm((CVTerm) evt.getNewValue()));
 		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)){
-			//TODO: this case can concern every SBase	
+			// this case can concern every SBase	
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
+			//TODO: there is no corresponding method in libSBML to add a declared namespace
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)){
 			Annotation anno = (Annotation) evtSrc;
 			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document", anno.getClass().getSimpleName()));
@@ -816,7 +818,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				SpeciesReference specRef = (SpeciesReference) evtSrc;
 				libDoc.getModel().getSpeciesReference(specRef.getId()).setConstant(specRef.getConstant());
 			}
-			// ...
 		} else if (prop.equals(TreeNodeChangeEvent.conversionFactor)){
 			if (evtSrc instanceof Species){
 				Species spec = (Species) evtSrc;
@@ -987,7 +988,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)){
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
 			//correspondingElement.setNamespaces(evt.getNewValue());
-			//TODO: How to set the Namespaces?
+			//TODO: How to set the namespaces? evt.getNewValue() returns a sorted set
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)){
 			//evtSrc is an Annotation-element
 			if (((SBase) evtSrc).getParentSBMLObject() != null){
@@ -1149,7 +1150,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libDoc.getModel().getRule(rrule.getVariable()).setUnits(rrule.getUnits());
 				} else if (rule instanceof AlgebraicRule){
 					AlgebraicRule algRule = (AlgebraicRule) rule;
-					//TODO
+					org.sbml.libsbml.AlgebraicRule libAlgRule = LibSBMLUtils.getCorrespondingAlgRule(libDoc, algRule);
+					if (libAlgRule != null){
+						libAlgRule.setUnits(algRule.getDerivedUnits());
+					}
 				} else if (rule instanceof AssignmentRule){
 					AssignmentRule assRule = (AssignmentRule) rule;
 					libDoc.getModel().getRule(assRule.getVariable()).setUnits(assRule.getUnits());
@@ -1182,7 +1186,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					libDoc.getModel().getRule((String)evt.getOldValue()).setVariable(rrule.getVariable());
 				} else if (rule instanceof AlgebraicRule){
 					AlgebraicRule algRule = (AlgebraicRule) rule;
-					//TODO
+					org.sbml.libsbml.AlgebraicRule libAlgRule = LibSBMLUtils.getCorrespondingAlgRule(libDoc, algRule);
+					libAlgRule.setVariable((String) evt.getNewValue());
 				} else if (rule instanceof AssignmentRule){
 					AssignmentRule assRule = (AssignmentRule) rule;
 					libDoc.getModel().getRule((String)evt.getOldValue()).setVariable(assRule.getVariable());
@@ -1341,9 +1346,12 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					Event event = (Event) trig.getParentSBMLObject();
 					return libDoc.getModel().getEvent(event.getId()).getTrigger();
 				} else if (evtSrc instanceof Rule){
-					Rule rule = (Rule) evtSrc;
 					if (evtSrc instanceof AlgebraicRule){
-						//TODO
+						if (LibSBMLUtils.getCorrespondingAlgRule(libDoc, (AlgebraicRule) evtSrc) != null){
+							return LibSBMLUtils.getCorrespondingAlgRule(libDoc, (AlgebraicRule) evtSrc);
+						}else{
+							logger.log(Level.DEBUG, String.format("Couldn't find the %s in the libSBML-Document", evtSrc.getClass().getSimpleName()));
+						}
 					}
 					else{
 						if (evtSrc instanceof RateRule){
