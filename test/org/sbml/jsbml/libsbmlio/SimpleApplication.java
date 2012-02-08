@@ -19,8 +19,10 @@
  */
 package org.sbml.jsbml.libsbmlio;
 
+import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.Unit.Kind;
 import org.sbml.jsbml.test.gui.JTreeOfSBML;
 import org.sbml.jsbml.xml.libsbml.LibSBMLChangeListener;
 import org.sbml.jsbml.xml.libsbml.LibSBMLReader;
@@ -46,43 +48,65 @@ public class SimpleApplication {
 			LibSBMLReader reader = new LibSBMLReader();
 			SBMLDocument doc = reader.convertSBMLDocument(args[0]);
 			//SBMLDocument doc = new SBMLDocument(2,4);
-			
+
 			org.sbml.libsbml.SBMLDocument libDoc = reader.getOriginalModel().getSBMLDocument();
 			//org.sbml.libsbml.SBMLDocument libDoc = new org.sbml.libsbml.SBMLDocument(2,4);
 			doc.addTreeNodeChangeListener(new LibSBMLChangeListener(doc, libDoc));
-			
+
 			/*
-			 * Some tests
+			 * Some tests to test nodeAdded in LibSBMLChangeListener
 			 */
 			Model model = doc.getModel();
 			if (model == null) {
 				model = doc.createModel("test_model");
 			}
 			model.createCompartmentType("ct001");
+			model.createCompartmentType("ct002");
 			model.createCompartment("c001");
+			model.createCompartment("c002");
 			model.createAlgebraicRule();
 			model.createAssignmentRule();
 			model.createConstraint();
 			model.createEvent("ev001");
+			model.createEvent("ev002");
+			model.getEvent("ev002").addCVTerm(new CVTerm());
 			model.createDelay();
+			model.createUnitDefinition();
+			model.createUnit(Kind.AMPERE);
+			model.createUnit(Kind.FARAD);
 			model.createEventAssignment();
-			model.createFunctionDefinition("func001");
+			model.createFunctionDefinition("func001"); // TODO: there is missing a call for a fireEvent
+			model.createFunctionDefinition("func002"); // TODO no nodeAdded-call here: why?
 			model.createInitialAssignment();
 			model.createParameter("param001");
 			model.createReaction("newReac001");
 			model.createKineticLaw();
 			model.createModifier();
+			model.createProduct("prod001");
+			model.createReactant();
+			model.createRateRule();
+			model.createSpecies("s001", model.getCompartment("c001"));
 			//model.createKineticParameter("param001");
-			
+
+			/*
+			 * some tests to test nodeRemoved in LibSBMLChangeListener
+			 */
 			model.removeCompartment("c001");
-			
+			for (int i=0; i<model.getListOfSpecies().size(); i++){
+				model.getListOfSpecies().remove(i);
+			}
+			model.removeConstraint(0);
+			model.removeEvent("ev001");
+			model.removeFunctionDefinition("func001");
+			model.removeCompartmentType("ct001");
+			model.removeParameter("param001");
+			model.removeUnitDefinition(0);
+
 			// Run some application:
 			new JTreeOfSBML(doc);
-			
-			// TODO: perform changes in the model.
-			
+
 			System.out.println(new org.sbml.libsbml.SBMLWriter().writeSBMLToString(libDoc));
-			
+
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
