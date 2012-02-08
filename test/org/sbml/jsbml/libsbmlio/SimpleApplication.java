@@ -19,7 +19,6 @@
  */
 package org.sbml.jsbml.libsbmlio;
 
-import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Unit.Kind;
@@ -69,7 +68,7 @@ public class SimpleApplication {
 			model.createConstraint();
 			model.createEvent("ev001");
 			model.createEvent("ev002");
-			model.getEvent("ev002").addCVTerm(new CVTerm());
+//			model.getEvent("ev002").addCVTerm(new CVTerm());
 			model.createDelay();
 			model.createUnitDefinition();
 			model.createUnit(Kind.AMPERE);
@@ -89,6 +88,15 @@ public class SimpleApplication {
 			//model.createKineticParameter("param001");
 
 			/*
+			 * some tests to test propertyChanged in LibSBMLChangeListener
+			 */
+			model.getSpecies("s001").setConstant(true);
+			model.getSpecies("s001").setBoundaryCondition(true);
+			model.getSpecies("s001").setHasOnlySubstanceUnits(false);
+			model.getSpecies("s001").setId("s01");
+			model.getSpecies("s01").setInitialAmount(0.3);
+			
+			/*
 			 * some tests to test nodeRemoved in LibSBMLChangeListener
 			 */
 			model.removeCompartment("c001");
@@ -101,6 +109,7 @@ public class SimpleApplication {
 			model.removeCompartmentType("ct001");
 			model.removeParameter("param001");
 			model.removeUnitDefinition(0);
+			model.getReaction("newReac001").removeProduct("prod001");
 
 			// Run some application:
 			new JTreeOfSBML(doc);

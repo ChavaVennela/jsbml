@@ -17,7 +17,6 @@
 package org.sbml.jsbml.xml.libsbml;
 
 import java.beans.PropertyChangeEvent;
-import java.io.Writer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -105,8 +104,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			org.sbml.libsbml.SBMLDocument libDoc) {
 		this.libDoc = libDoc;
 		this.doc = doc;
-		// TODO: hash all elements without id. JSBML --> libSBML
-		// all kinds of Rules, initialAssignment, stoichiometryMath (but this is inside of reactions), constraint
 	}
 
 
@@ -186,7 +183,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 					if (node instanceof SpeciesReference){
 						SpeciesReference specRef = (SpeciesReference) node;
-						if (specRef.getParentSBMLObject().equals(Type.listOfProducts)){
+						if (((ListOf<?>)specRef.getParentSBMLObject()).getSBaseListType().equals(Type.listOfProducts)){
 							org.sbml.libsbml.SpeciesReference libProduct = libDoc.getModel().createProduct();
 							if (specRef.isSetConstant()){
 								libProduct.setConstant(specRef.getConstant());
@@ -195,7 +192,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 								libProduct.setStoichiometry(specRef.getStoichiometry());
 							}
 							LibSBMLUtils.transferSimpleSpeciesReferenceProperties(specRef, libProduct);
-						} else if (specRef.getParentSBMLObject().equals(Type.listOfReactants)){
+						} else if (((ListOf<?>)specRef.getParentSBMLObject()).getSBaseListType().equals(Type.listOfReactants)){
 							org.sbml.libsbml.SpeciesReference libReactant = libDoc.getModel().createReactant();
 							if (specRef.isSetConstant()){
 								libReactant.setConstant(specRef.getConstant());
@@ -357,6 +354,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 
 			} else if (node instanceof SBMLDocument){
 				//TODO use method from LibSBMLWriter
+				// but i have no filename
 			} else if (node instanceof ListOf<?>){
 				// I don't have to ask what type of list the node is, 
 				// because of the recursion you get always the right case for every element in the list
@@ -551,10 +549,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (node instanceof ASTNode){
 			ASTNode astnode = (ASTNode) node;
-			if (astnode.getParentSBMLObject()!= null){
-				getCorrespondingSBaseElementInLibSBML(astnode.getParentSBMLObject());
-			}
-
 			logger.log(Level.DEBUG, String.format("Cannot add node" + astnode.getClass().getSimpleName()));
 		} else if (node instanceof TreeNodeAdapter){
 			TreeNodeAdapter treeNodeAd = (TreeNodeAdapter) node;
@@ -733,7 +727,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 	}
 
 
-	/* (non-Javadoc)
+	/* 
+	 * (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent evt) {
@@ -749,7 +744,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			correspondingElement.addCVTerm(LibSBMLUtils.convertCVTerm((CVTerm) evt.getNewValue()));
 		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)){
 			// this case can concern every SBase	
-			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
+			getCorrespondingSBaseElementInLibSBML(evtSrc);
 			//TODO: there is no corresponding method in libSBML to add a declared namespace
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)){
 			Annotation anno = (Annotation) evtSrc;
@@ -871,6 +866,12 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.history)){
 			// evtSrc is an Annotation-element
+			//TODO do something with the annotation
+			Annotation anno = (Annotation) evtSrc;
+			if (anno.getParent()!=null){
+				getCorrespondingSBaseElementInLibSBML(anno.getParent()).getAnnotation();
+			}
+
 		} else if (prop.equals(TreeNodeChangeEvent.id)){
 			if (evtSrc instanceof ASTNode){
 				ASTNode node = (ASTNode) evtSrc;
@@ -977,15 +978,13 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			NamedSBase nsb = (NamedSBase) evtSrc;
 			libDoc.getElementBySId(nsb.getId()).setName(nsb.getName());
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)){
-			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
-			//correspondingElement.setNamespaces(evt.getNewValue());
-			//TODO: How to set the namespaces? evt.getNewValue() returns a sorted set
+			// evtSrc is a XMLToken-element
+			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document", evtSrc.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)){
 			//evtSrc is an Annotation-element
-			if (((SBase) evtSrc).getParentSBMLObject() != null){
-				org.sbml.libsbml.SBase correspondingParentElement = getCorrespondingSBaseElementInLibSBML(((SBase) evtSrc).getParentSBMLObject());
-				//correspondingParentElement.getAnnotation()...;
-				//TODO
+			if (((Annotation) evtSrc).getParent() != null){
+				getCorrespondingSBaseElementInLibSBML(((Annotation) evtSrc).getParent()).getAnnotation();
+				//TODO: do something with the annotation
 			} else {
 				logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document, because there was no ParentSBMLObject found.", evtSrc.getClass().getSimpleName()));
 			}
@@ -1028,12 +1027,29 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				libDoc.getModel().getEvent(event.getId()).setPriority(prio);
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.qualifier)){
-			//TODO: CVTerm
+			// evtSrc is a CVTerm
+			CVTerm cvt = (CVTerm) evtSrc;
+			// convert evtSrc to a libSBML-CVTerm to compare the attributes and save the changes
+			org.sbml.libsbml.CVTerm myLibCvt = LibSBMLUtils.convertCVTerm(cvt);
+			for(int k=0; k<doc.getNumCVTerms();k++){
+				CVTerm cv = doc.getCVTerm(k);
+				if(cv.equals(cvt)){
+					org.sbml.libsbml.CVTerm libCvt = libDoc.getCVTerm(k);
+					if (myLibCvt.getQualifierType() != libCvt.getQualifierType())
+						libCvt.setQualifierType(myLibCvt.getQualifierType());
+					if (myLibCvt.getBiologicalQualifierType() != libCvt.getBiologicalQualifierType())
+						libCvt.setBiologicalQualifierType(myLibCvt.getBiologicalQualifierType());
+					if (myLibCvt.getModelQualifierType() != libCvt.getModelQualifierType())
+						libCvt.setModelQualifierType(myLibCvt.getModelQualifierType());
+					break;
+				}
+			}
+
 		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)){
 			// evtSrc is an Annotation
-			if (((SBase) evtSrc).getParentSBMLObject() != null){
-				org.sbml.libsbml.SBase correspondingParentElement = getCorrespondingSBaseElementInLibSBML(((SBase) evtSrc).getParentSBMLObject());
-				//TODO
+			if (((Annotation) evtSrc).getParent() != null){
+				getCorrespondingSBaseElementInLibSBML(((Annotation) evtSrc).getParent());
+				//TODO: do something with the annotation
 			} else {
 				logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document, because there was no ParentSBMLObject found.", evtSrc.getClass().getSimpleName()));
 			}
@@ -1236,7 +1252,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					else if (evtSrc instanceof QuantityWithUnit){
 						if (evtSrc instanceof LocalParameter){
 							LocalParameter locParam = (LocalParameter) evtSrc;
-							//TODO
+							KineticLaw kinLaw = (KineticLaw) locParam.getParentSBMLObject().getParentSBMLObject();
+							Reaction reac = kinLaw.getParentSBMLObject();
+							return libDoc.getModel().getReaction(reac.getId()).getKineticLaw().getLocalParameter(locParam.getId());
 						}
 						else if (evtSrc instanceof Symbol){
 							if (evtSrc instanceof Compartment){
