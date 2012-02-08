@@ -28,7 +28,6 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Constraint;
 import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.MathContainer;
-import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Unit;
@@ -497,6 +496,7 @@ public class LibSBMLUtils {
 	 * @param sbase
 	 * @param libSBase
 	 */
+	@SuppressWarnings("deprecation")
 	public static void transferNamedSBaseProperties(SBase sbase, org.sbml.libsbml.SBase libSBase){
 		if (((org.sbml.jsbml.NamedSBase) sbase).isSetName()){
 			libSBase.setName(((org.sbml.jsbml.NamedSBase) sbase).getName());
@@ -582,6 +582,7 @@ public class LibSBMLUtils {
 	 * @param unit
 	 * @param u
 	 */
+	@SuppressWarnings("deprecation")
 	public static int transferKindProperties(Unit unit, org.sbml.libsbml.Unit u) {
 		switch (unit.getKind()) {
 		case AMPERE:
@@ -702,6 +703,7 @@ public class LibSBMLUtils {
 	 * @param algRule
 	 * @return null if the rule was not found in the libSBMLDocument, else the corresponding rule
 	 */
+	@SuppressWarnings("deprecation")
 	public static org.sbml.libsbml.AlgebraicRule getCorrespondingAlgRule(
 			SBMLDocument libDoc, AlgebraicRule algRule) {
 		if (libDoc.getModel().getListOfRules() != null){

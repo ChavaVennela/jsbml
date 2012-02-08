@@ -17,7 +17,7 @@
 package org.sbml.jsbml.xml.libsbml;
 
 import java.beans.PropertyChangeEvent;
-import java.util.Date;
+import java.io.Writer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -73,9 +73,7 @@ import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.xml.XMLToken;
 import org.sbml.libsbml.ModelCreator;
 import org.sbml.libsbml.SBMLDocument;
-import org.sbml.libsbml.XMLNamespaces;
 import org.sbml.libsbml.XMLNode;
-import org.sbml.libsbml.libsbmlConstants;
 
 /**
  * @author Meike Aichele
@@ -358,7 +356,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				}
 
 			} else if (node instanceof SBMLDocument){
-				//TODO use method from LibSBMLReader
+				//TODO use method from LibSBMLWriter
 			} else if (node instanceof ListOf<?>){
 				// I don't have to ask what type of list the node is, 
 				// because of the recursion you get always the right case for every element in the list
@@ -481,18 +479,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 		} else if (node instanceof AnnotationElement){
 			if (node instanceof CVTerm){
 				CVTerm cvt = (CVTerm) node;
-				// there is no method to create a CVTerm in libSBML, 
-				// so it's set at the and of this case
-				org.sbml.libsbml.CVTerm libCvt = new org.sbml.libsbml.CVTerm();
-				if (cvt.isSetBiologicalQualifierType()){
-					libCvt.setBiologicalQualifierType(cvt.getBiologicalQualifierType().getElementNameEquivalent());
-				}
-				if (cvt.isSetQualifierType()){
-					//TODO
-					// libCvt.setQualifierType(cvt.getQualifierType());
-				}
-				// the case 'if (cvt.isSetType())' is not necessary, because it's already done in 'cvt.isSetQualifierType()'
-				libDoc.addCVTerm(libCvt);
+				libDoc.addCVTerm(LibSBMLUtils.convertCVTerm(cvt));
 			}
 			else if (node instanceof History){
 				History his = (History) node;
@@ -564,6 +551,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (node instanceof ASTNode){
 			ASTNode astnode = (ASTNode) node;
+			if (astnode.getParentSBMLObject()!= null){
+				getCorrespondingSBaseElementInLibSBML(astnode.getParentSBMLObject());
+			}
+
 			logger.log(Level.DEBUG, String.format("Cannot add node" + astnode.getClass().getSimpleName()));
 		} else if (node instanceof TreeNodeAdapter){
 			TreeNodeAdapter treeNodeAd = (TreeNodeAdapter) node;
@@ -1050,7 +1041,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			Reaction reac= (Reaction) evtSrc;
 			libDoc.getModel().getReaction(reac.getId()).setReversible(reac.getReversible());
 		} else if (prop.equals(TreeNodeChangeEvent.SBMLDocumentAttributes)){
-			//TODO: SBMLDocument, make recursion with the content of the doc-Attributes
 			org.sbml.jsbml.SBMLDocument sbmlDoc = (org.sbml.jsbml.SBMLDocument) evtSrc;
 			if (!sbmlDoc.getSBMLDocumentAttributes().containsValue(libDoc.getLevel())){
 				propertyChange(new TreeNodeChangeEvent(sbmlDoc, TreeNodeChangeEvent.level, libDoc.getLevel() , sbmlDoc.getLevel()));
@@ -1323,17 +1313,14 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				if (evtSrc instanceof FunctionDefinition){
 					FunctionDefinition funcDef = (FunctionDefinition) evtSrc;
 					return libDoc.getModel().getFunctionDefinition(funcDef.getId());
-				}
-				else if (evtSrc instanceof KineticLaw){
+				} else if (evtSrc instanceof KineticLaw){
 					KineticLaw kinLaw = (KineticLaw) evtSrc;
 					Reaction reac = kinLaw.getParentSBMLObject();
 					return libDoc.getModel().getReaction(reac.getId()).getKineticLaw();
-				}
-				else if (evtSrc instanceof InitialAssignment){
+				} else if (evtSrc instanceof InitialAssignment){
 					InitialAssignment initAssign = (InitialAssignment) evtSrc;
 					return libDoc.getModel().getInitialAssignment(initAssign.getSymbol());
-				}
-				else if (evtSrc instanceof EventAssignment){
+				} else if (evtSrc instanceof EventAssignment){
 					EventAssignment eventAssign = (EventAssignment) evtSrc;
 					Event event = (Event) eventAssign.getParentSBMLObject();
 					return libDoc.getModel().getEvent(event.getId()).getEventAssignment(eventAssign.getVariable());
@@ -1349,23 +1336,19 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (evtSrc instanceof AlgebraicRule){
 						if (LibSBMLUtils.getCorrespondingAlgRule(libDoc, (AlgebraicRule) evtSrc) != null){
 							return LibSBMLUtils.getCorrespondingAlgRule(libDoc, (AlgebraicRule) evtSrc);
-						}else{
+						} else {
 							logger.log(Level.DEBUG, String.format("Couldn't find the %s in the libSBML-Document", evtSrc.getClass().getSimpleName()));
 						}
-					}
-					else{
+					} else {
 						if (evtSrc instanceof RateRule){
 							return libDoc.getModel().getRule(((RateRule) evtSrc).getVariable());
-						}
-						else if (evtSrc instanceof Constraint){
+						} else if (evtSrc instanceof Constraint){
 							Constraint constr = (Constraint) evtSrc;
 							return libDoc.getModel().getConstraint(LibSBMLUtils.getContraintIndex(constr,doc));
-						}
-						else if (evtSrc instanceof Delay){
+						} else if (evtSrc instanceof Delay){
 							Delay delay = (Delay) evtSrc;
 							return libDoc.getModel().getEvent(delay.getParent().getId()).getDelay();
-						}
-						else if (evtSrc instanceof Priority){
+						} else if (evtSrc instanceof Priority){
 							Priority prio = (Priority) evtSrc;
 							Event prioEvent = prio.getParent();
 							return libDoc.getModel().getEvent(prioEvent.getId()).getPriority();
