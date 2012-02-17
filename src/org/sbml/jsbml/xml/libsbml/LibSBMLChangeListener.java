@@ -352,7 +352,7 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					LibSBMLUtils.transferKindProperties(unit, libUnit);
 				}
 
-			} else if (node instanceof SBMLDocument) {
+//			} else if (node instanceof SBMLDocument) {
 				// This can never happen because the top-level element SBMLDocument is never added to anything.
 			} else if (node instanceof ListOf<?>) {
 				// I don't have to ask what type of list the node is, 
@@ -503,8 +503,6 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			else if (node instanceof Annotation) {
 				Annotation annot = (Annotation) node;
 				if (annot.isSetParent()) {
-					org.sbml.libsbml.SBase sb = getCorrespondingSBaseElementInLibSBML(annot.getParent());
-					org.sbml.libsbml.XMLNode libAnnot = sb.getAnnotation();
 					SBase sbase = null;
 					org.sbml.libsbml.SBase libSBase = null;
 					if (annot.getParent() instanceof SBase) {
@@ -744,10 +742,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			//then the evtSrc is a SBase
 			org.sbml.libsbml.SBase correspondingElement = getCorrespondingSBaseElementInLibSBML(evtSrc);
 			correspondingElement.addCVTerm(LibSBMLUtils.convertCVTerm((CVTerm) evt.getNewValue()));
-		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)) {
-			// this case can concern every SBase	
-			getCorrespondingSBaseElementInLibSBML(evtSrc);
-			//TODO: there is no corresponding method in libSBML to add a declared namespace
+//		} else if (prop.equals(TreeNodeChangeEvent.addDeclaredNamespace)) {
+			//this case can be disregarded because libSBML does this without a hint
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)) {
 			Annotation anno = (Annotation) evtSrc;
 			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document", anno.getClass().getSimpleName()));
@@ -868,10 +864,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.history)) {
 			// evtSrc is an Annotation-element
-			//TODO do something with the annotation
 			Annotation anno = (Annotation) evtSrc;
 			if (anno.getParent() != null) {
-				getCorrespondingSBaseElementInLibSBML(anno.getParent()).getAnnotation();
+				org.sbml.libsbml.SBase sb = getCorrespondingSBaseElementInLibSBML(anno.getParent());
+				sb.setModelHistory(LibSBMLUtils.convertHistory(anno.getHistory()));
 			}
 
 		} else if (prop.equals(TreeNodeChangeEvent.id)) {
@@ -984,9 +980,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document", evtSrc.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)) {
 			//evtSrc is an Annotation-element
-			if (((Annotation) evtSrc).getParent() != null) {
-				getCorrespondingSBaseElementInLibSBML(((Annotation) evtSrc).getParent()).getAnnotation();
-				//TODO: do something with the annotation
+			Annotation annot = (Annotation) evtSrc;
+			if (annot.getParent() != null) {
+				org.sbml.libsbml.SBase sb = getCorrespondingSBaseElementInLibSBML(annot.getParent());
+				sb.setAnnotation(annot.getNonRDFannotation());
 			} else {
 				logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document, because there was no ParentSBMLObject found.", evtSrc.getClass().getSimpleName()));
 			}
@@ -1047,14 +1044,9 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 				}
 			}
 
-		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)) {
+//		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)) {
 			// evtSrc is an Annotation
-			if (((Annotation) evtSrc).getParent() != null) {
-				getCorrespondingSBaseElementInLibSBML(((Annotation) evtSrc).getParent());
-				//TODO: do something with the annotation
-			} else {
-				logger.log(Level.DEBUG, String.format("Couldn't change the %s in the libSBML-Document, because there was no ParentSBMLObject found.", evtSrc.getClass().getSimpleName()));
-			}
+			// this case can be disregarded because libSBML does this without a hint
 		} else if (prop.equals(TreeNodeChangeEvent.reversible)) {
 			Reaction reac= (Reaction) evtSrc;
 			libDoc.getModel().getReaction(reac.getId()).setReversible(reac.getReversible());

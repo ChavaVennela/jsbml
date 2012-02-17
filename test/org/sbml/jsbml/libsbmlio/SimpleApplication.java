@@ -19,6 +19,7 @@
  */
 package org.sbml.jsbml.libsbmlio;
 
+import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Unit.Kind;
@@ -68,14 +69,14 @@ public class SimpleApplication {
 			model.createConstraint();
 			model.createEvent("ev001");
 			model.createEvent("ev002");
-//			model.getEvent("ev002").addCVTerm(new CVTerm());
+			model.getEvent("ev002").addCVTerm(new CVTerm());
 			model.createDelay();
 			model.createUnitDefinition();
 			model.createUnit(Kind.AMPERE);
 			model.createUnit(Kind.FARAD);
 			model.createEventAssignment();
-			model.createFunctionDefinition("func001"); // TODO: there is missing a call for a fireEvent
-			model.createFunctionDefinition("func002"); // TODO no nodeAdded-call here: why?
+			model.createFunctionDefinition("func001"); 
+			model.createFunctionDefinition("func002");
 			model.createInitialAssignment();
 			model.createParameter("param001");
 			model.createReaction("newReac001");
