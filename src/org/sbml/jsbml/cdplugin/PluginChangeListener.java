@@ -156,28 +156,22 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		String prop = event.getPropertyName();
 		//TODO Each of these values have to be crosschecked whether they are used or not
 		//     If they are used, we have to parse them properly, else we can ignore them safely.
-		/**
-		 * Some of these TreeNodeChangeEvents are either not applicable for propertyChange or
-		 * not used since other methods are doing the work, therefore they're only listed here for 
-		 * documentation purposes:
-		 * - about
-		 * - addDeclaredNameSpace
-		 * - addExtension (no class in Plugin*)
-		 * - addNameSpace (no class in Plugin*)
-		 * - addNameSpace (no class in Plugin*)
-		 * - areaUnits (no class in Plugin*)
-		 * - baseListType (unclear how to access List<Of>)
-		 */
+
 		
 		if (prop.equals(TreeNodeChangeEvent.addCVTerm)) {
-			CVTerm cv = (CVTerm) event.getSource();
-			//TODO PluginCVTerm ?
+			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)) {
+			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)) {
+			//No PluginSBMLDocument available
 		} else if (prop.equals(TreeNodeChangeEvent.annotation)) {
+			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.annotationNameSpaces)) {
+			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.areaUnits)) {
+			//AreUnits can not be set in PluginModel
 		} else if (prop.equals(TreeNodeChangeEvent.baseListType)) {
+			//TODO method that "parses" all the lists properly
 		} else if (prop.equals(TreeNodeChangeEvent.boundaryCondition)) {
 			Species species = (Species) event.getSource();
 			PluginSpecies plugSpec = plugModel.getSpecies(species.getId());
@@ -189,25 +183,19 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugSpec.setCharge(species.getCharge());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.childNode)) {
-			//only called in ASTNode swapChilden(this,that) method
-			//TODO necessary to implement this ?
+			ASTNode node = (ASTNode) event.getSource();
+			//TODO How to go on? I don't know to which kind of type the ASTNode belongs here
 		} else if (prop.equals(TreeNodeChangeEvent.className)) {
-			//ASTNode related
+			//TODO ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.compartment)) {
-			if (event.getSource() instanceof Reaction){
-				Reaction r = (Reaction) event.getSource();
-				PluginReaction plugR = plugModel.getReaction(r.getId());
-				//there is no setCompartment() for PluginReaction - TODO 
-			} else if (event.getSource() instanceof Species){
+			if (event.getSource() instanceof Species){
 				Species spec = (Species) event.getSource();
 				PluginSpecies plugSpecies = plugModel.getSpecies(spec.getId());
 				plugSpecies.setCompartment(spec.getCompartment());
 				plugin.notifySBaseChanged(plugSpecies);
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.compartmentType)) {
-			CompartmentType compType = (CompartmentType) event.getSource();
-			PluginCompartmentType plugCompType = plugModel.getCompartmentType(compType.getId());
-			//no setCompartmentType available for Compartment or CompartmentType
+			// Deprecated Type? Should not be used anymore I think...
 		} else if (prop.equals(TreeNodeChangeEvent.constant)) {
 			//either symbol or speciesreference
 			if (event.getSource() instanceof SpeciesReference){
@@ -230,15 +218,15 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.created)) {
 			//must be history object
 			History hist = (History) event.getSource();
-			//there is no pluginhistory
+			//TODO What to do with a History Object? No PluginHistory available
 		} else if (prop.equals(TreeNodeChangeEvent.creator)) {
-			//there is no history
+			//TODO History not available
 		} else if (prop.equals(TreeNodeChangeEvent.currentList)) {
-			//only avilable in propertyChange
+			//unused method
 		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)) {
 			//ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.denominator)) {
-			//ASTNode
+			//ASTNode or SpeciesReference for which there is not getSpeciesReference method available 
 		} else if (prop.equals(TreeNodeChangeEvent.email)) {
 			//PluginCreator does not exist in CD
 		} else if (prop.equals(TreeNodeChangeEvent.encoding)) {
@@ -246,58 +234,54 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.exponent)) {
 			//ASTNode or Unit
 			if (event.getSource() instanceof ASTNode){
-				
+			 //TODO Can't locate an ASTNode or check whether I got the right one
 			} else if (event.getSource() instanceof Unit){
 				Unit ut = (Unit) event.getSource();
-				//how to get the appropriate element ?
-				//TODO
+				//TODO I can't check to which kind of type the Unit belongs to. 
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.extentUnits)) {
 			//PluginModel does not offer setExtentUnits or similar methods
 		} else if (prop.equals(TreeNodeChangeEvent.familyName)) {
-			//no PluginCreator
+			//PluginCreator does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.fast)) {
 			Reaction r = (Reaction) event.getSource();
 			PluginReaction plugR = plugModel.getReaction(r.getId());
 			plugR.setFast(r.getFast());
 			plugin.notifySBaseChanged(plugR);
 		} else if (prop.equals(TreeNodeChangeEvent.formula)) {
-			//nowhere only in PluginChangeListener
+			//Unused method
 		} else if (prop.equals(TreeNodeChangeEvent.givenName)) {
-			// no PluginCreator class avilable
+			//PluginCreator does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)) {
 			Species spec = (Species) event.getSource();
 			PluginSpecies plugSpec = plugModel.getSpecies(spec.getId());
 			plugSpec.setHasOnlySubstanceUnits(spec.getHasOnlySubstanceUnits());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.history)) {
-			// no PluginHistory class available
+			//History does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.id)) {
-			//AbstractNamedSBase has this, as well as ASTNode --> Dont know how to parse this
+			//TODO: Can't locate AbstractNamedSBase in the plugModel.
 		} else if (prop.equals(TreeNodeChangeEvent.initialAmount)) {
 			Species spec = (Species) event.getSource();
 			PluginSpecies plugSpec = plugModel.getSpecies(spec.getId());
 			plugSpec.setInitialAmount(spec.getInitialAmount());
 			plugSpec.setInitialConcentration(spec.getInitialConcentration());
-			//TODO do i have to set both ?
-			//Can i distinguish between initialAmount() and/or initialConcentration() ?
 		} else if (prop.equals(TreeNodeChangeEvent.initialValue)) {
-			//ASTNode or Trigger
-			//no PluginTrigger available
+			//ASTNode or Trigger - PluginTrigger does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.isEOF)) {
-			//not used at all
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.isExplicitlySetConstant)) {
-			//not LocalParameter in Plugin*
+			//LocalParameter does not exist in CD
 		} else if (prop.equals(TreeNodeChangeEvent.isSetNumberType)) {
 			//ASTnode
 		} else if (prop.equals(TreeNodeChangeEvent.kind)) {
 			//how to get PluginUnits () ? 
 		} else if (prop.equals(TreeNodeChangeEvent.kineticLaw)) {
-			//only used in this class
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.lengthUnits)) {
-			//no setLengthUnits() or similar method in pluginModel
+			//TODO: no setLengthUnits() or similar method in pluginModel
 		} else if (prop.equals(TreeNodeChangeEvent.level)) {
-			//how to set in AbstractSBase the level?
+			//AbstractSBase - unclear how to set the level here.
 		} else if (prop.equals(TreeNodeChangeEvent.listOfUnits)) {
 			//no setListOfUnits in plugModel available
 		} else if (prop.equals(TreeNodeChangeEvent.mantissa)) {
@@ -308,17 +292,17 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.message)) {
 			Constraint c = (Constraint) event.getSource();
 			PluginConstraint plugC = plugModel.getConstraint(c.getMathMLString());
-			//TODO how to setMessage in plugConstraint?
+			//TODO PluginConstraint does not allow setting a message. What do with that ?
 		} else if (prop.equals(TreeNodeChangeEvent.messageBuffer)) {
-			//only used in this class
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.metaId)) {
-			//AbstractSBase
+			//AbstractSBase - is this used anywhere?
 		} else if (prop.equals(TreeNodeChangeEvent.model)) {
-			//no SBMLDocument in Plugin*
+			//SBMLDocument is a JSBML related class
 		} else if (prop.equals(TreeNodeChangeEvent.modified)) {
-			//no history in Plugin*
+			//History does not exist in CD
 		} else if (prop.equals(TreeNodeChangeEvent.multiplier)) {
-			// how to get Units in PluginModel?
+			//Can't locate Units in pluginModel
 		} else if (prop.equals(TreeNodeChangeEvent.name)) {
 			if (event.getSource() instanceof FunctionDefinition){
 				FunctionDefinition funcDef = (FunctionDefinition) event.getSource();
@@ -328,19 +312,19 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 			//TODO ASTNode and AbstractNamedSBase are not used atm
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)) {
-			//only in this class used
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)) {
 			//only used in Annotation, theres no PluginAnnotation
 		} else if (prop.equals(TreeNodeChangeEvent.notes)) {
 			//AbstractSBase - how to use in Plugin*?
 		} else if (prop.equals(TreeNodeChangeEvent.notesBuffer)) {
-			//only used in this class
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.numerator)) {
 			//ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.offset)) {
 			//How to access PluginUnit
 		} else if (prop.equals(TreeNodeChangeEvent.organisation)) {
-			//no pluginCreator
+			//PluginCreator does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.outside)) {
 			Compartment c = (Compartment) event.getSource();
 			PluginCompartment plugC = plugModel.getCompartment(c.getId());
@@ -349,15 +333,15 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.parentSBMLObject)) {
 			//AbstractSBase
 		} else if (prop.equals(TreeNodeChangeEvent.persistent)) {
-			//no PlugiNTrigger (how to get ParentObject Event?) TODO
+			//PluginTrigger does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.priority)) {
 			Event evt = (Event) event.getSource();
 			PluginEvent plugEvt = plugModel.getEvent(evt.getId());
-			//no setpriority in PluginEvent class
+			//Priority can not be set in PluginEvent
 		} else if (prop.equals(TreeNodeChangeEvent.qualifier)) {
 			//CVterm - libsbml
 		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)) {
-			//No pluginannotation
+			//PluginAnnotation does not exist. 
 		} else if (prop.equals(TreeNodeChangeEvent.resource)) {
 			//only used in this class
 		} else if (prop.equals(TreeNodeChangeEvent.reversible)) {
@@ -386,7 +370,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugSpec.setSpatialSizeUnits(spec.getSpatialSizeUnits());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.species)) {
-			//dont know how to getSimpleSpeciesReference in Plugin*
+			//SimpleSpeciesReference does not exist in Plugin
 		} else if (prop.equals(TreeNodeChangeEvent.speciesType)) {
 			Species spec = (Species) event.getSource();
 			PluginSpecies plugSpec = plugModel.getSpecies(spec.getId());
@@ -402,14 +386,14 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugReac.getKineticLaw().setSubstanceUnits(klaw.getSubstanceUnits());
 			plugin.notifySBaseChanged(plugReac);
 		} else if (prop.equals(TreeNodeChangeEvent.symbol)) {
-			//only used in this class
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.SBMLDocumentAttributes)) {
-			//only used in this class
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.text)) {
-			//only used in this class
+			//unused
 		} else if (prop.equals(TreeNodeChangeEvent.timeUnits)) {
 			//here timeUnits can belong to Event, KineticLaw and Model (and as well several subfunctions...)
-			//TODO what to do in such a case ?
+			//TODO what to do in such a case ? Write a submethod to distinguish between all possible types?
 		} else if (prop.equals(TreeNodeChangeEvent.type)) {
 			//ASTNode or CVTerm (libsbml?)
 		} else if (prop.equals(TreeNodeChangeEvent.units)) {
@@ -428,7 +412,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			//ASTNode or Quantitywithunit (there is no PluginQuantity or something like that)
 			
 		} else if (prop.equals(TreeNodeChangeEvent.variable)) {
-			// Ambigous Classes -> Event Assignment, ExplicitRule and or Initial Assignment
+			// More than one class here -> Event Assignment, ExplicitRule and or Initial Assignment
 		} else if (prop.equals(TreeNodeChangeEvent.version)) {
 			//AbstractSBase
 		} else if (prop.equals(TreeNodeChangeEvent.volume)) {
@@ -439,7 +423,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.volumeUnits)) {
 			//No method setVolumeUnits in PluginModel found
 		} else if (prop.equals(TreeNodeChangeEvent.xmlTriple)) {
-			//only used in this class
+			//unused
 		}  
 	}
 
