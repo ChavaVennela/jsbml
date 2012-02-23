@@ -20,9 +20,11 @@
 package org.sbml.jsbml.libsbmlio;
 
 import org.sbml.jsbml.ASTNode;
+import org.sbml.jsbml.ASTNode.Type;
 import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Delay;
+import org.sbml.jsbml.EventAssignment;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.RateRule;
@@ -80,8 +82,8 @@ public class SimpleApplication {
 			model.createUnit(Kind.AMPERE);
 			model.createUnit(Kind.FARAD);
 			model.createEventAssignment();
-			model.createFunctionDefinition("func001"); // TODO: there is missing a call for a fireEvent
-			model.createFunctionDefinition("func002"); // TODO no nodeAdded-call here: why?
+			model.createFunctionDefinition("func001"); 
+			model.createFunctionDefinition("func002"); 
 			model.createInitialAssignment();
 			model.createParameter("param001");
 			model.createReaction("newReac001");
@@ -102,19 +104,21 @@ public class SimpleApplication {
 			model.getSpecies("s001").setId("s01");
 			model.getSpecies("s01").setInitialAmount(0.3);
 			model.getFunctionDefinition("func001").setAnnotation(new Annotation("new annotation"));
-			model.getFunctionDefinition("func001").setFormula("2*x");
 			model.getFunctionDefinition("func001").setHistory(new History());
 			model.getFunctionDefinition("func001").setLevel(2);
-			model.getFunctionDefinition("func001").setMath(new ASTNode("ast1"));
+			model.getFunctionDefinition("func001").setMath(new ASTNode(Type.LAMBDA));
 			model.getFunctionDefinition("func001").setName("funcdef001");
 			model.getFunctionDefinition("func001").setNotes("new notes");
 			model.getFunctionDefinition("func001").setVersion(3);
-			model.getFunctionDefinition("func001").setSBOTerm("sboid");
+			model.getFunctionDefinition("func001").setSBOTerm(3);
 			model.getEvent("ev001").setDelay(new Delay());
 			model.getEvent("ev001").setMetaId("new metaid event");
-			model.getEvent("ev001").setTimeUnits("NewTimeUnits");
-			model.getEvent("ev001").setUseValuesFromTriggerTime(true);
-			model.getEvent("ev001").setUnits(Kind.GRAM);
+			model.getEvent("ev001").addEventAssignment(new EventAssignment());
+			model.getEvent("ev001").getEventAssignment(0).setVariable("variable");
+			model.getEvent("ev001").getEventAssignment(0).setMath(new ASTNode(Type.DIVIDE));
+//			model.getEvent("ev001").setTimeUnits("NewTimeUnits");
+//			model.getEvent("ev001").setUseValuesFromTriggerTime(true);
+//			model.getEvent("ev001").setUnits(Kind.GRAM);
 			
 
 			/*
@@ -123,14 +127,15 @@ public class SimpleApplication {
 			model.removeCompartment("c001");
 			model.getListOfSpecies().remove(model.getListOfSpecies().size()-1);
 			model.removeConstraint(model.getListOfConstraints().size()-1);
-			model.removeEvent("ev001");
-			model.removeFunctionDefinition("func001");
+			model.removeEvent("ev002");
+			model.removeFunctionDefinition("func002");
 			model.removeCompartmentType("ct001");
 			model.removeParameter("param001");
 			model.removeUnitDefinition(model.getListOfUnitDefinitions().size()-1);
 			model.getReaction("newReac001").removeProduct("prod001");
 			model.removeInitialAssignment(model.getListOfInitialAssignments().size()-1);
 			model.removeRule(rr.getVariable());
+//			model.getEvent("ev001").removeEventAssignment("variable");
 
 			// Run some application:
 			new JTreeOfSBML(doc);
