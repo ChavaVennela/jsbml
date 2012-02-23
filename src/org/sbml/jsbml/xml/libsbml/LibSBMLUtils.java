@@ -417,8 +417,83 @@ public class LibSBMLUtils {
 	 * @return
 	 */
 	public static ModelHistory convertHistory(History history) {
-		// TODO Auto-generated method stub
-		return null;
+		org.sbml.libsbml.ModelHistory mo = new org.sbml.libsbml.ModelHistory();
+		if (history.isSetCreatedDate())
+			mo.setCreatedDate(LibSBMLUtils.convertDate(history.getCreatedDate()));
+		if (history.isSetModifiedDate())
+			mo.setModifiedDate(LibSBMLUtils.convertDate(history.getModifiedDate()));
+		// add creators
+		for (Creator mc : history.getListOfCreators()) {
+			boolean equal = false;
+			boolean nothingSet = true;
+			for (long i = 0; i < mo.getNumCreators() && !equal; i++) {
+				org.sbml.libsbml.ModelCreator moc = mo.getCreator(i);
+				equal = moc.isSetEmail() == mc.isSetEmail();
+				if (moc.isSetEmail() && mc.isSetEmail()) {
+					equal &= moc.getEmail().equals(mc.getEmail());
+					nothingSet = false;
+				}
+				equal &= moc.isSetFamilyName() == mc.isSetFamilyName();
+				if (moc.isSetFamilyName() && mc.isSetFamilyName()) {
+					equal &= moc.getFamilyName().equals(mc.getFamilyName());
+					nothingSet = false;
+				}
+				equal &= moc.isSetGivenName() == mc.isSetGivenName();
+				if (moc.isSetGivenName() && mc.isSetGivenName()) {
+					equal &= moc.getGivenName().equals(mc.getGivenName());
+					nothingSet = false;
+				}
+				equal &= moc.isSetOrganization() == mc.isSetOrganization();
+				if (moc.isSetOrganization() && mc.isSetOrganization()) {
+					equal &= moc.getOrganization().equals(mc.getOrganization());
+					nothingSet = false;
+				}
+			}
+			if (!equal || (equal && nothingSet)) {
+				org.sbml.libsbml.ModelCreator moc = new org.sbml.libsbml.ModelCreator();
+				moc.setEmail(mc.getEmail());
+				moc.setFamilyName(mc.getFamilyName());
+				moc.setGivenName(mc.getGivenName());
+				moc.setOrganization(mc.getOrganization());
+				mo.addCreator(moc);
+			}
+		}
+		// remove unnecessary creators
+		for (long i = mo.getNumCreators() - 1; i >= 0; i--) {
+			boolean contains = false;
+			boolean nothingSet = true;
+			org.sbml.libsbml.ModelCreator moc = mo.getCreator(i);
+			for (int j = 0; j < history.getNumCreators() && !contains; j++) {
+				Creator mc = history.getCreator(j);
+				contains = moc.isSetEmail() == mc.isSetEmail();
+				if (moc.isSetEmail() && mc.isSetEmail()) {
+					contains &= moc.getEmail().equals(mc.getEmail());
+					nothingSet = false;
+				}
+				contains &= moc.isSetFamilyName() == mc.isSetFamilyName();
+				if (moc.isSetFamilyName() && mc.isSetFamilyName()) {
+					contains &= moc.getFamilyName().equals(mc.getFamilyName());
+					nothingSet = false;
+				}
+				contains &= moc.isSetGivenName() == mc.isSetGivenName();
+				if (moc.isSetGivenName() && mc.isSetGivenName()) {
+					contains &= moc.getGivenName().equals(mc.getGivenName());
+					nothingSet = false;
+				}
+				contains &= moc.isSetOrganization() == mc.isSetOrganization();
+				if (moc.isSetOrganization() && mc.isSetOrganization()) {
+					contains &= moc.getOrganization().equals(
+							mc.getOrganization());
+					nothingSet = false;
+				}
+				if (nothingSet)
+					contains = false;
+			}
+			if (!contains){
+				mo.getListCreators().remove(i);
+			}
+		}
+		return mo;
 	}
 
 

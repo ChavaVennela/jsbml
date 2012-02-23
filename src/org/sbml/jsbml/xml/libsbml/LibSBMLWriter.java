@@ -32,13 +32,11 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.CompartmentType;
 import org.sbml.jsbml.Constraint;
-import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.Delay;
 import org.sbml.jsbml.Event;
 import org.sbml.jsbml.EventAssignment;
 import org.sbml.jsbml.ExplicitRule;
 import org.sbml.jsbml.FunctionDefinition;
-import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
 import org.sbml.jsbml.LocalParameter;
@@ -1524,13 +1522,14 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		}
 	}
 
+	// this method is now in LibSBMLUtils, called convertHistory()
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.sbml.jlibsbml.SBMLWriter#saveModelHistoryProperties(org.sbml.jlibsbml
 	 * .Model, java.lang.Object)
-	 */
+	 
 	private void saveHistoryProperties(History m, Object modelHistory) {
 		if (!(modelHistory instanceof org.sbml.libsbml.ModelHistory))
 			throw new IllegalArgumentException(
@@ -1632,7 +1631,7 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 			if (!contains)
 				mo.getListModifiedDates().remove(i);
 		}
-	}
+	}*/
 
 	/*
 	 * (non-Javadoc)
@@ -1890,9 +1889,8 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		}
 		if (s.isSetHistory()) {
 			if (!po.isSetModelHistory()) {
-				po.setModelHistory(new org.sbml.libsbml.ModelHistory());
+				po.setModelHistory(LibSBMLUtils.convertHistory(s.getHistory()));
 			}
-			saveHistoryProperties(s.getHistory(), po.getModelHistory());
 		}
 		// remove CVTerms that are not needed anymore.
 		for (long i = po.getNumCVTerms() - 1; i >= 0; i--) {
