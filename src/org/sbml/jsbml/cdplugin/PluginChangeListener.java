@@ -371,7 +371,13 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugSpec.setSpatialSizeUnits(spec.getSpatialSizeUnits());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.species)) {
-			//SimpleSpeciesReference does not exist in Plugin
+			if (event.getSource() instanceof SpeciesReference){
+				SpeciesReference specRef = (SpeciesReference) event.getSource();
+				//TODO do this
+			} else if (event.getSource() instanceof ModifierSpeciesReference){
+				//TODO do that
+				ModifierSpeciesReference modspecRef = (ModifierSpeciesReference) event.getSource();			
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.speciesType)) {
 			Species spec = (Species) event.getSource();
 			PluginSpecies plugSpec = plugModel.getSpecies(spec.getId());
@@ -412,8 +418,18 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.type)) {
 			//ASTNode or CVTerm (libsbml?)
 		} else if (prop.equals(TreeNodeChangeEvent.units)) {
-			//AbstractNamedSBaseWithUnit, ASTNode, ExplicitRule, KineticLaw and Model
-			//see timeUnits. what to do in such a case ?
+			if (event.getSource() instanceof KineticLaw){
+				KineticLaw klaw = (KineticLaw) event.getSource();
+				PluginReaction r = plugModel.getReaction(klaw.getParent().getId());
+				//TODO can't set anything in r.getKineticLaw() -- how to proceed here?
+			} else if (event.getSource() instanceof ExplicitRule){
+				ExplicitRule er = (ExplicitRule) event.getSource();
+				//TODO how to proceed with an explicit rule ?
+			} else if (event.getSource() instanceof ASTNode){
+				//TODO
+			} else if (event.getSource() instanceof Model){
+				//TODO
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.unsetCVTerms)) {
 			//AStnode or Annotation (pluginAnnotation does not exist)
 		} else if (prop.equals(TreeNodeChangeEvent.userObject)) {
@@ -426,7 +442,16 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.value)) {
 			//ASTNode or Quantitywithunit (there is no PluginQuantity or something like that)
 		} else if (prop.equals(TreeNodeChangeEvent.variable)) {
-			// More than one class here -> Event Assignment, ExplicitRule and or Initial Assignment
+			Object evtSrc = event.getSource();
+			if (evtSrc instanceof EventAssignment){
+				//TODO
+			} else if (evtSrc instanceof ExplicitRule){
+				//TODO
+			} else if (evtSrc instanceof InitialAssignment){
+				InitialAssignment ia = (InitialAssignment) evtSrc;
+				PluginInitialAssignment plI = plugModel.getInitialAssignment(ia.getSymbol());
+				//TODO Can't call setVariable on PluginInitialAssignment object
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.version)) {
 			//AbstractSBase
 		} else if (prop.equals(TreeNodeChangeEvent.volume)) {
