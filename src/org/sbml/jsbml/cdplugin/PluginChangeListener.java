@@ -34,6 +34,7 @@ import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
 import jp.sbi.celldesigner.plugin.PluginInitialAssignment;
 import jp.sbi.celldesigner.plugin.PluginKineticLaw;
 import jp.sbi.celldesigner.plugin.PluginListOf;
+import jp.sbi.celldesigner.plugin.PluginMassShowerAction;
 import jp.sbi.celldesigner.plugin.PluginModel;
 import jp.sbi.celldesigner.plugin.PluginModifierSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginParameter;
@@ -80,6 +81,7 @@ import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.Parameter;
 import org.sbml.jsbml.Priority;
 import org.sbml.jsbml.QuantityWithUnit;
 import org.sbml.jsbml.RateRule;
@@ -157,134 +159,165 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		//TODO Each of these values have to be crosschecked whether they are used or not
 		//     If they are used, we have to parse them properly, else we can ignore them safely.
 		if (prop.equals(TreeNodeChangeEvent.addCVTerm)) {
+			Annotation anno = (Annotation) eventsource;
+			TreeNode t = anno.getParent();
+			CVTerm term = event.getNewValue() != null? (CVTerm) event.getNewValue(): null;
+		//TODO Here one needs to search the corresponding TreeNode t
 			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)) {
 			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)) {
-			//No PluginSBMLDocument available
+			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the Model", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.annotation)) {
 			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.annotationNameSpaces)) {
 			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.areaUnits)) {
-			//AreUnits can not be set in PluginModel
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.baseListType)) {
 			//TODO method that "parses" all the lists properly
 		} else if (prop.equals(TreeNodeChangeEvent.boundaryCondition)) {
-			Species species = (Species) event.getSource();
+			Species species = (Species) eventsource;
 			PluginSpecies plugSpec = plugModel.getSpecies(species.getId());
 			plugSpec.setBoundaryCondition(species.getBoundaryCondition());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.charge)) {
-			Species species = (Species) event.getSource();
+			Species species = (Species) eventsource;
 			PluginSpecies plugSpec = plugModel.getSpecies(species.getId());
 			plugSpec.setCharge(species.getCharge());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.childNode)) {
-			ASTNode node = (ASTNode) event.getSource();
-			//TODO How to go on? I don't know to which kind of type the ASTNode belongs here
+			ASTNode node = (ASTNode) eventsource;
+			MathContainer conti = node.getParentSBMLObject();
+			conti.setMath((ASTNode) event.getNewValue());
+			plugin.notifySBaseChanged(plugModel);
 		} else if (prop.equals(TreeNodeChangeEvent.className)) {
-			//TODO ASTNode
+			ASTNode node = (ASTNode) eventsource;
+			MathContainer conti = node.getParentSBMLObject();
+			conti.setMath((ASTNode) event.getNewValue());
+			plugin.notifySBaseChanged(plugModel);
 		} else if (prop.equals(TreeNodeChangeEvent.compartment)) {
-			if (event.getSource() instanceof Species){
-				Species spec = (Species) event.getSource();
+			if (eventsource instanceof Species){
+				Species spec = (Species) eventsource;
 				PluginSpecies plugSpecies = plugModel.getSpecies(spec.getId());
 				plugSpecies.setCompartment(spec.getCompartment());
 				plugin.notifySBaseChanged(plugSpecies);
+			} else if(eventsource instanceof Reaction){
+				logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.compartmentType)) {
-			// Deprecated Type? Should not be used anymore I think...
+			Compartment c = (Compartment) eventsource;
+			PluginCompartment pc = plugModel.getCompartment(c.getId());
+			pc.setCompartmentType(c.getCompartmentType());
+			plugin.notifySBaseChanged(pc);
 		} else if (prop.equals(TreeNodeChangeEvent.constant)) {
-			//either symbol or speciesreference
 			if (event.getSource() instanceof SpeciesReference){
-				SpeciesReference specRef = (SpeciesReference) event.getSource();
-				//there is no PluginSpeciesReference class 
+				logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 			} else if (event.getSource() instanceof Symbol){
-				Symbol sym = (Symbol) event.getSource();
-				//there is no PluginSymbol class available
+				if (eventsource instanceof Compartment){
+					Compartment c = (Compartment) eventsource;
+					PluginCompartment pc = plugModel.getCompartment(c.getId());
+					pc.setConstant(c.getConstant());
+					plugin.notifySBaseChanged(pc);
+				} else if (eventsource instanceof Parameter){
+					Parameter p = (Parameter) eventsource;
+					PluginParameter pp = plugModel.getParameter(p.getId());
+					pp.setConstant(p.getConstant());
+					plugin.notifySBaseChanged(pp);
+				} else if (eventsource instanceof Species){
+					Species sp = (Species) eventsource;
+					PluginSpecies pspec = plugModel.getSpecies(sp.getId());
+					pspec.setConstant(sp.getConstant());
+					plugin.notifySBaseChanged(pspec);
+				}
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.conversionFactor)) {
-			//either Model or Species
-			if (event.getSource() instanceof Model){
-				Model mod = (Model) event.getSource();
-				//no function setConversionFactor...
-			} else if (event.getSource() instanceof Species){
-				Species spec = (Species) event.getSource();
-				PluginSpecies plugSpec = plugModel.getSpecies(spec.getId());
-				// no setConversionFactor method available
-			}
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.created)) {
-			//must be history object
-			//TODO What to do with a History Object? No PluginHistory available
+			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.creator)) {
-			//TODO History not available
+			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.currentList)) {
 			logger.log(Level.DEBUG, String.format("Unused propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)) {
-			//ASTNode
+			ASTNode node = (ASTNode) eventsource;
+			MathContainer conti = node.getParentSBMLObject();
+			//TODO ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.denominator)) {
 			//ASTNode or SpeciesReference for which there is not getSpeciesReference method available 
 		} else if (prop.equals(TreeNodeChangeEvent.email)) {
-			//PluginCreator does not exist in CD
+			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.encoding)) {
 			//ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.exponent)) {
 			//ASTNode or Unit
 			if (event.getSource() instanceof ASTNode){
-				ASTNode node = (ASTNode) event.getSource();
+				ASTNode node = (ASTNode) eventsource;
 				MathContainer cont = node.getParentSBMLObject();
 				cont.setMath(node);
 				//TODO I think we can't do that
 			} else if (event.getSource() instanceof Unit){
 				Unit ut = (Unit) event.getSource();
-				
-				//TODO I can't check to which kind of type the Unit belongs to. 
+				UnitDefinition put = (UnitDefinition) ut.getParent().getParentSBMLObject();
+				PluginUnitDefinition plugUt = plugModel.getUnitDefinition(put.getId());
+				for (Unit unit: put.getListOfUnits()){
+					if (unit.areIdentical(unit, ut)){
+						//TODO what do we do then ?
+					}
+				}
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.extentUnits)) {
-			//PluginModel does not offer setExtentUnits or similar methods
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.familyName)) {
-			//PluginCreator does not exist
+			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.fast)) {
-			Reaction r = (Reaction) event.getSource();
+			Reaction r = (Reaction) eventsource;
 			PluginReaction plugR = plugModel.getReaction(r.getId());
 			plugR.setFast(r.getFast());
 			plugin.notifySBaseChanged(plugR);
 		} else if (prop.equals(TreeNodeChangeEvent.formula)) {
 			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.givenName)) {
-			//PluginCreator does not exist
+			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)) {
-			Species spec = (Species) event.getSource();
+			Species spec = (Species) eventsource;
 			PluginSpecies plugSpec = plugModel.getSpecies(spec.getId());
 			plugSpec.setHasOnlySubstanceUnits(spec.getHasOnlySubstanceUnits());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.history)) {
-			//History does not exist
+			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.id)) {
 			//TODO: Can't locate AbstractNamedSBase in the plugModel.
 		} else if (prop.equals(TreeNodeChangeEvent.initialAmount)) {
-			Species spec = (Species) event.getSource();
+			Species spec = (Species) eventsource;
 			PluginSpecies plugSpec = plugModel.getSpecies(spec.getId());
 			plugSpec.setInitialAmount(spec.getInitialAmount());
 			plugSpec.setInitialConcentration(spec.getInitialConcentration());
 		} else if (prop.equals(TreeNodeChangeEvent.initialValue)) {
-			//ASTNode or Trigger - PluginTrigger does not exist
+			if (eventsource instanceof Trigger){
+				logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
+			} else if (eventsource instanceof ASTNode){
+				//TODO ASTNode behaviour needs to be changed here
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.isEOF)) {
 			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.isExplicitlySetConstant)) {
-			//LocalParameter does not exist in CD
+			LocalParameter lpam = (LocalParameter) eventsource;
+//TODO Parse localparameter to PluginParameter and add to KineticLaw inside a reaction.
 		} else if (prop.equals(TreeNodeChangeEvent.isSetNumberType)) {
 			//ASTnode
 		} else if (prop.equals(TreeNodeChangeEvent.kind)) {
-			//how to get PluginUnits () ? 
+			Unit ut = (Unit) eventsource;
+			UnitDefinition unitDef = (UnitDefinition) ut.getParentSBMLObject().getParentSBMLObject();
+			//TODO get propriate unit here and change the kind of the unit
 		} else if (prop.equals(TreeNodeChangeEvent.kineticLaw)) {
 			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.lengthUnits)) {
-			//TODO: no setLengthUnits() or similar method in pluginModel
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.level)) {
-			//AbstractSBase - unclear how to set the level here.
+			//TODO will have to do this for each object-- maybe easier with the already implemented search method in the treenodes
 		} else if (prop.equals(TreeNodeChangeEvent.listOfUnits)) {
-			//no setListOfUnits in plugModel available
+			logger.log(Level.DEBUG, String.format("Unused function %s in the Model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.mantissa)) {
 			//ASTNode setMantissa() uses this - how to convert this ?
 		} else if (prop.equals(TreeNodeChangeEvent.math)) {
@@ -299,11 +332,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.metaId)) {
 			//AbstractSBase - is this used anywhere?
 		} else if (prop.equals(TreeNodeChangeEvent.model)) {
-			//SBMLDocument is a JSBML related class
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model not supported.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.modified)) {
-			//History does not exist in CD
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange in %s.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.multiplier)) {
-			//Can't locate Units in pluginModel
+			//TODO locate unit in unitdefinitions --> Treenode search method required
 		} else if (prop.equals(TreeNodeChangeEvent.name)) {
 			if (event.getSource() instanceof FunctionDefinition){
 				FunctionDefinition funcDef = (FunctionDefinition) event.getSource();
@@ -315,7 +348,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)) {
 			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)) {
-			//only used in Annotation, theres no PluginAnnotation
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model not supported", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.notes)) {
 			//AbstractSBase - how to use in Plugin*?
 		} else if (prop.equals(TreeNodeChangeEvent.notesBuffer)) {
@@ -325,7 +358,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.offset)) {
 			//How to access PluginUnit
 		} else if (prop.equals(TreeNodeChangeEvent.organisation)) {
-			//PluginCreator does not exist
+			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.outside)) {
 			Compartment c = (Compartment) event.getSource();
 			PluginCompartment plugC = plugModel.getCompartment(c.getId());
@@ -334,17 +367,19 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.parentSBMLObject)) {
 			//AbstractSBase
 		} else if (prop.equals(TreeNodeChangeEvent.persistent)) {
-			//PluginTrigger does not exist
+			Trigger t = (Trigger) eventsource;
+			Event evt = t.getParent();
+			PluginEvent pevt = plugModel.getEvent(evt.getId());
+			pevt.setTrigger(PluginUtils.convert(evt.getTrigger().getMath()));
+			plugin.notifySBaseChanged(pevt);
 		} else if (prop.equals(TreeNodeChangeEvent.priority)) {
-			Event evt = (Event) event.getSource();
-			PluginEvent plugEvt = plugModel.getEvent(evt.getId());
-			//Priority can not be set in PluginEvent
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model not supported.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.qualifier)) {
 			//CVterm - libsbml
 		} else if (prop.equals(TreeNodeChangeEvent.rdfAnnotationNamespaces)) {
-			//PluginAnnotation does not exist. 
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model not supported.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.resource)) {
-			//only used in this class
+			logger.log(Level.DEBUG, String.format("Unused method %s in the model.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.reversible)) {
 			Reaction r = (Reaction) event.getSource();
 			PluginReaction plugR = plugModel.getReaction(r.getId());
@@ -352,7 +387,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.sboTerm)) {
 			//AbstractSbase
 		} else if (prop.equals(TreeNodeChangeEvent.scale)) {
-			//how to get PluginUnit
+			//TODO get PluginUnitdefinition and appropriate unit using search method
 		} else if (prop.equals(TreeNodeChangeEvent.setAnnotation)) {
 			//abstract SBase
 		} else if (prop.equals(TreeNodeChangeEvent.size)) {
@@ -373,9 +408,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.species)) {
 			if (event.getSource() instanceof SpeciesReference){
 				SpeciesReference specRef = (SpeciesReference) event.getSource();
-				//TODO do this
+				Reaction r = (Reaction) specRef.getParentSBMLObject();
+				PluginReaction pr = plugModel.getReaction(r.getId());
+				//TODO how to proceed here.
 			} else if (event.getSource() instanceof ModifierSpeciesReference){
-				//TODO do that
+				//TODO how to proceed here.
 				ModifierSpeciesReference modspecRef = (ModifierSpeciesReference) event.getSource();			
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.speciesType)) {
@@ -384,7 +421,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugSpec.setSpeciesType(spec.getSpeciesType());
 			plugin.notifySBaseChanged(plugSpec);
 		} else if (prop.equals(TreeNodeChangeEvent.stoichiometry)) {
-			//Species Reference undefined in Plugin*
+			//Species Reference
 		} else if (prop.equals(TreeNodeChangeEvent.style)) {
 			//ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.substanceUnits)) {
@@ -399,21 +436,19 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.text)) {
 			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.timeUnits)) {
-			Object evtSrc = event.getSource();
-			if (evtSrc instanceof Event){
-				Event evt = (Event) evtSrc;
+			if (eventsource instanceof Event){
+				Event evt = (Event) eventsource;
 				PluginEvent pEvt = plugModel.getEvent(evt.getId());
 				pEvt.setTimeUnits(evt.getTimeUnits());
 				plugin.notifySBaseChanged(pEvt);
-			} else if (evtSrc instanceof KineticLaw){
-				KineticLaw klaw = (KineticLaw) evtSrc;
+			} else if (eventsource instanceof KineticLaw){
+				KineticLaw klaw = (KineticLaw) eventsource;
 				PluginReaction pReac = plugModel.getReaction(klaw.getParent().getId());
 				PluginKineticLaw pKlaw = pReac.getKineticLaw();
 				pKlaw.setTimeUnits(klaw.getTimeUnits());
 				plugin.notifySBaseChanged(pKlaw);
-			} else if (evtSrc instanceof Model){
-				Model m = (Model) evtSrc;
-				//TODO unclear what to do with model in this case, also only applicable in version >3 of SBML
+			} else if (eventsource instanceof Model){
+				logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.type)) {
 			//ASTNode or CVTerm (libsbml?)
@@ -431,7 +466,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				//TODO
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.unsetCVTerms)) {
-			//AStnode or Annotation (pluginAnnotation does not exist)
+			if (eventsource instanceof ASTNode){
+				//TODO
+			} else {
+				logger.log(Level.DEBUG, String.format("Unused method %s in model.", eventsource.getClass().getSimpleName()));
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.userObject)) {
 			//ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.useValuesFromTriggerTime)) {
@@ -453,14 +492,14 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				//TODO Can't call setVariable on PluginInitialAssignment object
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.version)) {
-			//AbstractSBase
+			//TODO Search method required
 		} else if (prop.equals(TreeNodeChangeEvent.volume)) {
 			Compartment c = (Compartment) event.getSource();
 			PluginCompartment plugC = plugModel.getCompartment(c.getId());
 			plugC.setVolume(c.getVolume());
 			plugin.notifySBaseChanged(plugC);
 		} else if (prop.equals(TreeNodeChangeEvent.volumeUnits)) {
-			//No method setVolumeUnits in PluginModel found
+			logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.xmlTriple)) {
 			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		}  
