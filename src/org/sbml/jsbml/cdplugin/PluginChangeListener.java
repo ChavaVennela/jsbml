@@ -393,8 +393,22 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.text)) {
 			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.timeUnits)) {
-			//here timeUnits can belong to Event, KineticLaw and Model (and as well several subfunctions...)
-			//TODO what to do in such a case ? Write a submethod to distinguish between all possible types?
+			Object evtSrc = event.getSource();
+			if (evtSrc instanceof Event){
+				Event evt = (Event) evtSrc;
+				PluginEvent pEvt = plugModel.getEvent(evt.getId());
+				pEvt.setTimeUnits(evt.getTimeUnits());
+				plugin.notifySBaseChanged(pEvt);
+			} else if (evtSrc instanceof KineticLaw){
+				KineticLaw klaw = (KineticLaw) evtSrc;
+				PluginReaction pReac = plugModel.getReaction(klaw.getParent().getId());
+				PluginKineticLaw pKlaw = pReac.getKineticLaw();
+				pKlaw.setTimeUnits(klaw.getTimeUnits());
+				plugin.notifySBaseChanged(pKlaw);
+			} else if (evtSrc instanceof Model){
+				Model m = (Model) evtSrc;
+				//TODO unclear what to do with model in this case, also only applicable in version >3 of SBML
+			}
 		} else if (prop.equals(TreeNodeChangeEvent.type)) {
 			//ASTNode or CVTerm (libsbml?)
 		} else if (prop.equals(TreeNodeChangeEvent.units)) {
