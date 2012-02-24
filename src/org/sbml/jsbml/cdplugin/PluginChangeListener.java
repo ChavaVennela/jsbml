@@ -156,8 +156,6 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		String prop = event.getPropertyName();
 		//TODO Each of these values have to be crosschecked whether they are used or not
 		//     If they are used, we have to parse them properly, else we can ignore them safely.
-
-		
 		if (prop.equals(TreeNodeChangeEvent.addCVTerm)) {
 			//No PluginAnnotation available
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)) {
@@ -217,12 +215,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.created)) {
 			//must be history object
-			History hist = (History) event.getSource();
 			//TODO What to do with a History Object? No PluginHistory available
 		} else if (prop.equals(TreeNodeChangeEvent.creator)) {
 			//TODO History not available
 		} else if (prop.equals(TreeNodeChangeEvent.currentList)) {
-			//unused method
+			logger.log(Level.DEBUG, String.format("Unused propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)) {
 			//ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.denominator)) {
@@ -234,9 +231,13 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.exponent)) {
 			//ASTNode or Unit
 			if (event.getSource() instanceof ASTNode){
-			 //TODO Can't locate an ASTNode or check whether I got the right one
+				ASTNode node = (ASTNode) event.getSource();
+				MathContainer cont = node.getParentSBMLObject();
+				cont.setMath(node);
+				//TODO I think we can't do that
 			} else if (event.getSource() instanceof Unit){
 				Unit ut = (Unit) event.getSource();
+				
 				//TODO I can't check to which kind of type the Unit belongs to. 
 			}
 		} else if (prop.equals(TreeNodeChangeEvent.extentUnits)) {
@@ -249,7 +250,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugR.setFast(r.getFast());
 			plugin.notifySBaseChanged(plugR);
 		} else if (prop.equals(TreeNodeChangeEvent.formula)) {
-			//Unused method
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.givenName)) {
 			//PluginCreator does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.hasOnlySubstanceUnits)) {
@@ -269,7 +270,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.initialValue)) {
 			//ASTNode or Trigger - PluginTrigger does not exist
 		} else if (prop.equals(TreeNodeChangeEvent.isEOF)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.isExplicitlySetConstant)) {
 			//LocalParameter does not exist in CD
 		} else if (prop.equals(TreeNodeChangeEvent.isSetNumberType)) {
@@ -277,7 +278,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.kind)) {
 			//how to get PluginUnits () ? 
 		} else if (prop.equals(TreeNodeChangeEvent.kineticLaw)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.lengthUnits)) {
 			//TODO: no setLengthUnits() or similar method in pluginModel
 		} else if (prop.equals(TreeNodeChangeEvent.level)) {
@@ -294,7 +295,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			PluginConstraint plugC = plugModel.getConstraint(c.getMathMLString());
 			//TODO PluginConstraint does not allow setting a message. What do with that ?
 		} else if (prop.equals(TreeNodeChangeEvent.messageBuffer)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.metaId)) {
 			//AbstractSBase - is this used anywhere?
 		} else if (prop.equals(TreeNodeChangeEvent.model)) {
@@ -312,13 +313,13 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 			//TODO ASTNode and AbstractNamedSBase are not used atm
 		} else if (prop.equals(TreeNodeChangeEvent.namespace)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.nonRDFAnnotation)) {
 			//only used in Annotation, theres no PluginAnnotation
 		} else if (prop.equals(TreeNodeChangeEvent.notes)) {
 			//AbstractSBase - how to use in Plugin*?
 		} else if (prop.equals(TreeNodeChangeEvent.notesBuffer)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.numerator)) {
 			//ASTNode
 		} else if (prop.equals(TreeNodeChangeEvent.offset)) {
@@ -386,11 +387,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugReac.getKineticLaw().setSubstanceUnits(klaw.getSubstanceUnits());
 			plugin.notifySBaseChanged(plugReac);
 		} else if (prop.equals(TreeNodeChangeEvent.symbol)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.SBMLDocumentAttributes)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.text)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.timeUnits)) {
 			//here timeUnits can belong to Event, KineticLaw and Model (and as well several subfunctions...)
 			//TODO what to do in such a case ? Write a submethod to distinguish between all possible types?
@@ -410,7 +411,6 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			plugin.notifySBaseChanged(plugEvt);
 		} else if (prop.equals(TreeNodeChangeEvent.value)) {
 			//ASTNode or Quantitywithunit (there is no PluginQuantity or something like that)
-			
 		} else if (prop.equals(TreeNodeChangeEvent.variable)) {
 			// More than one class here -> Event Assignment, ExplicitRule and or Initial Assignment
 		} else if (prop.equals(TreeNodeChangeEvent.version)) {
@@ -423,7 +423,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.volumeUnits)) {
 			//No method setVolumeUnits in PluginModel found
 		} else if (prop.equals(TreeNodeChangeEvent.xmlTriple)) {
-			//unused
+			logger.log(Level.DEBUG, String.format("Cannot fire propertychange %s", event.getClass().getSimpleName()));
 		}  
 	}
 
