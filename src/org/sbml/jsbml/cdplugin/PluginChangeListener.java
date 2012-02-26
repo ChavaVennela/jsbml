@@ -22,19 +22,16 @@ import javax.swing.tree.TreeNode;
 
 import jp.sbi.celldesigner.plugin.CellDesignerPlugin;
 import jp.sbi.celldesigner.plugin.PluginAlgebraicRule;
-import jp.sbi.celldesigner.plugin.PluginAntiSenseRNA;
 import jp.sbi.celldesigner.plugin.PluginAssignmentRule;
 import jp.sbi.celldesigner.plugin.PluginCompartment;
 import jp.sbi.celldesigner.plugin.PluginCompartmentType;
 import jp.sbi.celldesigner.plugin.PluginConstraint;
-import jp.sbi.celldesigner.plugin.PluginDoSthAbstractAction;
 import jp.sbi.celldesigner.plugin.PluginEvent;
 import jp.sbi.celldesigner.plugin.PluginEventAssignment;
 import jp.sbi.celldesigner.plugin.PluginFunctionDefinition;
 import jp.sbi.celldesigner.plugin.PluginInitialAssignment;
 import jp.sbi.celldesigner.plugin.PluginKineticLaw;
 import jp.sbi.celldesigner.plugin.PluginListOf;
-import jp.sbi.celldesigner.plugin.PluginMassShowerAction;
 import jp.sbi.celldesigner.plugin.PluginModel;
 import jp.sbi.celldesigner.plugin.PluginModifierSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginParameter;
@@ -42,12 +39,10 @@ import jp.sbi.celldesigner.plugin.PluginRateRule;
 import jp.sbi.celldesigner.plugin.PluginReaction;
 import jp.sbi.celldesigner.plugin.PluginRule;
 import jp.sbi.celldesigner.plugin.PluginSBase;
-import jp.sbi.celldesigner.plugin.PluginSimpleSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpecies;
 import jp.sbi.celldesigner.plugin.PluginSpeciesAlias;
 import jp.sbi.celldesigner.plugin.PluginSpeciesReference;
 import jp.sbi.celldesigner.plugin.PluginSpeciesType;
-import jp.sbi.celldesigner.plugin.PluginStructuralState;
 import jp.sbi.celldesigner.plugin.PluginUnit;
 import jp.sbi.celldesigner.plugin.PluginUnitDefinition;
 
@@ -77,6 +72,7 @@ import org.sbml.jsbml.History;
 import org.sbml.jsbml.InitialAssignment;
 import org.sbml.jsbml.KineticLaw;
 import org.sbml.jsbml.ListOf;
+import org.sbml.jsbml.ListOf.Type;
 import org.sbml.jsbml.LocalParameter;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
@@ -89,7 +85,6 @@ import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.Rule;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBO;
-import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
@@ -1374,4 +1369,245 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		}
 	}
 
+	
+	public PluginSBase getCorrespondingElementInJSBML(Object evtSrc) {
+		if (evtSrc instanceof AbstractSBase) {
+			if (evtSrc instanceof AbstractNamedSBase) {
+				if (evtSrc instanceof CompartmentType) {
+					CompartmentType ct = (CompartmentType) evtSrc;
+					return plugModel.getCompartmentType(ct.getId());
+				} else if (evtSrc instanceof UnitDefinition) {
+					UnitDefinition ud = (UnitDefinition) evtSrc;
+					return plugModel.getUnitDefinition(ud.getId());
+				} else if (evtSrc instanceof Model) {
+					return plugModel;
+				} else if (evtSrc instanceof Reaction) {
+					Reaction r = (Reaction) evtSrc;
+					return plugModel.getReaction(r.getId());
+				} else if (evtSrc instanceof SimpleSpeciesReference) {
+					if (evtSrc instanceof ModifierSpeciesReference) {
+						ModifierSpeciesReference mod = (ModifierSpeciesReference) evtSrc;
+						if (mod.isSetParent()
+								&& mod.getParent().isSetParentSBMLObject()) {
+							String reactionID = ((Reaction) mod
+									.getParentSBMLObject()
+									.getParentSBMLObject()).getId();
+							return plugModel.getReaction(reactionID)
+									.getModifier(0); // TODO Here we can't use
+														// mod.getId() like in
+														// libsbml, since we
+														// need an index instead
+														// of an id --> What
+														// shall we do here ?
+						}
+					} else if (evtSrc instanceof SpeciesReference) {
+						// TODO Where do SpeciesReferences belong to?
+					}
+				} else if (evtSrc instanceof AbstractNamedSBaseWithUnit) {
+					if (evtSrc instanceof Event) {
+						Event e = (Event) evtSrc;
+						return plugModel.getEvent(e.getId());
+					} else if (evtSrc instanceof QuantityWithUnit) {
+						if (evtSrc instanceof LocalParameter) {
+							LocalParameter lp = (LocalParameter) evtSrc;
+							if (lp.isSetParent()
+									&& lp.getParent().isSetParent()) {
+								KineticLaw k = (KineticLaw) lp
+										.getParentSBMLObject()
+										.getParentSBMLObject();
+								if (k.isSetParent()) {
+									Reaction r = k.getParentSBMLObject();
+									// return
+									// plugModel.getReaction(r.getId()).getKineticLaw().getParameter(index)//TODO
+									// Here we have the same problem, access
+									// required via index, but we only have an
+									// identifier ...
+								}
+							}
+						} else if (evtSrc instanceof Symbol) {
+							if (evtSrc instanceof Compartment) {
+								Compartment c = (Compartment) evtSrc;
+								return plugModel.getCompartment(c.getId());
+							} else if (evtSrc instanceof Species) {
+								Species s = (Species) evtSrc;
+								return plugModel.getSpecies(s.getId());
+							} else if (evtSrc instanceof Parameter) {
+								Parameter p = (Parameter) evtSrc;
+								return plugModel.getParameter(p.getId());
+							}
+						}
+					}
+				}
+			} else if (evtSrc instanceof Unit) {
+				Unit u = (Unit) evtSrc;
+				// TODO Write a find Unit method for Unitdefinitions
+			} else if (evtSrc instanceof SBMLDocument) {
+				return plugModel;
+			} else if (evtSrc instanceof ListOf<?>) {
+				Type listType = ((ListOf<?>) evtSrc).getSBaseListType();
+				if (listType.equals(Type.listOfCompartments)) {
+					return plugModel.getListOfCompartments();
+				} else if (listType.equals(Type.listOfCompartmentTypes)) {
+					return plugModel.getListOfCompartmentTypes();
+				} else if (listType.equals(Type.listOfConstraints)) {
+					return plugModel.getListOfConstraints();
+				} else if (listType.equals(Type.listOfEvents)) {
+					return plugModel.getListOfEvents();
+				} else if (listType.equals(Type.listOfFunctionDefinitions)) {
+					return plugModel.getListOfFunctionDefinitions();
+				} else if (listType.equals(Type.listOfInitialAssignments)) {
+					return plugModel.getListOfInitialAssignments();
+				} else if (listType.equals(Type.listOfLocalParameters)) {
+					if (((ListOf<?>) evtSrc).getParentSBMLObject() != null) {
+						KineticLaw kinLaw = (KineticLaw) ((ListOf<?>) evtSrc)
+								.getParentSBMLObject();
+						return plugModel
+								.getReaction(
+										kinLaw.getParentSBMLObject().getId())
+								.getKineticLaw().getListOfParameters();
+					}
+				} else if (listType.equals(Type.listOfModifiers)) {
+					if (((ListOf<?>) evtSrc).getParentSBMLObject() != null) {
+						Reaction reac = (Reaction) ((ListOf<?>) evtSrc)
+								.getParentSBMLObject();
+						return plugModel.getReaction(reac.getId())
+								.getListOfModifiers();
+					}
+				} else if (listType.equals(Type.listOfParameters)) {
+					return plugModel.getListOfParameters();
+				} else if (listType.equals(Type.listOfProducts)) {
+					if (((ListOf<?>) evtSrc).getParentSBMLObject() != null) {
+						Reaction reac = (Reaction) ((ListOf<?>) evtSrc)
+								.getParentSBMLObject();
+						return plugModel.getReaction(reac.getId())
+								.getListOfProducts();
+					}
+				} else if (listType.equals(Type.listOfReactants)) {
+					if (((ListOf<?>) evtSrc).getParentSBMLObject() != null) {
+						Reaction reac = (Reaction) ((ListOf<?>) evtSrc)
+								.getParentSBMLObject();
+						return plugModel.getReaction(reac.getId())
+								.getListOfReactants();
+					}
+				} else if (listType.equals(Type.listOfReactions)) {
+					return plugModel.getListOfReactions();
+				} else if (listType.equals(Type.listOfRules)) {
+					return plugModel.getListOfRules();
+				} else if (listType.equals(Type.listOfSpecies)) {
+					return plugModel.getListOfSpecies();
+				} else if (listType.equals(Type.listOfSpeciesTypes)) {
+					return plugModel.getListOfSpeciesTypes();
+				} else if (listType.equals(Type.listOfUnitDefinitions)) {
+					return plugModel.getListOfUnitDefinitions();
+				} else if (listType.equals(Type.listOfUnits)) {
+					if (((ListOf<?>) evtSrc).getParentSBMLObject() != null) {
+						UnitDefinition udef = (UnitDefinition) ((ListOf<?>) evtSrc)
+								.getParentSBMLObject();
+						return plugModel.getUnitDefinition(udef.getId())
+								.getListOfUnits();
+					}
+				}
+			} else if (evtSrc instanceof AbstractMathContainer) {
+				if (evtSrc instanceof FunctionDefinition) {
+					FunctionDefinition fd = (FunctionDefinition) evtSrc;
+					return plugModel.getFunctionDefinition(fd.getId());
+				} else if (evtSrc instanceof KineticLaw) {
+					KineticLaw k = (KineticLaw) evtSrc;
+					Reaction r = (Reaction) k.getParentSBMLObject();
+					if (r != null) {
+						return plugModel.getReaction(r.getId()).getKineticLaw();
+					} else {
+						logger.log(Level.DEBUG, String.format(
+								"Couldn't find node %s", evtSrc.getClass()
+										.getSimpleName()));
+					}
+				} else if (evtSrc instanceof InitialAssignment) {
+					InitialAssignment ia = (InitialAssignment) evtSrc;
+					if (ia.isSetSymbol()) {
+						return plugModel.getInitialAssignment(ia.getSymbol());
+					} else {
+						logger.log(Level.DEBUG, String.format(
+								"Couldn't find node %s", evtSrc.getClass()
+										.getSimpleName()));
+					}
+				} else if (evtSrc instanceof EventAssignment) {
+					EventAssignment ea = (EventAssignment) evtSrc;
+					Event e = (Event) ea.getParentSBMLObject();
+					if (ea.isSetVariable()) {
+						// TODO index access required, string using the variable
+						// doesnt help here...
+					}
+				} else if (evtSrc instanceof StoichiometryMath) {
+					StoichiometryMath sm = (StoichiometryMath) evtSrc;
+					SpeciesReference sp = (SpeciesReference) sm
+							.getParentSBMLObject();
+					if (sp != null) {
+						// TODO get SpeciesReference in plugmodel...return
+						// plugModel.getSp
+					} else {
+						logger.log(Level.DEBUG, String.format(
+								"Couldn't find node %s", evtSrc.getClass()
+										.getSimpleName()));
+					}
+				} else if (evtSrc instanceof Trigger) {
+					Trigger t = (Trigger) evtSrc;
+					Event e = (Event) t.getParentSBMLObject();
+					if (e != null) {
+						// TODO check which return type is required now return
+						// plugModel.getEvent(e.getId()).getTrigger();
+					} else {
+						logger.log(Level.DEBUG, String.format(
+								"Couldn't find node %s", evtSrc.getClass()
+										.getSimpleName()));
+					}
+				} else if (evtSrc instanceof Rule) {
+					if (evtSrc instanceof AlgebraicRule) {
+						// TODO getCorrespondingAlgebraicRule
+					} else if (evtSrc instanceof RateRule) {
+						RateRule rr = (RateRule) evtSrc;
+						if (rr.isSetVariable()) {
+							// TODO only indexed access available through :
+							// return plugModel.getRule(index)
+						} else {
+							logger.log(Level.DEBUG, String.format(
+									"Couldn't find node %s", evtSrc.getClass()
+											.getSimpleName()));
+						}
+					} else if (evtSrc instanceof Constraint) {
+						Constraint c = (Constraint) evtSrc;
+						if (c.isSetMath()) {
+							return plugModel.getConstraint(c.getMathMLString());
+						} else {
+							logger.log(Level.DEBUG, String.format(
+									"Couldn't find node %s", evtSrc.getClass()
+											.getSimpleName()));
+						}
+					} else if (evtSrc instanceof Delay) {
+						Delay d = (Delay) evtSrc;
+						if (d.isSetParent()) {
+							Event e = d.getParent();
+							// TODO Return Type needs to be fixed return
+							// plugModel.getEvent(e.getId()).getDelay();
+						} else {
+							logger.log(Level.DEBUG, String.format(
+									"Couldn't find node %s", evtSrc.getClass()
+											.getSimpleName()));
+						}
+					} else if (evtSrc instanceof Priority) {
+						Priority p = (Priority) evtSrc;
+						Event e = p.getParent();
+						if (e != null) {
+							// TODO get Priority not applicable here ....return
+							// plugModel.getEvent(e.getId()).get
+						} else {
+							logger.log(Level.DEBUG, String.format(
+									"Couldn't find node %s", evtSrc.getClass()
+											.getSimpleName()));
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 }
