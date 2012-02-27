@@ -940,7 +940,8 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 
 				switch (listOf.getSBaseListType()) {
 				case listOfCompartments:
-					ListOfCompartments ll = new ListOfCompartments();
+					// FIXME
+					//ListOfCompartments ll = new ListOfCompartments();
 					
 					break;
 				case listOfCompartmentTypes:
