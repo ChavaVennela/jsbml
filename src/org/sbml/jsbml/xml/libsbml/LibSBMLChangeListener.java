@@ -183,6 +183,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					}
 					if (node instanceof SpeciesReference) {
 						SpeciesReference specRef = (SpeciesReference) node;
+						//TODO: What if the user creates a new SpeciesReference with createSpeciesReference?
+						// then the Reference is neither a product nor a reactant
 						if (((ListOf<?>)specRef.getParentSBMLObject()).getSBaseListType().equals(Type.listOfProducts)) {
 							org.sbml.libsbml.SpeciesReference libProduct = libDoc.getModel().createProduct();
 							if (specRef.isSetConstant()) {
