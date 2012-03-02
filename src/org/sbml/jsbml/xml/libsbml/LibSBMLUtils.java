@@ -39,6 +39,7 @@ import org.sbml.libsbml.SBMLDocument;
 import org.sbml.libsbml.libsbmlConstants;
 
 /**
+ * this class consists of help-methods which are used in all classes of this package
  * @author Meike Aichele
  * @version $Rev$
  * @since 1.0
@@ -773,7 +774,7 @@ public class LibSBMLUtils {
 	}
 
 	/**
-	 * sets MetaId, SBOTerm, Notes and Annotation in the libSBML object, 
+	 * sets {@link MetaId}, {@link SBOTerm}, {@link Notes} and {@link Annotation} in the libSBML object, 
 	 * if it's set in the JSBML object.
 	 * @param sbase
 	 * @param libSBase
@@ -796,7 +797,7 @@ public class LibSBMLUtils {
 
 	/**
 	 * sets the species in libSBML object if the species is set in the JSBML object
-	 * and calls the method transferNamedSBaseProperties(SBase, libSBase).
+	 * and calls the method {@link transferNamedSBaseProperties(SBase, libSBase)}.
 	 * @param sbase
 	 * @param libSBase
 	 */

@@ -30,6 +30,7 @@ import static org.junit.Assert.*;
 
 
 /**
+ * This class is used to test LibSBMLChangeListener with JUnit-tests
  * @author Meike Aichele
  * @version $Rev$
  * @since 1.0
@@ -61,6 +62,9 @@ public class LibSBMLChangeListenerTest {
 
 	}
 	
+	/*
+	 * test-method to check nodeAdded() in LibSBMLChangeListener
+	 */
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testNodeAdded() {
@@ -105,13 +109,52 @@ public class LibSBMLChangeListenerTest {
 		assertNotNull(libDoc.getModel().getUnitDefinition("udef1").getListOfUnits());
 	}
 	
-/*	@Test
+	/*
+	 * test-method to check propertyChanged() in LibSBMLChangeListener
+	 */
+	@SuppressWarnings("deprecation")
+	@Test
 	public void testPropertyChanged() {
-		
+		doc.getModel().setId("model02");
+		assertEquals(libDoc.getModel().getId(), "model02");
+		doc.getModel().setName("modelName");
+		assertEquals(libDoc.getModel().getName(), "modelName");
+		doc.getModel().getCompartment("comp001").setConstant(true);
+		assertTrue(libDoc.getModel().getCompartment("comp001").getConstant());
+		doc.getModel().getCompartment("comp001").setCompartmentType("comptype001");
+		assertEquals(libDoc.getModel().getCompartment("comp001").getCompartmentType(), "comptype001");
+		doc.getModel().getCompartment("comp001").setMetaId("metaCompId");
+		assertEquals(libDoc.getModel().getCompartment("comp001").getMetaId(), "metaCompId");
+		doc.getModel().getCompartment("comp001").setSize(0.5d);
+		assertEquals(libDoc.getModel().getCompartment("comp001").getSize(), 0.5d, 1E-24d);
+		doc.getModel().getCompartment("comp001").setSpatialDimensions(2);
+		assertEquals(libDoc.getModel().getCompartment("comp001").getSpatialDimensions(), 2);
+		doc.getModel().getEvent("evt001").unsetTrigger();
+		assertNull(libDoc.getModel().getEvent("evt001").getTrigger());
 	}
 	
+	/*
+	 * test-method to check nodeRemoved() in LibSBMLChangeListener
+	 */
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testNodeRemoved() {
-		
-	}*/
+		assertNotNull(doc.getModel().getCompartment("comp001"));
+		doc.getModel().removeCompartment("comp001");
+		assertNull(libDoc.getModel().getCompartment("comp001"));
+		doc.getModel().removeCompartmentType("comptype001");
+		assertNull(libDoc.getModel().getCompartmentType("comptype001"));
+		doc.getModel().removeReaction("reac001");
+		assertNull(libDoc.getModel().getReaction("reac001"));
+		doc.getModel().removeEvent("evt001");
+		assertNull(libDoc.getModel().getEvent("evt001"));
+		doc.getModel().removeFunctionDefinition("funcDef");
+		assertNull(libDoc.getModel().getFunctionDefinition("funcDef"));
+		doc.getModel().removeParameter("param01");
+		assertNull(libDoc.getModel().getParameter("param01"));
+		doc.getModel().removeSpeciesType("st01");
+		assertNull(libDoc.getModel().getSpeciesType("st01"));
+		doc.getModel().removeUnitDefinition("udef1");
+		assertNull(libDoc.getModel().getUnitDefinition("udef1"));		
+	}
 }
