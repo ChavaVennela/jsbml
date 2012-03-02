@@ -5,7 +5,7 @@
  * This file is part of JSBML. Please visit <http://sbml.org/Software/JSBML>
  * for the latest version of JSBML and more information about SBML.
  *
- * Copyright (C) 2009-2011 jointly by the following organizations:
+ * Copyright (C) 2009-2012 jointly by the following organizations:
  * 1. The University of Tuebingen, Germany
  * 2. EMBL European Bioinformatics Institute (EBML-EBI), Hinxton, UK
  * 3. The California Institute of Technology, Pasadena, CA, USA
@@ -763,31 +763,29 @@ public class PluginSBMLWriter implements SBMLOutputConverter {
 		return equal;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.SBMLWriter#getNumErrors(java.lang.Object)
 	 */
 	public int getNumErrors(Object sbase) {
-		// TODO Auto-generated method stub
+		return getErrorCount(sbase);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.SBMLOutputConverter#getErrorCount(java.lang.Object)
+	 */
+	public int getErrorCount(Object sbase) {
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.sbml.jsbml.SBMLWriter#getWriteWarnings(java.lang.Object)
 	 */
 	public List<SBMLException> getWriteWarnings(Object sbase) {
 		return new LinkedList<SBMLException>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.sbml.jsbml.SBMLWriter#removeUnneccessaryElements(org.sbml.jsbml.Model
-	 * , java.lang.Object)
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.SBMLWriter#removeUnneccessaryElements(org.sbml.jsbml.Model, java.lang.Object)
 	 */
 	public void removeUnneccessaryElements(Model model, Object orig) {
 		if (!(orig instanceof PluginModel))

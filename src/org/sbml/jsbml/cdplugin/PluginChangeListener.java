@@ -1370,7 +1370,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		}
 	}
 
-	
+	/**
+	 * 
+	 * @param evtSrc
+	 * @return
+	 */
 	public PluginSBase getCorrespondingElementInJSBML(Object evtSrc) {
 		if (evtSrc instanceof AbstractSBase) {
 			if (evtSrc instanceof AbstractNamedSBase) {
@@ -1611,4 +1615,5 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		}
 		return null;
 	}
+
 }
