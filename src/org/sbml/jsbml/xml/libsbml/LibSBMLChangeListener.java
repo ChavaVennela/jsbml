@@ -64,6 +64,7 @@ import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.SpeciesType;
 import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Trigger;
@@ -124,6 +125,10 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 					if (ct.isSetNotes()) {
 						libCt.setNotes(ct.getNotesString());
 					}
+				} else if (node instanceof SpeciesType){
+					SpeciesType specType = (SpeciesType) node;
+					org.sbml.libsbml.SpeciesType LibSpecType = libDoc.getModel().createSpeciesType();
+					LibSBMLUtils.transferNamedSBaseProperties(specType, LibSpecType);
 				} else if (node instanceof UnitDefinition) {
 					UnitDefinition udef = (UnitDefinition) node;
 					org.sbml.libsbml.UnitDefinition libUdef = libDoc.getModel().createUnitDefinition();
@@ -557,6 +562,8 @@ public class LibSBMLChangeListener implements TreeNodeChangeListener {
 			if (node instanceof org.sbml.jsbml.AbstractNamedSBase) {
 				if (node instanceof CompartmentType) {
 					libModel.removeCompartmentType(((CompartmentType) node).getId());
+				} else if (node instanceof SpeciesType){
+					libModel.removeSpeciesType(((SpeciesType) node).getId());
 				} else if (node instanceof UnitDefinition) {
 					libModel.removeUnitDefinition(((UnitDefinition) node).getId());
 				} else if (node instanceof Model) {
