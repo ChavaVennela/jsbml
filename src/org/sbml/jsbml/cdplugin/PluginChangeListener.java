@@ -16,6 +16,7 @@
  */
 package org.sbml.jsbml.cdplugin;
 
+import java.awt.Component.BaselineResizeBehavior;
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.tree.TreeNode;
@@ -94,10 +95,15 @@ import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Trigger;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.ext.groups.ListOfGroups;
 import org.sbml.jsbml.util.TreeNodeChangeEvent;
 import org.sbml.jsbml.util.TreeNodeChangeListener;
 import org.sbml.jsbml.xml.XMLToken;
+import org.sbml.libsbml.ListOfCompartmentTypes;
 import org.sbml.libsbml.ListOfCompartments;
+import org.sbml.libsbml.ListOfConstraints;
+import org.sbml.libsbml.ListOfEventAssignments;
+import org.sbml.libsbml.ListOfEvents;
 import org.sbml.libsbml.XMLNode;
 import org.sbml.libsbml.libsbml;
 import org.sbml.libsbml.libsbmlConstants;
@@ -151,26 +157,25 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 	public void propertyChange(PropertyChangeEvent event) {
 		Object eventsource = event.getSource();
 		String prop = event.getPropertyName();
-		//TODO Each of these values have to be crosschecked whether they are used or not
-		//     If they are used, we have to parse them properly, else we can ignore them safely.
+
 		if (prop.equals(TreeNodeChangeEvent.addCVTerm)) {
 			Annotation anno = (Annotation) eventsource;
-			TreeNode t = anno.getParent();
 			CVTerm term = event.getNewValue() != null? (CVTerm) event.getNewValue(): null;
-		//TODO Here one needs to search the corresponding TreeNode t
-			//No PluginAnnotation available
+			anno.addCVTerm(term);
+			//TODO Notify missing here...
 		} else if (prop.equals(TreeNodeChangeEvent.addExtension)) {
-			//No PluginAnnotation available
+			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the Model", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.addNamespace)) {
 			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the Model", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.annotation)) {
-			//No PluginAnnotation available
+			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the Model", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.annotationNameSpaces)) {
-			//No PluginAnnotation available
+			logger.log(Level.DEBUG, String.format("Couldn't change the %s in the Model", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.areaUnits)) {
 			logger.log(Level.DEBUG, String.format("Changing %s in the Model only supported with SBML version > 3.", eventsource.getClass().getSimpleName()));
 		} else if (prop.equals(TreeNodeChangeEvent.baseListType)) {
-			//TODO method that "parses" all the lists properly
+			//Method is only called in creating a new List, which means we don't need to update anything here.
+			
 		} else if (prop.equals(TreeNodeChangeEvent.boundaryCondition)) {
 			Species species = (Species) eventsource;
 			PluginSpecies plugSpec = plugModel.getSpecies(species.getId());
@@ -1615,5 +1620,6 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		}
 		return null;
 	}
-
+	
+	
 }
