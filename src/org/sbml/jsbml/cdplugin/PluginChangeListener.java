@@ -105,6 +105,7 @@ import org.sbml.libsbml.ListOfCompartments;
 import org.sbml.libsbml.ListOfConstraints;
 import org.sbml.libsbml.ListOfEventAssignments;
 import org.sbml.libsbml.ListOfEvents;
+import org.sbml.libsbml.ListOfParameters;
 import org.sbml.libsbml.XMLNode;
 import org.sbml.libsbml.libsbml;
 import org.sbml.libsbml.libsbmlConstants;
@@ -1410,16 +1411,10 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 						ModifierSpeciesReference mod = (ModifierSpeciesReference) evtSrc;
 						if (mod.isSetParent()
 								&& mod.getParent().isSetParentSBMLObject()) {
-							String reactionID = ((Reaction) mod
-									.getParentSBMLObject()
-									.getParentSBMLObject()).getId();
+							Reaction r = (Reaction) mod.getParentSBMLObject().getParentSBMLObject();
+							String reactionID = r.getId();
 							return plugModel.getReaction(reactionID)
-									.getModifier(0); // TODO Here we can't use
-														// mod.getId() like in
-														// libsbml, since we
-														// need an index instead
-														// of an id --> What
-														// shall we do here ?
+									.getModifier(getModifier(r, mod));
 						}
 					} else if (evtSrc instanceof SpeciesReference) {
 						SpeciesReference specRef = (SpeciesReference) evtSrc;
@@ -1442,11 +1437,7 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 										.getParentSBMLObject();
 								if (k.isSetParent()) {
 									Reaction r = k.getParentSBMLObject();
-									// return
-									// plugModel.getReaction(r.getId()).getKineticLaw().getParameter(index)//TODO
-									// Here we have the same problem, access
-									// required via index, but we only have an
-									// identifier ...
+									return plugModel.getReaction(r.getId()).getKineticLaw().getParameter(searchKineticLaw(k, lp));
 								}
 							}
 						} else if (evtSrc instanceof Symbol) {
@@ -1650,4 +1641,34 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		return 0;
 	}
 	
+	public int searchKineticLaw(KineticLaw k, LocalParameter p){
+		ListOf<LocalParameter> lp = k.getListOfParameters();
+		int temp = 0;
+		for (int i = 0; i < lp.size(); i++){
+			LocalParameter locp = lp.get(i);
+			if (locp.equals(p)){
+				temp = i;
+				return temp;
+			} else {
+				continue;
+			}
+		}
+		return temp;
+	}
+	
+	public int getModifier(Reaction r, ModifierSpeciesReference m){
+		ListOf<ModifierSpeciesReference> lmod = r.getListOfModifiers();
+		int temp = 0;
+		for (int i = 0; i < lmod.size(); i++){
+			ModifierSpeciesReference mod = lmod.get(i);
+			if (mod.equals(m)){
+				temp = i;
+				return temp;
+			} else {
+				continue;
+			}
+		}
+		
+		return temp;
+	}
 }
