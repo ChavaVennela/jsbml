@@ -1456,7 +1456,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 				}
 			} else if (evtSrc instanceof Unit) {
 				Unit u = (Unit) evtSrc;
-				// TODO Write a find Unit method for Unitdefinitions
+				if (u.isSetParent()){
+					UnitDefinition ut = (UnitDefinition) u.getParent().getParent();
+					return plugModel.getUnitDefinition(ut.getId()).getUnit(getUnitIndex(ut, u));
+				}
+				
 			} else if (evtSrc instanceof SBMLDocument) {
 				return plugModel;
 			} else if (evtSrc instanceof ListOf<?>) {
@@ -1669,6 +1673,20 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 			}
 		}
 		
+		return temp;
+	}
+	
+	public int getUnitIndex(UnitDefinition ud, Unit u){
+		ListOf<Unit> lu = ud.getListOfUnits();
+		int temp = 0;
+		for (int i = 0; i < lu.size(); i++){
+			if (lu.get(i).equals(u)){
+				temp = i;
+				return temp;
+			} else {
+				continue;
+			}
+		}
 		return temp;
 	}
 }
