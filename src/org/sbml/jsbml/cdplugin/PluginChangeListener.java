@@ -18,6 +18,7 @@ package org.sbml.jsbml.cdplugin;
 
 import java.awt.Component.BaselineResizeBehavior;
 import java.beans.PropertyChangeEvent;
+import java.util.Enumeration;
 
 import javax.swing.tree.TreeNode;
 
@@ -242,8 +243,18 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		} else if (prop.equals(TreeNodeChangeEvent.definitionURL)) {
 			ASTNode node = (ASTNode) eventsource;
 			MathContainer conti = node.getParentSBMLObject();
-			//TODO ASTNode
+			int index = searchMathContainerASTNode(conti, node);
+			ASTNode currNode = (ASTNode) conti.getChildAt(index);
+			currNode.setDefinitionURL((String) event.getNewValue());
+			//TODO howto notify here ?
 		} else if (prop.equals(TreeNodeChangeEvent.denominator)) {
+			if (eventsource instanceof SpeciesReference){
+				SpeciesReference specRef = (SpeciesReference) eventsource;
+				String specString = specRef.getSpecies();
+				plugModel.getSpecies(specString);
+			} else if (eventsource instanceof ASTNode){
+				//Do that
+			}
 			//ASTNode or SpeciesReference for which there is not getSpeciesReference method available 
 		} else if (prop.equals(TreeNodeChangeEvent.email)) {
 			logger.log(Level.DEBUG, String.format("Couldn't change %s in the model.", eventsource.getClass().getSimpleName()));
@@ -1411,7 +1422,11 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 														// shall we do here ?
 						}
 					} else if (evtSrc instanceof SpeciesReference) {
-						// TODO Where do SpeciesReferences belong to?
+						SpeciesReference specRef = (SpeciesReference) evtSrc;
+						
+						if (specRef.isSetParent() &&specRef.getParentSBMLObject().isSetParentSBMLObject()){
+							String rID = ((Reaction) specRef.getParentSBMLObject().getParentSBMLObject()).getId();
+						}
 					}
 				} else if (evtSrc instanceof AbstractNamedSBaseWithUnit) {
 					if (evtSrc instanceof Event) {
@@ -1621,5 +1636,18 @@ public class PluginChangeListener implements TreeNodeChangeListener {
 		return null;
 	}
 	
+	public int searchMathContainerASTNode(MathContainer c, ASTNode n){
+		int counter = 0;
+		Enumeration<TreeNode> e = c.children();
+		TreeNode currNode = null;
+		while ((currNode = e.nextElement()) != null){
+			if(n.equals(currNode)){
+				return counter;
+			} else {
+				counter++;
+			}
+		}
+		return 0;
+	}
 	
 }
