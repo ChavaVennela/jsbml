@@ -708,12 +708,17 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		return equal;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.sbml.jlibsbml.SBMLWriter#getNumErrors(java.lang.Object)
 	 */
 	public int getNumErrors(Object sbase) {
+		return getErrorCount(sbase);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.SBMLOutputConverter#getErrorCount(java.lang.Object)
+	 */
+	public int getErrorCount(Object sbase) {
 		if (!(sbase instanceof org.sbml.libsbml.SBase))
 			throw new IllegalArgumentException("sbase" + error + "SBase.");
 		org.sbml.libsbml.SBMLDocument doc = ((org.sbml.libsbml.SBase) sbase)
@@ -2756,4 +2761,5 @@ public class LibSBMLWriter implements SBMLOutputConverter {
 		}
 		return ud;
 	}
+
 }

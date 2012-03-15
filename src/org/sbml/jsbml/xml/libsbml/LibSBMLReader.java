@@ -1,6 +1,6 @@
 /*
- * $Id: LibSBMLReader.java 102 2009-12-13 19:52:50Z andreas-draeger $
- * $URL: https://jsbml.svn.sourceforge.net/svnroot/jsbml/trunk/src/org/sbml/jsbml/io/LibSBMLReader.java $
+ * $Id$
+ * $URL$
  * ----------------------------------------------------------------------------
  * This file is part of JSBML. Please visit <http://sbml.org/Software/JSBML>
  * for the latest version of JSBML and more information about SBML.
@@ -1304,12 +1304,17 @@ public class LibSBMLReader implements SBMLInputConverter {
 		return model;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.sbml.jlibsbml.SBMLReader#getNumErrors()
 	 */
 	public int getNumErrors() {
+		return getErrorCount();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.sbml.jsbml.SBMLInputConverter#getErrorCount()
+	 */
+	public int getErrorCount() {
 		org.sbml.libsbml.SBMLDocument doc = originalModel.getSBMLDocument();
 		doc.checkConsistency();
 		return (int) doc.getNumErrors();
@@ -2039,4 +2044,5 @@ public class LibSBMLReader implements SBMLInputConverter {
 			ud.addUnit(readUnit(libUD.getUnit(i)));
 		return ud;
 	}
+
 }
