@@ -390,7 +390,7 @@ public class LibSBMLUtils {
 		default:
 			break;
 		}
-		for (int j = 0; j < t.getResourceCount(); j++) {
+		for (int j = 0; j < t.getNumResources(); j++) {
 			libCVt.addResource(t.getResourceURI(j));
 		}
 		return libCVt;
@@ -464,7 +464,7 @@ public class LibSBMLUtils {
 			boolean contains = false;
 			boolean nothingSet = true;
 			org.sbml.libsbml.ModelCreator moc = mo.getCreator(i);
-			for (int j = 0; (j < history.getCreatorCount()) && !contains; j++) {
+			for (int j = 0; (j < history.getNumCreators()) && !contains; j++) {
 				Creator mc = history.getCreator(j);
 				contains = moc.isSetEmail() == mc.isSetEmail();
 				if (moc.isSetEmail() && mc.isSetEmail()) {
@@ -573,7 +573,7 @@ public class LibSBMLUtils {
 	 */
 	public static long getCreatorIndex(Creator creator, org.sbml.jsbml.SBMLDocument doc) {
 		int index = 0;
-		for (int k = 0; k < doc.getHistory().getCreatorCount(); k++){
+		for (int k = 0; k < doc.getHistory().getNumCreators(); k++){
 			Creator c = doc.getHistory().getCreator(k);
 			if (c.equals(creator)){
 				index = k;
