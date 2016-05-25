@@ -1,0 +1,10 @@
+
+# /
+/src
+/.settings
+/bin
+/.classpath
+/.project
+
+# /doc/
+/doc/api
