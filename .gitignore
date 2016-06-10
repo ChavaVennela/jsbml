@@ -1,10 +1,6 @@
-
-# /
-/src
-/.settings
-/bin
-/.classpath
-/.project
-
-# /doc/
-/doc/api
+**/src
+**/.settings
+**/bin
+**/.classpath
+**/.project
+**/api
