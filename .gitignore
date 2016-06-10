@@ -1,17 +1,11 @@
-
-# /
-/lib
-/.settings
-/bin
-/.classpath
-/.fatjar
-/.project
-/build
-/dist
-
-# /doc/
-/doc/api
-
-# /lib/
-/lib/libsbml-4.2.0
-/lib/linux
+**/lib
+**/.settings
+**/bin
+**/.classpath
+**/.fatjar
+**/.project
+**/build
+**/dist
+**/api
+**/libsbml-4.2.0
+**/linux
